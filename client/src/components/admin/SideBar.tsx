@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 export default function SideBar() {
   // Common styles for all sidebar links
   const linkBaseStyle =
-    "block px-4 py-2 rounded-lg transition-colors hover:bg-white/10";
+    "block px-4 py-2 rounded-[5px] transition-colors hover:bg-white/10";
 
   // Applies a vibrant background when the link matches the current URL
   const getLinkStyle = ({ isActive }: { isActive: boolean }) =>
@@ -10,25 +10,34 @@ export default function SideBar() {
       ? `${linkBaseStyle} bg-white/20 text-white font-medium`
       : linkBaseStyle;
 
+  const sideBarLinks = [
+    {
+      name: "Projects",
+      link: "/admin/projects",
+    },
+    {
+      name: "Resources",
+      link: "/admin/resources",
+    },
+    {
+      name: "Settings",
+      link: "/admin/settings",
+    },
+  ];
   return (
-    <aside className="gradient-primary shadow-card text-slate-200 w-64 min-h-screen p-4">
+    <aside className="gradient-primary fixe shadow-card text-slate-200 w-64 min-h-screen p-4">
+      <h1 className="font-bold text-2xl mb-6">MINI INVOICE</h1>
       <nav>
         <ul className="space-y-2">
-          <li>
-            <NavLink to="/admin/projects" className={getLinkStyle}>
-              Projects
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/admin/resources" className={getLinkStyle}>
-              Resources
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/admin/settings" className={getLinkStyle}>
-              Settings
-            </NavLink>
-          </li>
+          {
+            sideBarLinks.map((path, index) => (
+              <li key={index}>
+                <NavLink to={path.link} className={getLinkStyle}>
+                   {path.name}
+                </NavLink>
+              </li>
+            ))
+          }
         </ul>
       </nav>
     </aside>
