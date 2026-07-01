@@ -1,7 +1,3 @@
-// import React from 'react'
-
-import { Link } from "react-router-dom";
-
 const Login = () => {
   return (
     <section className="min-h-[80vh] flex justify-center">
@@ -32,9 +28,6 @@ const Login = () => {
           className="bg-primary text-slate-50 my-4 w-full rounded-2xl py-2 ">
           Sign In
         </button>
-        <p>Or</p>
-        <p>Don't Have an Account? <Link to="/register" className="text-primary"> click here
-        </Link></p>
       </form>
     </section>
   );

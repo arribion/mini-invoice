@@ -19,7 +19,6 @@ import ManageMembers from "./routes/admin/ManageMembers";
 import NotFoundComponent from "./components/NotFound";
 import About from "./routes/About";
 import Login from "./routes/auth/Login";
-import Register from "./routes/auth/register";
 import InvoiceViewer from "./routes/client/InvoiceViewer";
 
 const App = () => {
@@ -35,7 +34,6 @@ const App = () => {
         <Route path="settings" element={<Settings />} />
         <Route path="about" element={<About />} />
         <Route path="login" element={<Login />} />
-        <Route path="register" element={<Register />} />
       </Route>
 
       {/* Admin Routes */}
