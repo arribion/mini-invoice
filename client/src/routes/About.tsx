@@ -2,7 +2,7 @@
 
 const About = () => {
   return (
-    <div>About</div>
+    <div className="min-h-[70vh]">About</div>
   )
 }
 

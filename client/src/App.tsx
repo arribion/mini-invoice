@@ -20,20 +20,31 @@ import NotFoundComponent from "./components/NotFound";
 import About from "./routes/About";
 import Login from "./routes/auth/Login";
 import InvoiceViewer from "./routes/client/InvoiceViewer";
+import AuthLayout from "./layout/AuthLayout";
+import MainLayout from "./layout/MainLayout";
 
 const App = () => {
   return (
     <Routes>
-      {/* Client Routes */}
-      <Route element={<ClientLayout />}>
-        <Route path="/" element={<Index />} />
-        <Route path="resources" element={<Resources />} />
-        <Route path="transactions" element={<Transactions />} />
-        <Route path="transactions/:projectID" element={<InvoiceViewer />} />
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route path="settings" element={<Settings />} />
-        <Route path="about" element={<About />} />
+      {/* auth layout */}
+      <Route element={<AuthLayout />}>
         <Route path="login" element={<Login />} />
+      </Route>
+
+      {/* main Routes */}
+      <Route element={<MainLayout />}>
+        <Route path="/" element={<Index />} />
+        <Route path="about" element={<About />} />
+      </Route>
+
+      {/* client layout */}
+      <Route element={<ClientLayout />}>
+        <Route path="/client/dashboard" element={<Dashboard />} />
+        <Route path="/client/resources" element={<Resources />} />
+        <Route path="/client/transactions" element={<Transactions />} />
+        <Route path="/client/transactions/:projectID" element={<InvoiceViewer />} />
+        <Route path="/client/dashboard" element={<Dashboard />} />
+        <Route path="/client/settings" element={<Settings />} />
       </Route>
 
       {/* Admin Routes */}

@@ -1,13 +1,13 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
-import { Wallet, Menu, X, LayoutDashboard, ArrowLeftRight, Star } from "lucide-react";
+import { Wallet, Menu, X, LayoutDashboard, ArrowLeftRight } from "lucide-react";
 import { useState } from "react";
-import { Bell } from "lucide-react";
+
 const navLinks = [
-  // { to: "/", label: "Home", icon: null },
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/transactions", label: "Invoics Transactions", icon: ArrowLeftRight },
-  { to: "/resources", label: "Resources", icon: ArrowLeftRight },
+  { to: "/", label: "Home", icon: null },
+  { to: "/about", label: "About", icon: LayoutDashboard },
+  { to: "/contact-us", label: "Contact Us", icon: ArrowLeftRight },
+  
 ] as const;
 
 export function Navbar() {
@@ -22,8 +22,9 @@ export function Navbar() {
           <div className="flex h-9 w-9 items-center justify-center rounded-[10px] gradient-primary">
             <Wallet className="h-5 w-5 text-primary-foreground" />
           </div>
-          <span className="text-xl text-blue-500 font-bold tracking-tight">
-           MINI <span className="text-gray-500">INVOICE</span>
+          <span className="text-2xl text-blue-500 font-bold tracking-tight">
+            <span className="text-gray-500">GT</span>
+            -ONLINE
           </span>
         </Link>
 
@@ -48,22 +49,10 @@ export function Navbar() {
               </Button>
             </Link>
           ))}
-          <div className="mx-2">
-            <Star className="h-5 w-5 text-foreground cursor-pointer" />
-          </div>
-          <div className="mx-2">
-            <Bell className="h-5 w-5 text-foreground cursor-pointer" />
-          </div>
-          <div className="hidden items-center gap-3 mx-4 md:flex">
-            <Link to="/settings">
-              <Button variant="hero" size="sm">
-                JM
-              </Button>
-            </Link>
-          </div>
+         
           <Link to="/login">
             <button className="bg-black text-slate-50 rounded-3xl px-4 py-1">
-              Sign In/Sign Up
+              Sign In
             </button>
           </Link>
         </div>

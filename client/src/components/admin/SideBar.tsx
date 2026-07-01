@@ -39,7 +39,7 @@ export default function SideBar() {
   return (
     <aside className="gradient-primary fixe shadow-card text-slate-200 w-64 min-h-screen p-4">
       <Link to="/">
-        <h1 className="font-bold text-2xl mb-6 hover:text-sky-50">MINI INVOICE</h1>
+        <h1 className="font-bold text-4xl mb-6 hover:text-sky-50">GT</h1>
       </Link>
       <nav>
         <ul className="space-y-2">

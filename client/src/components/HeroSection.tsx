@@ -16,11 +16,11 @@ export function HeroSection() {
           </div> */}
 
           <h1 className="text-4xl font-extrabold tracking-tight text-primary-foreground sm:text-5xl lg:text-6xl leading-[1.1]">
-            Quick Invoice ManageR
+            GT ONLINE CONSULTANTS
           </h1>
 
           <p className="mt-6 text-lg text-primary-foreground/70 sm:text-xl max-w-2xl mx-auto leading-relaxed">
-            Process invoices for your client seemlessly and track there progress
+            Thinking in systems, building for the future.
           </p>
 
           <div className="mt-5 flex flex-col items-center justify-center gap-4 sm:flex-row">
