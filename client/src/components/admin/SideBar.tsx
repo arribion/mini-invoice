@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 export default function SideBar() {
   // Common styles for all sidebar links
   const linkBaseStyle =
@@ -12,6 +12,14 @@ export default function SideBar() {
 
   const sideBarLinks = [
     {
+      name: "Dashboard",
+      link: "/admin",
+    },
+    {
+      name: "Tasks",
+      link: "/admin/tasks",
+    },
+    {
       name: "Projects",
       link: "/admin/projects",
     },
@@ -20,24 +28,28 @@ export default function SideBar() {
       link: "/admin/resources",
     },
     {
+      name: "Members",
+      link: "/admin/members",
+    },
+    {
       name: "Settings",
       link: "/admin/settings",
     },
   ];
   return (
     <aside className="gradient-primary fixe shadow-card text-slate-200 w-64 min-h-screen p-4">
-      <h1 className="font-bold text-2xl mb-6">MINI INVOICE</h1>
+      <Link to="/">
+        <h1 className="font-bold text-2xl mb-6 hover:text-sky-50">MINI INVOICE</h1>
+      </Link>
       <nav>
         <ul className="space-y-2">
-          {
-            sideBarLinks.map((path, index) => (
-              <li key={index}>
-                <NavLink to={path.link} className={getLinkStyle}>
-                   {path.name}
-                </NavLink>
-              </li>
-            ))
-          }
+          {sideBarLinks.map((path, index) => (
+            <li key={index}>
+              <NavLink to={path.link} className={getLinkStyle}>
+                {path.name}
+              </NavLink>
+            </li>
+          ))}
         </ul>
       </nav>
     </aside>

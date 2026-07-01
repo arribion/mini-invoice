@@ -23,7 +23,7 @@ export function Navbar() {
             <Wallet className="h-5 w-5 text-primary-foreground" />
           </div>
           <span className="text-xl text-blue-500 font-bold tracking-tight">
-            ARRIBION MINI <span className="text-gray-500">INVOICE</span>
+           MINI <span className="text-gray-500">INVOICE</span>
           </span>
         </Link>
 
@@ -61,6 +61,11 @@ export function Navbar() {
               </Button>
             </Link>
           </div>
+          <Link to="/login">
+            <button className="bg-black text-slate-50 rounded-3xl px-4 py-1">
+              Sign In/Sign Up
+            </button>
+          </Link>
         </div>
 
         <button

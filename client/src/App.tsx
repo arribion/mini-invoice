@@ -14,8 +14,13 @@ import AdminDashboard from "./routes/admin/AdminDashboard";
 import ManageProjects from "./routes/admin/ManageProjects";
 import AdminSetting from "./routes/admin/AdminSetting";
 import ManageResources from "./routes/admin/ManageResources";
+import ManageMembers from "./routes/admin/ManageMembers";
 
 import NotFoundComponent from "./components/NotFound";
+import About from "./routes/About";
+import Login from "./routes/auth/Login";
+import Register from "./routes/auth/register";
+import InvoiceViewer from "./routes/client/InvoiceViewer";
 
 const App = () => {
   return (
@@ -25,26 +30,24 @@ const App = () => {
         <Route path="/" element={<Index />} />
         <Route path="resources" element={<Resources />} />
         <Route path="transactions" element={<Transactions />} />
+        <Route path="transactions/:projectID" element={<InvoiceViewer />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="settings" element={<Settings />} />
+        <Route path="about" element={<About />} />
+        <Route path="login" element={<Login />} />
+        <Route path="register" element={<Register />} />
       </Route>
 
       {/* Admin Routes */}
       <Route path="/admin" element={<AdminLayout />}>
-        {/* Matches exactly "/admin" */}
         <Route index element={<AdminDashboard />} />
-
-        {/* Matches "/admin/projects" */}
         <Route path="projects" element={<ManageProjects />} />
-
-        {/* Matches "/admin/resources" (Swapped client component for admin component) */}
         <Route path="resources" element={<ManageResources />} />
-
-        {/* Matches "/admin/settings" */}
+        <Route path="members" element={<ManageMembers />} />
         <Route path="settings" element={<AdminSetting />} />
       </Route>
 
-      {/* Global Fallback (Optional but recommended) */}
+      {/* Global Fallback */}
       <Route path="*" element={<NotFoundComponent />} />
     </Routes>
   );

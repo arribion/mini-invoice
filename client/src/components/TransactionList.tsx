@@ -2,6 +2,7 @@ import {
   FileText,
   ExternalLink
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export interface Transaction {
   id: string;
@@ -45,18 +46,7 @@ export function TransactionList({ transactions = sampleTransactions, limit, show
     <div className="overflow-hidden rounded-2xl border bg-white shadow-sm">
       {showHeader && (
         <div className="flex items-center justify-between border-b px-6 py-5">
-          <div>
-            <h2 className="text-lg font-semibold text-slate-900">
-              Recent Invoices
-            </h2>
-            <p className="mt-1 text-sm text-slate-500">
-              Manage and track all paid invoices.
-            </p>
-          </div>
-
-          <button className="rounded-lg border px-4 py-2 text-sm font-medium hover:bg-slate-50">
-            View all
-          </button>
+          {/* ongeza content  */}
         </div>
       )}
 
@@ -78,7 +68,7 @@ export function TransactionList({ transactions = sampleTransactions, limit, show
               const positive = tx.amount > 0;
 
               return (
-                <tr key={tx.id} className="transition hover:bg-slate-50">
+                <tr key={tx.id} className="transition hover:bg-sky-50">
                   <td className="px-6 py-5">
                     <div className="flex items-center gap-4">
                       <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-green-100">
@@ -120,10 +110,12 @@ export function TransactionList({ transactions = sampleTransactions, limit, show
                   <td className="px-6 text-sm text-slate-500">Oct 16, 2026</td>
 
                   <td className="px-6 text-right">
-                    <button className="inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition hover:bg-slate-100">
-                      View
-                      <ExternalLink size={16} />
-                    </button>
+                    <Link to={`${tx.id}`}> 
+                      <button className="inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition hover:bg-slate-100">
+                        View
+                        <ExternalLink size={16} />
+                      </button>
+                    </Link>
                   </td>
                 </tr>
               );
