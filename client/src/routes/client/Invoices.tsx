@@ -1,15 +1,13 @@
-
 import { Plus, Receipt, ArrowUpRight, Wallet } from "lucide-react";
 import { TransactionList } from "../../components/TransactionList";
-import ProjectList from "../../components/ProjectList";
 
-function Transactions() {
+function Invoices() {
   return (
     <section className="min-h-screen mx-auto max-w-7xl px-6 py-10 bg-slate-50">
       <div className="mb-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
         <div>
           <p className="text-sm font-medium text-green-600">
-            Dashboard / Transactions
+            Dashboard / Invoices
           </p>
 
           <h1 className="mt-2 text-4xl font-bold tracking-tight text-slate-900">
@@ -75,18 +73,8 @@ function Transactions() {
         </div>
       </div>
 
-      {/* PROJECT LIST */}
-      <div className="my-6">
-        <div className="mb-4">
-          <h1 className="mt-2 text-4xl font-bold tracking-tight text-slate-900">
-            ALL <span className="text-sky-500">PROJECTS</span>
-          </h1>
-          <p>Choose Project for tasking</p>
-        </div>
-        <ProjectList />
-      </div>
     </section>
   );
 }
 
-export default Transactions
+export default Invoices

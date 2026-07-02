@@ -51,7 +51,7 @@ export function Navbar() {
           ))}
          
           <Link to="/login">
-            <button className="bg-black text-slate-50 rounded-3xl px-4 py-1">
+            <button className="bg-sky-500 shadow-card text-slate-50 rounded-3xl px-4 py-1">
               Sign In
             </button>
           </Link>

@@ -65,7 +65,19 @@ function Resources() {
   return (
     <section className="min-h-[80.8vh] bg-gray-50 px-4 py-10">
       <div className="mx-auto max-w-7xl">
-       
+        <div className="mb-4">
+          <p className="text-sm font-medium text-green-600">
+            Dashboard / Resources
+          </p>
+
+          <h1 className="mt-2 text-4xl font-bold tracking-tight text-slate-900">
+            PROJECT <span className="text-sky-500">RESOURCES</span>
+          </h1>
+
+          <p className="mt-2 text-slate-500">
+           Get All project guides.
+          </p>
+        </div>
 
         {loading && (
           <div className="py-20 text-center text-gray-500">

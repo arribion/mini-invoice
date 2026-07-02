@@ -4,7 +4,7 @@ import {
 } from "react-router-dom";
 import Index from "./routes";
 import Resources from "./routes/client/Resources";
-import Transactions from "./routes/client/Transactions";
+import Invoices from "./routes/client/Invoices";
 import Dashboard from "./routes/client/dashboard";
 import Settings from "./routes/client/Settings";
 import ClientLayout from "./layout/ClientLayout";
@@ -22,6 +22,9 @@ import Login from "./routes/auth/Login";
 import InvoiceViewer from "./routes/client/InvoiceViewer";
 import AuthLayout from "./layout/AuthLayout";
 import MainLayout from "./layout/MainLayout";
+import Payments from "./routes/client/Payments";
+import Projects from "./routes/client/Projects";
+import Tasks from "./routes/client/Tasks";
 
 const App = () => {
   return (
@@ -41,9 +44,14 @@ const App = () => {
       <Route element={<ClientLayout />}>
         <Route path="/client/dashboard" element={<Dashboard />} />
         <Route path="/client/resources" element={<Resources />} />
-        <Route path="/client/transactions" element={<Transactions />} />
-        <Route path="/client/transactions/:projectID" element={<InvoiceViewer />} />
-        <Route path="/client/dashboard" element={<Dashboard />} />
+        <Route path="/client/invoices" element={<Invoices />} />
+        <Route
+          path="/client/transactions/:projectID"
+          element={<InvoiceViewer />}
+        />
+        <Route path="/client/tasks" element={<Tasks />} />
+        <Route path="/client/projects" element={<Projects />} />
+        <Route path="/client/payments" element={<Payments />} />
         <Route path="/client/settings" element={<Settings />} />
       </Route>
 
