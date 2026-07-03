@@ -12,12 +12,10 @@ export function HeroSection() {
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}>
-      {/* 1. REMOVED THE SOLID bg-sky-500 DIV THAT WAS BLOCKING THE IMAGE */}
-      {/* 2. OPTIONAL: Keep the gradient overlay, but ensure it uses opacity (e.g., bg-opacity-50) so the image peeks through */}
       <div className="absolute inset-0 bg-sky-950/70" />
 
       <div className="relative mx-auto max-w-7xl px-4 pb-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
-        <div className="mx-auto max-w-3xl text-center">
+        <div className="mx-auto max-w-3xl sm:mt-[15em] text-center">
           <h1 className="text-4xl font-extrabold tracking-tight text-primary-foreground sm:text-5xl lg:text-6xl leading-[1.1]">
             GT ONLINE CONSULTANTS
           </h1>

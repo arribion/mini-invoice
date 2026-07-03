@@ -2,7 +2,7 @@
 export function SettingsOverview() {
   return (
     <>
-      <article>
+      <article className="bg-white shadow-card p-4 rounded-[15px] border text-slate-950">
         <div>
           <h1>Personal Information</h1>
           <p>Update your bio</p>
