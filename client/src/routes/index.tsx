@@ -1,5 +1,10 @@
 
-import { HeroSection, ArchitectureSection } from "../components/HeroSection";
+import {
+  HeroSection,
+  ArchitectureSection,
+  FeaturesSection,
+  TestimonialsSection
+} from "../components/HeroSection";
 
 function Index() {
   return (
@@ -7,6 +12,8 @@ function Index() {
       <main className="flex-1">
         <HeroSection />
         <ArchitectureSection />
+        <FeaturesSection />
+        <TestimonialsSection/>
       </main>
     </div>
   );
