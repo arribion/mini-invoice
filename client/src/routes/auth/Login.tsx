@@ -55,6 +55,9 @@ const Login = () => {
         <Link to="/client/dashboard">
           <p className="text-center text-sky-500">Client Dashboard</p>
         </Link>
+        <Link to="/admin/">
+          <p className="text-center text-sky-500">Admin Dashboard</p>
+        </Link>
       </form>
     </section>
   );

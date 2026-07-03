@@ -141,7 +141,7 @@ export function FeaturesSection() {
   return (
     <section className="py-20 bg-primary/10">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-bold text-center text-foreground mb-12">
+        <h2 className="text-3xl font-bold text-center text-sky-500 mb-12">
           Why Choose Us
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -187,7 +187,7 @@ export function TestimonialsSection() {
   return (
     <section className="py-20 bg-accent/10">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-bold text-center text-foreground mb-12">
+        <h2 className="text-3xl font-bold text-center text-sky-500 mb-12">
           What Our Clients Say
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

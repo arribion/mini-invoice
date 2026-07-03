@@ -1,4 +1,4 @@
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Menu, X, LayoutDashboard, ArrowLeftRight } from "lucide-react";
 import { useState } from "react";
@@ -12,7 +12,6 @@ const navLinks = [
 ] as const;
 
 export function Navbar() {
-   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -26,12 +25,6 @@ export function Navbar() {
             -ONLINE
           </span>
         </Link>
-
-        <button
-          onClick={() => navigate("/admin/")}
-          className="text-[10px] cursor-pointer">
-          Admin
-        </button>
 
         <div className="hidden items-center gap-1 md:flex">
           {navLinks.map((link) => (
