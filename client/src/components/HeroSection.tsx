@@ -61,7 +61,7 @@ export function ArchitectureSection() {
   ];
 
   return (
-    <section className="py-24 sm:py-32 bg-accent/30">
+    <section className="py-24 sm:py-22 bg-accent/30">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center mb-16">
           <h2 className="text-3xl font-bold tracking-tight text-sky-500 sm:text-4xl">

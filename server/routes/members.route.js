@@ -2,7 +2,7 @@ import express from "express";
 const member_router = express.Router()
 
 import {
-    add_member,
+  add_member,
   get_member,
   get_all_member,
   update_member,

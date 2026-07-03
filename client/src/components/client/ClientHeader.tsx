@@ -1,12 +1,13 @@
 import { Bell, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "../ui/button";
-// import Button from "../ui/button"
+import gt_logo from "../../assets/gt-logo.png";
+
 const ClientHeader = () => {
   return (
-    <div className="bg-sky-500 p-4 flex items-center justify-between">
-      <h1><input type="text" placeholder="search..." className="bg-slate-50 text-gray-600" /></h1>
-      <div className=" flex items-center gap-2">
+    <div className="sticky top-0 z-30 flex h-15 items-center justify-between border-b border-gray-200 bg-white px-8">
+      <img src={gt_logo} alt="" className="max-w-[2em]" />
+      <div className=" flex items-center text-slate-50 gap-2">
         <div className="mx-2">
           <Star className="h-5 w-5 text-foreground cursor-pointer" />
         </div>

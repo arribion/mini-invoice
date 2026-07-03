@@ -1,7 +1,8 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
-import { Wallet, Menu, X, LayoutDashboard, ArrowLeftRight } from "lucide-react";
+import { Menu, X, LayoutDashboard, ArrowLeftRight } from "lucide-react";
 import { useState } from "react";
+import gt_logo from "../assets/gt-logo.png";
 
 const navLinks = [
   { to: "/", label: "Home", icon: null },
@@ -19,9 +20,7 @@ export function Navbar() {
     <nav className="sticky top-0 z-50 border-b border-border bg-slate-50">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link to="/" className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-[10px] gradient-primary">
-            <Wallet className="h-5 w-5 text-primary-foreground" />
-          </div>
+          <img src={gt_logo} alt="" className="max-w-[4em]" />
           <span className="text-2xl text-blue-500 font-bold tracking-tight">
             <span className="text-gray-500">GT</span>
             -ONLINE
@@ -31,7 +30,7 @@ export function Navbar() {
         <button
           onClick={() => navigate("/admin/")}
           className="text-[10px] cursor-pointer">
-          Go to Admin
+          Admin
         </button>
 
         <div className="hidden items-center gap-1 md:flex">

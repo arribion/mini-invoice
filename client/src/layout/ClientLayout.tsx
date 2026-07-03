@@ -38,6 +38,11 @@ const clientLinks = [
     path: "Resources",
     link: "/client/resources",
   },
+   {
+    id: 1,
+    path: "Settings",
+    link: "/client/settings",
+  },
 ];
 const ClientLayout = () => {
   return (

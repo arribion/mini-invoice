@@ -11,11 +11,13 @@ app.use(cors());
 // routes
 import project_router from "./routes/project.route.js";
 import member_router from "./routes/members.route.js";
+import auth_router from "./routes/auth.route.js";
 
 app.get("/", (req, res) => {
     res.send("app running");
 });
 
+app.use("/api/auth", auth_router);
 app.use("/api/projects", project_router);
 app.use("/api/members", member_router);
 
