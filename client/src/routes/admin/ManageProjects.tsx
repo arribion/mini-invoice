@@ -1,5 +1,5 @@
 import ProjectUploadForm from "../../components/admin/ProjectUploadForm";
-import ProjectList from "../../components/ProjectList";
+import ProjectList from "../../components/client/ProjectList";
 
 const ManageProjects = () => {
   return (
@@ -14,7 +14,6 @@ const ManageProjects = () => {
 
       {/* Main Layout */}
       <div className="grid gap-6 lg:grid-cols-12">
-
         {/* Project List */}
         <section className="lg:col-span-8">
           <ProjectList />

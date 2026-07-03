@@ -1,6 +1,7 @@
 import userModel from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+
 const register = async (req, res) => {
     try {
         const { name, email, password } = req.body;
@@ -27,7 +28,7 @@ const register = async (req, res) => {
             sameSite: "strict",
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         });
-
+        
         res.cookie("accessToken", accessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",

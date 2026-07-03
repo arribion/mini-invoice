@@ -1,11 +1,28 @@
-// TaskSubmission id, tasker_id, project_id, period_id, file_url,
-// row_count, status, submitted_at, reviewed_by
+import taskModel from "../models/task.model.js";
 
-
-const submit_task = async (req, res) => {
+const taskLogUpload = async (req, res) => {
     try {
-        const { tasker_id, project_id, period_id, file_url, row_count } = req.body;
-        // Logic for submitting task
+        const { id, submission_id, task_ref, units_hours, entry_date, flag_reason } = req.body;
+        if (!id || !submission_id || !task_ref || !units_hours || !entry_date) {
+            return res.status(400).json({
+                message: "All required fields must be provided"
+            });
+        }
+        const newTask = new taskModel({
+            id,
+            submission_id,
+            task_ref,
+            units_hours,
+            entry_date,
+            flag_reason
+        });
+        await newTask.save();
+
+        return res.status(201).json({
+            success: true,
+            message: "Task submitted successfully",
+            data: newTask
+        });
     } catch (error) {
         return res.status(500).json({
             success: false,
@@ -13,4 +30,8 @@ const submit_task = async (req, res) => {
             error: error.message
         });
     }
+};
+
+export default {
+    taskLogUpload
 };

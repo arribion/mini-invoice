@@ -129,7 +129,9 @@ function Dashboard() {
 
           {/* Sidebar */}
           <aside className="space-y-6 lg:col-span-4">
-            <QuickActions onSendMoney={() => setSendOpen(true)} />
+            <QuickActions
+              // onSendMoney={() => setSendOpen(true)}
+            />
 
             <PaymentMethods />
           </aside>

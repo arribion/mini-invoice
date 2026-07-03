@@ -10,7 +10,7 @@ function Invoices() {
             Dashboard / Invoices
           </p>
 
-          <h1 className="mt-2 text-4xl font-bold tracking-tight text-slate-900">
+          <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900">
             PROJECT <span className="text-sky-500">INVOICES</span>
           </h1>
 

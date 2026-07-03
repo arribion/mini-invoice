@@ -1,8 +1,8 @@
-import ProjectList from "../../components/ProjectList";
+import ProjectList from "../../components/client/ProjectList";
 
 const Projects = () => {
   return (
-    <div>
+    <div className="px-4 py-2">
       {" "}
       {/* PROJECT LIST */}
       <div className="my-6">
@@ -11,13 +11,11 @@ const Projects = () => {
             Dashboard / Invoices
           </p>
 
-          <h1 className="mt-2 text-4xl font-bold tracking-tight text-slate-900">
+          <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900">
             PROJECT <span className="text-sky-500">INVOICES</span>
           </h1>
 
-          <p className="mt-2 text-slate-500">
-            Choose project for tasking
-          </p>
+          <p className="mt-2 text-slate-500">Choose project for tasking</p>
         </div>
         <ProjectList />
       </div>

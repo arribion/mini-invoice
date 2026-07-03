@@ -70,7 +70,7 @@ function Resources() {
             Dashboard / Resources
           </p>
 
-          <h1 className="mt-2 text-4xl font-bold tracking-tight text-slate-900">
+          <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900">
             PROJECT <span className="text-sky-500">RESOURCES</span>
           </h1>
 

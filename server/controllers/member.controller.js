@@ -1,4 +1,4 @@
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 import { MemberModel } from "../models/member.model.js";
 
 // Create Member

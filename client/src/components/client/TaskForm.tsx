@@ -36,27 +36,14 @@ const TaskForm = () => {
   };
 
   return (
-    <div
-      style={{
-        maxWidth: "400px",
-        margin: "20px auto",
-        fontFamily: "sans-serif",
-      }}>
-      <form onSubmit={handleSubmit(onSubmit)} noValidate className="text-gray-700 shadow-card p-6 rounded-lg bg-white">
-        {/* ID Field */}
-        <div style={{ marginBottom: "15px" }}>
-          <label style={{ display: "block", marginBottom: "5px" }}>ID</label>
-          <input
-            type="text"
-            {...register("id")}
-            className="border rounded p-1 w-full"
-          />
-          {errors.id && (
-            <p style={{ color: "red", fontSize: "12px", margin: "5px 0 0" }}>
-              {errors.id.message}
-            </p>
-          )}
-        </div>
+    <div>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        noValidate
+        className="text-gray-700 shadow-card max-w-md p-6 rounded-lg bg-white">
+        <h2 className="text-slate-800 my-4  font-bold text-center">
+          Create Task Log Directly
+        </h2>
 
         {/* Submission ID Field */}
         <div style={{ marginBottom: "15px" }}>
@@ -66,7 +53,7 @@ const TaskForm = () => {
           <input
             type="text"
             {...register("submission_id")}
-           className="border rounded p-1 w-full"
+            className="border rounded p-1 w-full"
           />
           {errors.submission_id && (
             <p style={{ color: "red", fontSize: "12px", margin: "5px 0 0" }}>
@@ -83,7 +70,7 @@ const TaskForm = () => {
           <input
             type="text"
             {...register("task_ref")}
-           className="border rounded p-1 w-full"
+            className="border rounded p-1 w-full"
           />
           {errors.task_ref && (
             <p style={{ color: "red", fontSize: "12px", margin: "5px 0 0" }}>
@@ -101,7 +88,7 @@ const TaskForm = () => {
             type="number"
             step="0.1"
             {...register("units_hours")}
-           className="border rounded p-1 w-full"
+            className="border rounded p-1 w-full"
           />
           {errors.units_hours && (
             <p style={{ color: "red", fontSize: "12px", margin: "5px 0 0" }}>
@@ -134,7 +121,7 @@ const TaskForm = () => {
           </label>
           <textarea
             {...register("flag_reason")}
-           className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded"
           />
           {errors.flag_reason && (
             <p style={{ color: "red", fontSize: "12px", margin: "5px 0 0" }}>
