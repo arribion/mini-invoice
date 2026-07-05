@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 // import { useAuth } from "./context/AuthContext";
 import { Link } from "react-router-dom";
-
+import toast from "react-hot-toast";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -50,6 +50,13 @@ const Login = () => {
           // disabled={loading}
           className="bg-sky-500 text-slate-50 my-4 w-full rounded-2xl py-1">
           {/* {loading ? "Logging in..." : "Sign In"} */}
+        </button>
+
+        <button
+          onClick={() => { toast.error("Tulia Nitakupanga bandae !"); }}
+          type="submit"
+          className="bg-sky-500 text-slate-50 my-4 w-full rounded py-1">
+          Login
         </button>
 
         <Link to="/client/dashboard">
