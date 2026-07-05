@@ -2,6 +2,8 @@ import {
   Routes, Route,
   // Navigate
 } from "react-router-dom";
+import { ProtectedRoute } from "./routes/ProtectedRoute";
+
 import Index from "./routes";
 import Resources from "./routes/client/Resources";
 import Invoices from "./routes/client/Invoices";
@@ -41,29 +43,32 @@ const App = () => {
       </Route>
 
       {/* client layout */}
-      <Route element={<ClientLayout />}>
+      <Route element={<ProtectedRoute children={undefined} />}>
         <Route path="/client/dashboard" element={<Dashboard />} />
         <Route path="/client/resources" element={<Resources />} />
-        <Route path="/client/invoices" element={<Invoices />} />
-        <Route
-          path="/client/transactions/:projectID"
-          element={<InvoiceViewer />}
-        />
-        <Route path="/client/tasks" element={<Tasks />} />
-        <Route path="/client/projects" element={<Projects />} />
-        <Route path="/client/payments" element={<Payments />} />
-        <Route path="/client/settings" element={<Settings />} />
-      </Route>
+        <Route element={<ClientLayout />}>
+          <Route path="/client/dashboard" element={<Dashboard />} />
+          <Route path="/client/resources" element={<Resources />} />
+          <Route path="/client/invoices" element={<Invoices />} />
+          <Route
+            path="/client/transactions/:projectID"
+            element={<InvoiceViewer />}
+          />
+          <Route path="/client/tasks" element={<Tasks />} />
+          <Route path="/client/projects" element={<Projects />} />
+          <Route path="/client/payments" element={<Payments />} />
+          <Route path="/client/settings" element={<Settings />} />
+        </Route>
 
-      {/* Admin Routes */}
-      <Route path="/admin" element={<AdminLayout />}>
-        <Route index element={<AdminDashboard />} />
-        <Route path="projects" element={<ManageProjects />} />
-        <Route path="resources" element={<ManageResources />} />
-        <Route path="members" element={<ManageMembers />} />
-        <Route path="settings" element={<AdminSetting />} />
+        {/* Admin Routes */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="projects" element={<ManageProjects />} />
+          <Route path="resources" element={<ManageResources />} />
+          <Route path="members" element={<ManageMembers />} />
+          <Route path="settings" element={<AdminSetting />} />
+        </Route>
       </Route>
-
       {/* Global Fallback */}
       <Route path="*" element={<NotFoundComponent />} />
     </Routes>
