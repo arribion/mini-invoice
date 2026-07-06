@@ -15,7 +15,14 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 // Central Backend Base URL
-const API_URL = "http://localhost:3001/api/auth";
+const BASE_URL = import.meta.env.VITE_BASE_URL; 
+
+if (!BASE_URL) {
+  console.log("Error: VITE_BASE_URL is not defined");
+}
+
+
+const API_URL = `${BASE_URL}/api/v1/auth`; 
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User>(null);

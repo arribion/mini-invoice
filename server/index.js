@@ -44,9 +44,9 @@ app.get("/", (req, res) => {
 });
 
 // Route Mounts
-app.use("/api/v1", auth_router);
-app.use("/api/projects", project_router);
-app.use("/api/members", member_router);
+app.use("/api/v1/auth", auth_router);
+app.use("/api/v1/projects", project_router);
+app.use("/api/v1/members", member_router);
 
 app.listen(PORT, () => {
   connectDB();
