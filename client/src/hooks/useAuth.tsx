@@ -14,15 +14,15 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-// Central Backend Base URL
-const BASE_URL = import.meta.env.VITE_BASE_URL; 
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 if (!BASE_URL) {
-  console.log("Error: VITE_BASE_URL is not defined");
+  console.error(
+    "Environment Error: VITE_BASE_URL is missing from your .env file.",
+  );
 }
 
-
-const API_URL = `${BASE_URL}/api/v1/auth`; 
+const API_URL = `${BASE_URL}/api/v1/auth`;
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User>(null);
@@ -55,9 +55,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const res = await axios.post(
         `${API_URL}/login`,
         { email, password },
-        { withCredentials: true }, // HTTP-only cookies from backend
+        { withCredentials: true }, // Handles HTTP-only cookies from backend
       );
-
       if (res.data?.success) {
         setUser(res.data.user); // { email, role }
         toast.success("Welcome back!");
