@@ -1,10 +1,10 @@
-import userModel from "../models/user.model.js";
-import bcrypt from "bcryptjs";
+import userModel from "../models/userModel.js";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-const register = async (req, res) => {
+export const register = async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { name, email, password, role } = req.body;
         if (!name || !email || !password) {
             return res.status(400).json({ message: "All fields are required" });
         }
@@ -55,7 +55,7 @@ const register = async (req, res) => {
     }
 };
 
-const login = async (req, res) => {
+export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
         if (!email || !password) {
@@ -101,7 +101,7 @@ const login = async (req, res) => {
 
 };
 
-const refreshToken = async (req, res) => {
+export const refreshToken = async (req, res) => {
     try {
         const refreshToken = req.cookies.refreshToken;
         if (!refreshToken) {
@@ -134,7 +134,7 @@ const refreshToken = async (req, res) => {
     }
 };
 
-const logout = async (req, res) => {
+export const logout = async (req, res) => {
     try {
         res.clearCookie("refreshToken");
         res.clearCookie("accessToken");

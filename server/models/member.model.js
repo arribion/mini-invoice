@@ -34,7 +34,7 @@ const memberSchema = new mongoose.Schema(
     role: {
       type: String,
       enum: ["ADMIN", "SOFTWARE_ENGINEER", "REVIEWER", "MANAGER"],
-      default: "SOFTWARE_ENGINEER",
+      default: "REVIEWER",
     },
 
     status: {

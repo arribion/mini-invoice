@@ -6,6 +6,6 @@ auth_router
     .post("/logout", logout)
     .post("/refresh-token", refreshToken);
 
-auth_router.post("/register/user",register);
+auth_router.post("/register", register);
 
 export default auth_router;

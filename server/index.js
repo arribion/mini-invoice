@@ -3,8 +3,19 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import connectDB from "./config/db.js";
 import "dotenv/config";
+import path from "path";
+
 const app = express();
 
+const fileName = path.resolve() + "/views";
+const __dirname = path.resolve(fileName);
+
+const PORT = process.env.PORT;
+if (!PORT) {
+    console.log("error accessing connection port..");
+    process.exit(1);
+}
+ 
 app.use(bodyParser.json());
 app.use(cors());
 
@@ -21,7 +32,7 @@ app.use("/api/auth", auth_router);
 app.use("/api/projects", project_router);
 app.use("/api/members", member_router);
 
-app.listen(3001, () => {
+app.listen(PORT, () => {
     connectDB()
-    console.log("http://localhost:3001");
+    console.log(`http://localhost:${PORT}`);
 });
