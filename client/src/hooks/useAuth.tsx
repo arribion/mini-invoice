@@ -22,8 +22,7 @@ if (!BASE_URL) {
   );
 }
 
-// const API_URL = `${BASE_URL}/api/v1/auth`;
-const API_URL = `https://mini-invoice.onrender.com/api/v1/auth`;
+const API_URL = `${BASE_URL}/api/v1/auth`;
 
 export const AuthProvider = ({
   children,
