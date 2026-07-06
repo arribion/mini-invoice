@@ -3,6 +3,14 @@ import userModel from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+const {
+    JWT_ACCESS_SECRET,
+    JWT_REFRESH_SECRET
+} = process.env;
+if (!JWT_ACCESS_SECRET || JWT_REFRESH_SECRET) {
+    console.log("unable to access jwt access and refresh secrets...");
+}
+
 export const register = async (req, res) => {
   try {
     const { name, email, password, role } = req.body; // 'role' is extracted here
@@ -29,12 +37,12 @@ export const register = async (req, res) => {
 
     const accessToken = jwt.sign(
       { email, role: newUser.role },
-      process.env.JWT_SECRET,
+      JWT_ACCESS_SECRET,
       { expiresIn: "1h" },
     );
     const refreshToken = jwt.sign(
       { email, role: newUser.role },
-      process.env.JWT_SECRET,
+      JWT_REFRESH_SECRET,
       { expiresIn: "7d" },
     );
 
@@ -85,12 +93,12 @@ export const login = async (req, res) => {
     // FIX 3: Add role to payload here too
     const accessToken = jwt.sign(
       { email: user.email, role: user.role },
-      process.env.JWT_SECRET,
+      JWT_ACCESS_SECRET,
       { expiresIn: "1h" },
     );
     const refreshToken = jwt.sign(
       { email: user.email, role: user.role },
-      process.env.JWT_SECRET,
+      JWT_REFRESH_SECRET,
       { expiresIn: "7d" },
     );
 

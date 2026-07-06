@@ -48,11 +48,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const res = await axios.post(
         `${API_URL}/login`,
         { email, password },
-        { withCredentials: true }, // CRUCIAL: Captures HTTP-only cookies from backend
+        { withCredentials: true }, // HTTP-only cookies from backend
       );
 
       if (res.data?.success) {
-        setUser(res.data.user); // Contains { email, role }
+        setUser(res.data.user); // { email, role }
         toast.success("Welcome back!");
       }
     } catch (error: any) {

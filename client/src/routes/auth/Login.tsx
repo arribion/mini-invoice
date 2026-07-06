@@ -65,8 +65,6 @@ const Login = () => {
             required
           />
         </div>
-
-        {/* Combined into a single, clean reactive action button */}
         <button
           type="submit"
           disabled={isLoading}

@@ -1,8 +1,8 @@
-// routes/ProtectedRoute.tsx
 import { useEffect } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import toast from "react-hot-toast";
+import { Oval } from "react-loader-spinner";
 
 type ProtectedRouteProps = {
   allowedRoles?: ("client" | "admin")[];
@@ -26,7 +26,22 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
   }, [isLoggedIn, isLoading, allowedRoles, user]);
 
   if (isLoading) {
-    return <div>Loading authentication...</div>; // Replace with a spinner if desired
+    return (
+      <div className="flex justify-center items-center mt-[6em]">
+        <Oval
+          height={80}
+          width={80}
+          color="#0EA5E9"
+          wrapperStyle={{}}
+          wrapperClass=""
+          visible={true}
+          ariaLabel="oval-loading"
+          secondaryColor="#4fa94d"
+          strokeWidth={2}
+          strokeWidthSecondary={2}
+        />
+      </div>
+    );
   }
 
   if (!isLoggedIn) {
@@ -34,7 +49,7 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
   }
 
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {
-    // Redirect to their respective dashboards if they land on the wrong route
+    // Redirect to  respective dashboards if they land on the wrong route
     return (
       <Navigate
         to={user.role === "admin" ? "/admin" : "/client/dashboard"}
