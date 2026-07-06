@@ -27,7 +27,7 @@ const sideBarLinks = [
     link: "/admin/invoicing",
   },
   {
-    name: "Instructions",
+    name: "Resources",
     link: "/admin/resources",
   },
   {

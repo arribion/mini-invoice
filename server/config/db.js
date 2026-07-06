@@ -12,7 +12,7 @@ const connectDB = async () => {
         mongoose.connect(MONGO_URI,{
              dbName: 'gtonline' 
     });
-        console.log("database connected successfully...");
+        console.log("Database connected successfully...");
     } catch (error) {
         console.log(error);
     }

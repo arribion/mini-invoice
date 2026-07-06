@@ -2,12 +2,13 @@
 import userModel from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import "dotenv/config";
 
 const {
     JWT_ACCESS_SECRET,
     JWT_REFRESH_SECRET
 } = process.env;
-if (!JWT_ACCESS_SECRET || JWT_REFRESH_SECRET) {
+if (!JWT_ACCESS_SECRET || !JWT_REFRESH_SECRET) {
     console.log("unable to access jwt access and refresh secrets...");
 }
 

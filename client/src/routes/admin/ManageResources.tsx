@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
-import { FileText, Trash2, Upload } from "lucide-react";
+import { FileText, Trash2, Upload, Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import axios from "axios";
 
 interface Resource {
   id: string;
@@ -8,41 +9,98 @@ interface Resource {
   size: string;
   uploadedAt: string;
   file: File;
+  status: "idle" | "uploading" | "success" | "error"; // Tracks file progress
+  progress: number; // Percentage 0-100
+  cloudinaryUrl?: string; // Stored link from backend
 }
 
 const formatBytes = (bytes: number) => {
   if (bytes === 0) return "0 B";
-
   const k = 1024;
   const sizes = ["B", "KB", "MB", "GB"];
-
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
 };
 
 const ManageResources = () => {
   const inputRef = useRef<HTMLInputElement>(null);
-
   const [resources, setResources] = useState<Resource[]>([]);
 
-  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Function to send a single file via Axios
+  const uploadSingleFile = async (id: string, file: File) => {
+    const formData = new FormData();
+    // The key name MUST be "file" to match upload.single("file") or your multer field config
+    formData.append("file", file);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3001/api/v1/resources/upload",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          // Optional tracking of progress percentage
+          onUploadProgress: (progressEvent) => {
+            const total = progressEvent.total || file.size;
+            const percentage = Math.round((progressEvent.loaded * 100) / total);
+            
+            setResources((prev) =>
+              prev.map((item) =>
+                item.id === id ? { ...item, progress: percentage } : item
+              )
+            );
+          },
+        }
+      );
+
+      // Backend returns success, update status and store URL
+      if (response.data.success) {
+        setResources((prev) =>
+          prev.map((item) =>
+            item.id === id
+              ? { ...item, status: "success", cloudinaryUrl: response.data.url }
+              : item
+          )
+        );
+      }
+    } catch (error: any) {
+      console.error(`Upload failed for ${file.name}:`, error);
+      setResources((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, status: "error" } : item
+        )
+      );
+    }
+  };
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
 
     const uploadedFiles = Array.from(e.target.files);
 
-    const newResources = uploadedFiles.map((file) => ({
+    // 1. Create fresh state instances for the UI layout
+    const newResources: Resource[] = uploadedFiles.map((file) => ({
       id: crypto.randomUUID(),
       name: file.name,
       type: file.type || "Unknown",
       size: formatBytes(file.size),
       uploadedAt: new Date().toLocaleDateString(),
       file,
+      status: "uploading",
+      progress: 0,
     }));
 
+    // Add them to state instantly so loaders display
     setResources((prev) => [...newResources, ...prev]);
+    e.target.value = ""; // Reset input field
 
-    e.target.value = "";
+    // 2. Fire off HTTP requests for all selected files simultaneously
+    await Promise.all(
+      newResources.map((resource) =>
+        uploadSingleFile(resource.id, resource.file)
+      )
+    );
   };
 
   const deleteFile = (id: string) => {
@@ -53,7 +111,6 @@ const ManageResources = () => {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Manage Resources</h1>
-
         <p className="mt-2 text-gray-600">
           Upload documents and manage downloadable resources.
         </p>
@@ -63,7 +120,6 @@ const ManageResources = () => {
         <div className="flex flex-col gap-4 border-b border-gray-200 p-6 md:flex-row md:items-center md:justify-between">
           <div>
             <h2 className="text-lg font-semibold">Resource Library</h2>
-
             <p className="text-sm text-gray-500">
               Upload PDFs, Word documents, ZIP files and more.
             </p>
@@ -80,7 +136,8 @@ const ManageResources = () => {
 
             <button
               onClick={() => inputRef.current?.click()}
-              className="inline-flex items-center gap-2 rounded-xl bg-green-600 px-5 py-3 font-medium text-white transition hover:bg-green-700">
+              className="inline-flex items-center gap-2 rounded-xl bg-green-600 px-5 py-3 font-medium text-white transition hover:bg-green-700"
+            >
               <Upload size={18} />
               Upload Files
             </button>
@@ -94,19 +151,15 @@ const ManageResources = () => {
                 <th className="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-500">
                   File
                 </th>
-
                 <th className="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-500">
                   Type
                 </th>
-
                 <th className="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-500">
                   Size
                 </th>
-
                 <th className="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-500">
-                  Uploaded
+                  Status
                 </th>
-
                 <th className="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-500">
                   Actions
                 </th>
@@ -129,31 +182,52 @@ const ManageResources = () => {
                       <div className="rounded-xl bg-green-100 p-3">
                         <FileText className="text-green-600" size={20} />
                       </div>
-
                       <div>
-                        <p className="font-semibold text-gray-900">
-                          {resource.name}
-                        </p>
-
-                        <p className="text-sm text-gray-500">
-                          Downloadable Resource
-                        </p>
+                        {resource.cloudinaryUrl ? (
+                          <a 
+                            href={resource.cloudinaryUrl} 
+                            target="_blank" 
+                            rel="noreferrer" 
+                            className="font-semibold text-green-700 underline hover:text-green-800"
+                          >
+                            {resource.name}
+                          </a>
+                        ) : (
+                          <p className="font-semibold text-gray-900">{resource.name}</p>
+                        )}
+                        <p className="text-sm text-gray-500">Downloadable Resource</p>
                       </div>
                     </div>
                   </td>
 
                   <td className="px-6 py-5 text-gray-600">{resource.type}</td>
-
                   <td className="px-6 py-5 text-gray-600">{resource.size}</td>
 
+                  {/* Dynamic Status / Progress Bar Column */}
                   <td className="px-6 py-5 text-gray-600">
-                    {resource.uploadedAt}
+                    {resource.status === "uploading" && (
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="animate-spin text-green-600" size={16} />
+                        <span className="text-xs font-medium text-gray-500">{resource.progress}%</span>
+                      </div>
+                    )}
+                    {resource.status === "success" && (
+                      <div className="flex items-center gap-1.5 text-green-600 text-sm font-medium">
+                        <CheckCircle size={16} /> Ready
+                      </div>
+                    )}
+                    {resource.status === "error" && (
+                      <div className="flex items-center gap-1.5 text-red-600 text-sm font-medium">
+                        <AlertCircle size={16} /> Failed
+                      </div>
+                    )}
                   </td>
 
                   <td className="px-6 py-5">
                     <button
                       onClick={() => deleteFile(resource.id)}
-                      className="inline-flex items-center gap-2 rounded-lg bg-red-50 px-4 py-2 text-red-600 transition hover:bg-red-100">
+                      className="inline-flex items-center gap-2 rounded-lg bg-red-50 px-4 py-2 text-red-600 transition hover:bg-red-100"
+                    >
                       <Trash2 size={18} />
                       Delete
                     </button>

@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser"; 
 import connectDB from "./config/db.js";
+import bodyParser from "body-parser";
+// import { check_uploaded_files } from "./middleware/Upload.check.file.js";
 import "dotenv/config";
 import path from "path";
 
@@ -23,7 +25,9 @@ if (!process.env.PORT) {
 // Middlewares
 app.use(express.json()); 
 app.use(cookieParser());
-
+app.use(express.json());
+app.use(bodyParser.json());
+// app.use(check_uploaded_files());
 app.use(
   cors({
     origin: [
@@ -35,9 +39,11 @@ app.use(
 );
 
 // Routes Imports
+import auth_router from "./routes/auth.route.js";
 import project_router from "./routes/project.route.js";
 import member_router from "./routes/members.route.js";
-import auth_router from "./routes/auth.route.js";
+import resource_router from "./routes/resources.route.js";
+
 
 app.get("/", (req, res) => {
   res.send("app running");
@@ -47,6 +53,8 @@ app.get("/", (req, res) => {
 app.use("/api/v1/auth", auth_router);
 app.use("/api/v1/projects", project_router);
 app.use("/api/v1/members", member_router);
+app.use("/api/v1/resources", resource_router);
+
 
 app.listen(PORT, () => {
   connectDB();
