@@ -1,19 +1,47 @@
-import { type ReactNode } from "react";
+// routes/ProtectedRoute.tsx
+import { useEffect } from "react";
+import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import { Navigate } from "react-router-dom";
 import toast from "react-hot-toast";
+
 type ProtectedRouteProps = {
-  children: ReactNode;
+  allowedRoles?: ("client" | "admin")[];
 };
 
-export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { isLoggedIn } = useAuth();
+export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
+  const { isLoggedIn, isLoading, user } = useAuth();
+
+  useEffect(() => {
+    if (!isLoading && !isLoggedIn) {
+      toast.error("Please log in to view this page.");
+    } else if (
+      !isLoading &&
+      isLoggedIn &&
+      allowedRoles &&
+      user &&
+      !allowedRoles.includes(user.role)
+    ) {
+      toast.error("Unauthorized access.");
+    }
+  }, [isLoggedIn, isLoading, allowedRoles, user]);
+
+  if (isLoading) {
+    return <div>Loading authentication...</div>; // Replace with a spinner if desired
+  }
 
   if (!isLoggedIn) {
-    toast.error("Please log in to view this page.");
     return <Navigate to="/login" replace />;
   }
 
-  // If logged in, render the protected page
-  return <>{children}</>;
+  if (allowedRoles && user && !allowedRoles.includes(user.role)) {
+    // Redirect to their respective dashboards if they land on the wrong route
+    return (
+      <Navigate
+        to={user.role === "admin" ? "/admin" : "/client/dashboard"}
+        replace
+      />
+    );
+  }
+
+  return <Outlet />;
 };

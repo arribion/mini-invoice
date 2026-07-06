@@ -1,7 +1,5 @@
-import {
-  Routes, Route,
-  // Navigate
-} from "react-router-dom";
+// App.tsx
+import { Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
 
 import Index from "./routes";
@@ -31,21 +29,19 @@ import Tasks from "./routes/client/Tasks";
 const App = () => {
   return (
     <Routes>
-      {/* auth layout */}
+      {/* Public Auth Layout */}
       <Route element={<AuthLayout />}>
         <Route path="login" element={<Login />} />
       </Route>
 
-      {/* main Routes */}
+      {/* Public Main Routes */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<Index />} />
         <Route path="about" element={<About />} />
       </Route>
 
-      {/* client layout */}
-      <Route element={<ProtectedRoute children={undefined} />}>
-        <Route path="/client/dashboard" element={<Dashboard />} />
-        <Route path="/client/resources" element={<Resources />} />
+      {/* Client Specific Protected Routes */}
+      <Route element={<ProtectedRoute allowedRoles={["client"]} />}>
         <Route element={<ClientLayout />}>
           <Route path="/client/dashboard" element={<Dashboard />} />
           <Route path="/client/resources" element={<Resources />} />
@@ -59,8 +55,10 @@ const App = () => {
           <Route path="/client/payments" element={<Payments />} />
           <Route path="/client/settings" element={<Settings />} />
         </Route>
+      </Route>
 
-        {/* Admin Routes */}
+      {/* Admin Specific Protected Routes */}
+      <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
           <Route path="projects" element={<ManageProjects />} />
@@ -69,6 +67,7 @@ const App = () => {
           <Route path="settings" element={<AdminSetting />} />
         </Route>
       </Route>
+
       {/* Global Fallback */}
       <Route path="*" element={<NotFoundComponent />} />
     </Routes>

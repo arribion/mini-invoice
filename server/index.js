@@ -17,7 +17,10 @@ if (!PORT) {
 }
  
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors({
+    origin: "http://localhost:5173",
+    credentials: true                // Required to allow the browser to accept backend cookies
+}));
 
 // routes
 import project_router from "./routes/project.route.js";
