@@ -15,7 +15,7 @@ if (!API_URL) {
 const fileName = path.resolve() + "/views";
 const __dirname = path.resolve(fileName);
 
-const PORT = process.env.PORT || 3001; // Fallback added for local/production safety
+const PORT = process.env.PORT || 3001;
 if (!process.env.PORT) {
   console.log("error accessing connection port..");
 }

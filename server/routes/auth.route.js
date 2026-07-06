@@ -17,12 +17,11 @@ auth_router
 
 // Protected token verification route for React frontend
 auth_router.get("/verify", protect, (req, res) => {
-  // Because 'protect' runs first, req.user already contains the decoded token data
   return res.status(200).json({
     success: true,
     user: {
       email: req.user.email,
-      role: req.user.role, // "client" or "admin" to match React UI expectations
+      role: req.user.role,
     },
   });
 });
