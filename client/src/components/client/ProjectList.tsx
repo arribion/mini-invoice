@@ -27,7 +27,7 @@ const ProjectList = () => {
       setLoading(true);
       setError("");
 
-      const { data } = await api.get<Project[]>("/api/v1/projects/get");
+      const { data } = await api.get<Project[]>("/api/v1/projects");
 
       // Basic validation
       if (!Array.isArray(data)) {
