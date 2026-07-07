@@ -10,6 +10,20 @@ interface Project {
   status: "ACTIVE" | "PENDING" | "CLOSED";
 }
 
+// 2. Raw layout received from Express payload
+interface ExpressProjectPayload {
+  id: string;
+  project_name: string;
+  platform: string;
+  description: string;
+  avg_pay: string; // Payload string type: "23"
+  status: "ACTIVE" | "PENDING" | "CLOSED";
+}
+
+interface ApiError {
+  message?: string;
+}
+
 const api = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
   headers: {
@@ -27,17 +41,28 @@ const ProjectList = () => {
       setLoading(true);
       setError("");
 
-      const { data } = await api.get<Project[]>("/api/v1/projects");
+      // Fetching raw payload type array
+      const { data } =
+        await api.get<ExpressProjectPayload[]>("/api/v1/projects");
 
-      // Basic validation
       if (!Array.isArray(data)) {
         throw new Error("Invalid response from server.");
       }
 
-      setProjects(data);
+      const mappedProjects: Project[] = data.map((proj) => ({
+        id: proj.id,
+        projectName: proj.project_name,
+        platform: proj.platform,
+        description: proj.description,
+        ratePerHour: Number(proj.avg_pay) || 0,
+        status: proj.status,
+      }));
+
+      setProjects(mappedProjects);
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || err.message);
+        const serverError = err.response?.data as ApiError | undefined;
+        setError(serverError?.message || err.message);
       } else {
         setError("Something went wrong.");
       }
@@ -108,32 +133,27 @@ const ProjectList = () => {
                 </th>
               </tr>
             </thead>
-
             <tbody className="divide-y divide-gray-100">
               {projects.map((project) => (
                 <tr key={project.id} className="transition hover:bg-green-50">
                   <td className="px-6 py-5 font-semibold text-gray-900">
                     {project.projectName}
                   </td>
-
                   <td className="px-6 py-5 text-gray-700">
                     {project.platform}
                   </td>
-
                   <td className="px-6 py-5 text-gray-600">
                     {project.description}
                   </td>
-
                   <td className="px-6 py-5 font-medium text-gray-900">
                     KES {project.ratePerHour.toLocaleString()}
                   </td>
-
                   <td className="px-6 py-5">
                     <span
-                      className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${badgeColor(
+                      className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold items-center gap-1 ${badgeColor(
                         project.status,
                       )}`}>
-                      ● {project.status}
+                      <span>●</span> {project.status}
                     </span>
                   </td>
                 </tr>
