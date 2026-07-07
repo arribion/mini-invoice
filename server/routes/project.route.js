@@ -9,19 +9,12 @@ import {
 
 const project_router = express.Router();
 
-// Create a project
-project_router.post("/", add_project);
 
-// Get all projects
-project_router.get("/", get_all_project);
-
-// Get a single project by ID
-project_router.get("/:id", get_project);
-
-// Update a project
-project_router.put("/:id", update_project);
-
-// Delete a project
-project_router.delete("/:id", delete_project);
+project_router
+  .post("/add", add_project)
+  .get("/get", get_all_project)
+  .get("/get/:id", get_project)
+  .put("/update/:id", update_project)
+  .delete("/delete/:id", delete_project);
 
 export default project_router;

@@ -9,11 +9,6 @@ import path from "path";
 
 const app = express();
 
-const API_URL = process.env.API_URL;
-if (!API_URL) {
-  console.log("error accessing url");
-}
-
 const fileName = path.resolve() + "/views";
 const __dirname = path.resolve(fileName);
 

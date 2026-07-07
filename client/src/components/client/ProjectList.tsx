@@ -11,7 +11,7 @@ interface Project {
 }
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: import.meta.env.VITE_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -27,7 +27,7 @@ const ProjectList = () => {
       setLoading(true);
       setError("");
 
-      const { data } = await api.get<Project[]>("/projects");
+      const { data } = await api.get<Project[]>("/api/v1/projects/get");
 
       // Basic validation
       if (!Array.isArray(data)) {
