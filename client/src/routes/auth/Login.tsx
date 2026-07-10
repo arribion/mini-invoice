@@ -29,6 +29,8 @@ const Login = () => {
     login(email, password);
   };
 
+  const btnStyle = isLoading ? { color: "blue" } : undefined;
+
   return (
     <section className="min-h-[80vh] flex justify-center">
       <form
@@ -67,6 +69,7 @@ const Login = () => {
         </div>
         <button
           type="submit"
+          style={btnStyle}
           disabled={isLoading}
           className="bg-sky-500 text-slate-50 my-6 w-full rounded py-2 font-medium hover:bg-sky-600 transition-colors disabled:bg-slate-300">
           {isLoading ? "Logging in..." : "Login"}

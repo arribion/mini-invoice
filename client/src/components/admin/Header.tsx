@@ -5,7 +5,7 @@ const Header = () => {
     <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-gray-200 bg-white px-8">
       {/* Left */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+        <h1 className="text-2xl font-bold text-sky-500">Admin Dashboard</h1>
         <p className="text-sm text-gray-500">
           Welcome back, manage your projects efficiently.
         </p>

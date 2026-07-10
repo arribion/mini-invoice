@@ -128,7 +128,7 @@ const ManageMembers = () => {
 
       <div className="grid gap-6 lg:grid-cols-12">
         <aside className="lg:col-span-4">
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="rounded-[10px] border border-gray-200 bg-white p-6 shadow-sm">
             <div className="mb-6">
               <h2 className="text-lg font-semibold text-gray-900">
                 {isEditing ? "Edit Member" : "Create Member"}
@@ -236,7 +236,7 @@ const ManageMembers = () => {
         </aside>
 
         <section className="lg:col-span-8">
-          <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+          <div className="overflow-hidden rounded-[10px] border border-gray-200 bg-white shadow-sm">
             <div className="border-b border-gray-200 px-6 py-4">
               <h2 className="text-lg font-semibold text-gray-900">
                 Members List

@@ -14,15 +14,15 @@ const ManageProjects = () => {
 
       {/* Main Layout */}
       <div className="grid gap-6 lg:grid-cols-12">
-        {/* Project List */}
-        <section className="lg:col-span-8">
-          <ProjectList />
-        </section>
-
         {/* Project Form */}
         <aside className="lg:col-span-4">
           <ProjectUploadForm />
         </aside>
+
+        {/* Project List */}
+        <section className="lg:col-span-8">
+          <ProjectList />
+        </section>
       </div>
     </div>
   );

@@ -50,7 +50,17 @@ const ProjectUploadForm = () => {
       setServerError("");
       setSuccess("");
 
-      await api.post("/projects", data);
+      // Remap front-end camelCase to backend snake_case keys
+      const backendData = {
+        project_name: data.projectName,
+        platform: data.platform,
+        avg_pay: data.ratePerHour,
+        description: data.description,
+        status: data.status,
+      };
+
+      // Send the correctly formatted payload
+      await api.post("/api/v1/projects", backendData);
 
       setSuccess("Project created successfully.");
       reset();
@@ -65,23 +75,12 @@ const ProjectUploadForm = () => {
     }
   };
 
+
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
       className="mx-auto w-full space-y-5 rounded-[10px] border border-gray-200 bg-white p-8 shadow-sm">
       <h2 className="text-xl font-semibold text-sky-500">Create Project</h2>
-
-      {serverError && (
-        <div className="rounded-lg bg-red-100 p-3 text-sm text-red-700">
-          {serverError}
-        </div>
-      )}
-
-      {success && (
-        <div className="rounded-lg bg-green-100 p-3 text-sm text-green-700">
-          {success}
-        </div>
-      )}
 
       <div>
         <label className="mb-2 block font-medium">Project Name</label>
@@ -89,7 +88,7 @@ const ProjectUploadForm = () => {
         <input
           {...register("projectName")}
           placeholder="Project Vox"
-          className="w-full rounded-lg border px-4 py-3 outline-none focus:border-green-500"
+          className="w-full rounded border px-3 py-1 outline-none focus:border-green-500"
         />
 
         {errors.projectName && (
@@ -105,7 +104,7 @@ const ProjectUploadForm = () => {
         <input
           {...register("platform")}
           placeholder="Handshake"
-          className="w-full rounded-lg border px-4 py-3 outline-none focus:border-green-500"
+          className="w-full rounded border px-3 py-1 outline-none focus:border-green-500"
         />
 
         {errors.platform && (
@@ -122,7 +121,7 @@ const ProjectUploadForm = () => {
           type="number"
           {...register("ratePerHour")}
           placeholder="1000"
-          className="w-full rounded-lg border px-4 py-3 outline-none focus:border-green-500"
+          className="w-full rounded border px-3 py-1 outline-none focus:border-green-500"
         />
 
         {errors.ratePerHour && (
@@ -137,7 +136,7 @@ const ProjectUploadForm = () => {
 
         <select
           {...register("status")}
-          className="w-full rounded-lg border px-4 py-3 outline-none focus:border-green-500">
+          className="w-full rounded border px-3 py-1 outline-none focus:border-green-500">
           <option value="ACTIVE">Active</option>
           <option value="PENDING">Pending</option>
           <option value="CLOSED">Closed</option>
@@ -165,10 +164,23 @@ const ProjectUploadForm = () => {
         )}
       </div>
 
+      {/* status message */}
+      {serverError && (
+        <div className="rounded bg-red-100 p-3 text-sm text-red-700">
+          {serverError}
+        </div>
+      )}
+
+      {success && (
+        <div className="rounded bg-green-100 p-3 text-sm text-green-700">
+          {success}
+        </div>
+      )}
+
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full rounded-lg bg-green-600 py-3 font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50">
+        className="w-full rounded bg-green-600 py-3 font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50">
         {isSubmitting ? "Creating Project..." : "Create Project"}
       </button>
     </form>

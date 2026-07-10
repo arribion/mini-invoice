@@ -3,7 +3,7 @@ import gt_logo from "../../assets/gt-logo.png";
 export default function SideBar() {
 
 const linkBaseStyle =
-    "block px-4 py-2 rounded-[5px] transition-colors hover:bg-white/10";
+    "block px-4 py-2 rounded transition-colors hover:bg-white/10";
 const getLinkStyle = ({ isActive }: { isActive: boolean }) =>
     isActive
       ? `${linkBaseStyle} bg-white/20 text-white font-medium`
