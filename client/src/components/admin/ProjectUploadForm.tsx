@@ -18,8 +18,13 @@ const projectSchema = z.object({
 
 type ProjectFormData = z.infer<typeof projectSchema>;
 
+const BASE_URL = import.meta.env.VITE_API_URL;
+if (!BASE_URL) {
+  console.log("error accessing base url on project upload form...")
+}
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -60,7 +65,10 @@ const ProjectUploadForm = () => {
       };
 
       // Send the correctly formatted payload
-      await api.post("/api/v1/projects", backendData);
+      await api.post(
+        "https://mini-invoice.onrender.com/api/v1/projects/",
+        backendData,
+      );
 
       setSuccess("Project created successfully.");
       reset();
@@ -79,7 +87,7 @@ const ProjectUploadForm = () => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="mx-auto w-full space-y-5 rounded-[10px] border border-gray-200 bg-white p-8 shadow-sm">
+      className="mx-auto bg-slate-50 w-full space-y-5 rounded-[10px] border border-gray-200 z-50 p-8 shadow-sm">
       <h2 className="text-xl font-semibold text-sky-500">Create Project</h2>
 
       <div>

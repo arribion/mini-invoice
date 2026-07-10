@@ -6,6 +6,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
 } from "lucide-react";
+import QuickActions from "../../components/admin/QuickActions";
 
 const stats = [
   {
@@ -170,28 +171,7 @@ const AdminDashboard = () => {
             </div>
           </div>
         </div>
-
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-900">Quick Actions</h2>
-          <p className="mt-1 text-sm text-gray-500">
-            Common admin tasks at a glance.
-          </p>
-
-          <div className="mt-6 space-y-3">
-            <button className="w-full rounded-xl bg-green-600 px-4 py-3 text-left text-sm font-semibold text-white transition hover:bg-green-700">
-              Create Member Login
-            </button>
-            <button className="w-full rounded-xl border border-gray-200 px-4 py-3 text-left text-sm font-semibold text-gray-700 transition hover:bg-gray-50">
-              Add New Project
-            </button>
-            <button className="w-full rounded-xl border border-gray-200 px-4 py-3 text-left text-sm font-semibold text-gray-700 transition hover:bg-gray-50">
-              Upload Resource
-            </button>
-            <button className="w-full rounded-xl border border-gray-200 px-4 py-3 text-left text-sm font-semibold text-gray-700 transition hover:bg-gray-50">
-              Review Pending Payments
-            </button>
-          </div>
-        </div>
+        <QuickActions/>
       </div>
 
       <div className="mt-8 rounded-2xl border border-gray-200 bg-white shadow-sm">

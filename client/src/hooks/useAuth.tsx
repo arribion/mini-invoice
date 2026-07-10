@@ -66,7 +66,7 @@ export const AuthProvider = ({
         toast.success("Welcome back!");
       }
     } catch (error: any) {
-      const errorMsg = error.response?.data?.message || "Invalid credentials.";
+      const errorMsg = error.response?.data?.message || "Something went wrong.";
       toast.error(errorMsg);
     } finally {
       setIsLoading(false);
