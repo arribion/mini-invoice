@@ -23,7 +23,7 @@ type Resource = {
 };
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_LOCAL_BASE_URL,
+  baseURL: import.meta.env.VITE_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },

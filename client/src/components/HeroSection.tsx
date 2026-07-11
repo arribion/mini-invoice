@@ -163,22 +163,27 @@ export function FeaturesSection() {
 export function TestimonialsSection() {
   const testimonials = [
     {
-      name: "Jane Doe",
-      role: "Startup Founder",
-      feedback:
-        "This platform streamlined our invoicing and project management. Highly recommend!",
-    },
-    {
-      name: "Michael Smith",
+      name: "Amelia Earhart",
       role: "Freelancer",
       feedback:
-        "I can manage multiple clients and payments effortlessly. It’s a game-changer.",
+        "The most difficult thing is the decision to act, the rest is merely tenacity.",
     },
     {
-      name: "Sarah Johnson",
+      name: "Karen Lamb",
+      role: "##########",
+      feedback: "A year from now you may wish you had started today.",
+    },
+    {
+      name: "Winston Churchill",
+      role: "##########",
+      feedback:
+        "Success is not final; failure is not fatal: It is the courage to continue that counts.",
+    },
+    {
+      name: "Walt Disney",
       role: "Consultant",
       feedback:
-        "Reliable, secure, and easy to use. My clients love the transparency.",
+        "All our dreams can come true, if we have the courage to pursue them.",
     },
   ];
 
@@ -186,7 +191,7 @@ export function TestimonialsSection() {
     <section className="py-20 bg-accent/10">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <h2 className="text-3xl font-bold text-center text-sky-500 mb-12">
-          What Our Clients Say
+          What they Said To you :)
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {testimonials.map((t) => (
@@ -203,7 +208,7 @@ export function TestimonialsSection() {
               </div>
               <p className="text-muted-foreground mb-4">"{t.feedback}"</p>
               <h4 className="text-sm font-semibold text-card-foreground">
-                {t.name}
+                <del>{t.name}</del>
               </h4>
               <p className="text-xs text-muted-foreground">{t.role}</p>
             </div>
