@@ -26,8 +26,9 @@ app.use(bodyParser.json());
 app.use(
   cors({
     origin: [
+      "http://localhost:5174",
       "http://localhost:5173",
-      "https://mini-invoice-mrlc-alpha.vercel.app",
+      "https://mini-invoice-mrlc-alpha.vercel.app/",
     ],
     credentials: true,
   }),
