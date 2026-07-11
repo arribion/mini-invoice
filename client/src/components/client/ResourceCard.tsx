@@ -2,8 +2,8 @@ import React from "react";
 import {
   Download,
   ExternalLink,
-  Image as ImageIcon,
-  Video,
+//   Image as ImageIcon,
+//   Video,
   FileText,
 } from "lucide-react";
 

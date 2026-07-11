@@ -2,25 +2,12 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import {
   FileText,
-  Download,
-  ExternalLink,
-  FileDown,
+  // Download,
+  // ExternalLink,
+  // FileDown,
 } from "lucide-react";
 import ResourceCard from "../../components/client/ResourceCard";
-
-type Resource = {
-  id: string;
-  title: string;
-  name: string;
-  description?: string;
-  fileType?: string;
-  type: string;
-  size: string;
-  fileUrl: string;
-  url?: string;
-  createdAt?: string;
-  uploadedAt?: string;
-};
+import type { Resource } from "../../components/client/ResourceCard";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
@@ -59,14 +46,14 @@ function Resources() {
     fetchResources();
   }, []);
 
-  const getFileLabel = (fileType?: string) => {
-    if (!fileType) return "File";
-    if (fileType.includes("pdf")) return "PDF";
-    if (fileType.includes("word") || fileType.includes("document"))
-      return "DOC";
-    if (fileType.includes("image")) return "Image";
-    return fileType.toUpperCase();
-  };
+  // const getFileLabel = (fileType?: string) => {
+  //   if (!fileType) return "File";
+  //   if (fileType.includes("pdf")) return "PDF";
+  //   if (fileType.includes("word") || fileType.includes("document"))
+  //     return "DOC";
+  //   if (fileType.includes("image")) return "Image";
+  //   return fileType.toUpperCase();
+  // };
 
   return (
     <section className="min-h-[80.8vh] bg-gray-50 px-4 py-10">
