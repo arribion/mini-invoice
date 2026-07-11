@@ -10,10 +10,10 @@ import {
 } from "../controllers/member.controller.js"
 
 member_router
-    .post("/add", add_member)
-    .get("/get", get_member)
-    .get("/all", get_all_member)
-    .put("/", update_member)
-    .delete("/", delete_member);
+    .post("/", add_member)
+    .get("/", get_all_member)
+    .get("/:id", get_member)
+    .put("/:id", update_member)
+    .delete("/:id", delete_member);
 
 export default member_router;

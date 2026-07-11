@@ -6,18 +6,24 @@ import {
   ExternalLink,
   FileDown,
 } from "lucide-react";
+import ResourceCard from "../../components/client/ResourceCard";
 
 type Resource = {
   id: string;
   title: string;
+  name: string;
   description?: string;
   fileType?: string;
+  type: string;
+  size: string;
   fileUrl: string;
+  url?: string;
   createdAt?: string;
+  uploadedAt?: string;
 };
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: import.meta.env.VITE_LOCAL_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -33,7 +39,7 @@ function Resources() {
       setLoading(true);
       setError("");
 
-      const { data } = await api.get("/resources");
+      const { data } = await api.get("/api/v1/resources/get");
 
       if (Array.isArray(data)) {
         setResources(data);
@@ -86,7 +92,7 @@ function Resources() {
         )}
 
         {!loading && error && (
-          <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center text-red-700">
+          <div className="rounded-[10px] border border-red-200 bg-red-50 p-6 text-center text-red-700">
             {error}
           </div>
         )}
@@ -106,60 +112,14 @@ function Resources() {
         )}
 
         {!loading && !error && resources.length > 0 && (
-          <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+         <div className="grid gap-6 grid-cols-[repeat(auto-fill,minmax(300px,1fr))]">
             {resources.map((resource) => (
-              <div
+              <ResourceCard
                 key={resource.id}
-                className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
-                <div className="mb-4 flex items-start gap-4">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-red-100 text-red-600">
-                    <FileDown size={26} />
-                  </div>
-
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="truncate text-lg font-semibold text-gray-900">
-                        {resource.title}
-                      </h3>
-                      <span className="rounded-full bg-gray-100 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-gray-600">
-                        {getFileLabel(resource.fileType)}
-                      </span>
-                    </div>
-
-                    <p className="mt-1 line-clamp-2 text-sm text-gray-500">
-                      {resource.description || "No description provided."}
-                    </p>
-
-                    {resource.createdAt && (
-                      <p className="mt-2 text-xs text-gray-400">
-                        Uploaded{" "}
-                        {new Date(resource.createdAt).toLocaleDateString()}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex gap-3">
-                  <a
-                    href={resource.fileUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-100">
-                    <ExternalLink size={16} />
-                    View
-                  </a>
-
-                  <a
-                    href={resource.fileUrl}
-                    download
-                    className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-red-700">
-                    <Download size={16} />
-                    Download
-                  </a>
-                </div>
-              </div>
+                resource={resource}
+              />
             ))}
-          </div>
+          </div>   
         )}
       </div>
     </section>

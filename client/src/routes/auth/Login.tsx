@@ -29,7 +29,7 @@ const Login = () => {
     login(email, password);
   };
 
-  const btnStyle = isLoading ? { color: "green" } : undefined;
+  const btnStyle = isLoading ? { color: "gray" } : undefined;
 
   return (
     <section className="min-h-[80vh] flex justify-center">

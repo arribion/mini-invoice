@@ -25,6 +25,9 @@ import MainLayout from "./layout/MainLayout";
 import Payments from "./routes/client/Payments";
 import Projects from "./routes/client/Projects";
 import Tasks from "./routes/client/Tasks";
+import Task from "./components/admin/Task";
+import Invoicing from "./components/admin/Invoicing";
+import Financies from "./components/admin/Financies";
 
 const App = () => {
   return (
@@ -61,6 +64,9 @@ const App = () => {
       <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
+          <Route path="tasks" element={<Task />} />
+          <Route path="invoicing" element={<Invoicing />} />
+          <Route path="financies" element={<Financies />} />
           <Route path="projects" element={<ManageProjects />} />
           <Route path="resources" element={<ManageResources />} />
           <Route path="members" element={<ManageMembers />} />

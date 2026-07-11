@@ -27,7 +27,7 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center mt-[12em]">
+      <div className="flex justify-center items-center mt-[15em]">
         <Oval
           height={80}
           width={80}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { LuRefreshCcw } from "react-icons/lu";
+import { FiSearch } from "react-icons/fi";
 interface Project {
   id: string;
   projectName: string;
@@ -42,6 +43,7 @@ const ProjectList = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
 
   const fetchProjects = async () => {
     try {
@@ -91,23 +93,38 @@ const ProjectList = () => {
 
   return (
     <div className="w-full overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-      <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
-        <div>
-          <h2 className="text-lg font-semibold text-gray-900">All Projects</h2>
-          <p className="text-sm text-gray-500">
-            View and manage all your current projects.
-          </p>
+      <div>
+        <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">
+              All Projects
+            </h2>
+            <p className="text-sm text-gray-500">
+              View and manage all your current projects.
+            </p>
+          </div>
+
+          <button
+            onClick={fetchProjects}
+            disabled={loading}
+            className="rounded flex gap-2 items-center bg-green-600 px-4 py-1 text-[9px] font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50">
+            <LuRefreshCcw size={15} className={loading ? "animate-spin" : ""} />
+            {loading ? "Refreshing..." : "Refresh"}
+          </button>
         </div>
 
-        <button
-          onClick={fetchProjects}
-          disabled={loading}
-          className="rounded flex gap-2 items-center bg-green-600 px-4 py-1 text-[9px] font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50">
-          <LuRefreshCcw className={loading ? "animate-spin" : ""} />
-          {loading ? "Refreshing..." : "Refresh"}
-        </button>
+        <div className="border-b p-6">
+          <div className="flex  border rounded-lg pl-2 items-center">
+            <FiSearch className="text-gray-700" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search projects..."
+              className="w-full text-gray-700 rounded-lg py-3 pl-1"
+            />
+          </div>
+        </div>
       </div>
-
       {loading && (
         <div className="p-10 text-center text-gray-500">
           Loading projects...
