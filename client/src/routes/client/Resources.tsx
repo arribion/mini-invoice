@@ -1,11 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import {
-  FileText,
-  // Download,
-  // ExternalLink,
-  // FileDown,
-} from "lucide-react";
+import { FileText } from "lucide-react";
 import ResourceCard from "../../components/client/ResourceCard";
 import type { Resource } from "../../components/client/ResourceCard";
 
@@ -25,7 +20,6 @@ function Resources() {
     try {
       setLoading(true);
       setError("");
-
       const { data } = await api.get("/api/v1/resources/get");
 
       if (Array.isArray(data)) {
@@ -46,15 +40,6 @@ function Resources() {
     fetchResources();
   }, []);
 
-  // const getFileLabel = (fileType?: string) => {
-  //   if (!fileType) return "File";
-  //   if (fileType.includes("pdf")) return "PDF";
-  //   if (fileType.includes("word") || fileType.includes("document"))
-  //     return "DOC";
-  //   if (fileType.includes("image")) return "Image";
-  //   return fileType.toUpperCase();
-  // };
-
   return (
     <section className="min-h-[80.8vh] bg-gray-50 px-4 py-10">
       <div className="mx-auto max-w-7xl">
@@ -62,14 +47,10 @@ function Resources() {
           <p className="text-sm font-medium text-green-600">
             Dashboard / Resources
           </p>
-
           <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900">
             PROJECT <span className="text-sky-500">RESOURCES</span>
           </h1>
-
-          <p className="mt-2 text-slate-500">
-           Get All project guides.
-          </p>
+          <p className="mt-2 text-slate-500">Get All project guides.</p>
         </div>
 
         {loading && (
@@ -99,14 +80,11 @@ function Resources() {
         )}
 
         {!loading && !error && resources.length > 0 && (
-         <div className="grid gap-6 grid-cols-[repeat(auto-fill,minmax(300px,1fr))]">
+          <div className="grid gap-6 grid-cols-[repeat(auto-fill,minmax(300px,1fr))]">
             {resources.map((resource) => (
-              <ResourceCard
-                key={resource.id}
-                resource={resource}
-              />
+              <ResourceCard key={resource.id} resource={resource} />
             ))}
-          </div>   
+          </div>
         )}
       </div>
     </section>

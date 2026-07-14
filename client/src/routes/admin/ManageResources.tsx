@@ -22,6 +22,11 @@ const formatBytes = (bytes: number) => {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
 };
 
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+if (!BASE_URL) {
+  console.log("Error accessing resource upload base url...")
+}
+
 const ManageResources = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [resources, setResources] = useState<Resource[]>([]);
@@ -34,7 +39,7 @@ const ManageResources = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3001/api/v1/resources/upload",
+        `${BASE_URL}/api/v1/resources/upload`,
         formData,
         {
           headers: {

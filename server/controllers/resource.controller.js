@@ -3,7 +3,14 @@ import streamUpload from "../utils/cloudinary.upload.js";
 
 export const uploadResource = async (req, res) => {
   const file = req.file;
-  try {
+  const { title, description } = req.body;
+  try { 
+    // if (!title || !description) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: "Title and description is required",
+    //   });
+    // }
     if (!file) {
       return res.status(400).json({
         success: false,
