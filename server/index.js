@@ -32,6 +32,8 @@ app.use(
       "https://mini-invoice-mrlc-alpha.vercel.app",
       "https://mini-invoice-two.vercel.app",
     ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Accept', 'Authorization'],
     credentials: true,
   }),
 );
