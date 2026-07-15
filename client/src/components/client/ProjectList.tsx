@@ -107,8 +107,8 @@ const ProjectList = () => {
           <button
             onClick={fetchProjects}
             disabled={loading}
-            className="rounded flex gap-2 items-center bg-green-600 px-4 py-1 text-[9px] font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50">
-            <LuRefreshCcw size={15} className={loading ? "animate-spin" : ""} />
+            className="rounded flex gap-2 items-center bg-green-600 px-4 py-1 font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50">
+            <LuRefreshCcw  className={loading ? "animate-spin" : ""} />
             {loading ? "Refreshing..." : "Refresh"}
           </button>
         </div>

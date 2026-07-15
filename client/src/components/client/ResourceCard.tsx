@@ -30,7 +30,7 @@ const ResourceCard: React.FC<Props> = ({ resource }) => {
       <div className="relative h-56 w-full overflow-hidden bg-gray-100">
         {isImage && (
           <img
-            src={resource.url}
+            src={resource.url || "https://placehold.net/400x400.png"}
             alt={resource.name}
             className="h-full w-full object-cover"
           />
@@ -46,7 +46,7 @@ const ResourceCard: React.FC<Props> = ({ resource }) => {
 
         {/* Fixed: Replaced iframe with a clean PDF UI block to prevent browser crashes */}
         {isPdf && (
-          <div className="flex h-full flex-col items-center justify-center bg-red-50 text-red-500">
+          <div className="flex h-full flex-col items-center justify-center bg-gray-300 text-red-500">
             <FileText size={50} />
             <span className="mt-2 text-xs font-medium">PDF Document</span>
           </div>
@@ -85,7 +85,6 @@ const ResourceCard: React.FC<Props> = ({ resource }) => {
             <ExternalLink size={18} /> View
           </a>
 
-          {/* Style Note: Changed hover:bg-red-700 to hover:bg-sky-700 to match the blue base theme */}
           <a
             href={resource.url}
             target="_blank"
