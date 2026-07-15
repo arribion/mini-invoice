@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
-import { FileText, Trash2, Upload, Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import { FileText, Upload, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 import axios from "axios";
+import ResourceTable from "../../components/admin/ResourceTable";
 
 interface Resource {
   id: string;
@@ -108,10 +109,6 @@ const ManageResources = () => {
     );
   };
 
-  const deleteFile = (id: string) => {
-    setResources((prev) => prev.filter((file) => file.id !== id));
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="mb-8">
@@ -124,9 +121,9 @@ const ManageResources = () => {
       <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
         <div className="flex flex-col gap-4 border-b border-gray-200 p-6 md:flex-row md:items-center md:justify-between">
           <div>
-            <h2 className="text-lg font-semibold">Resource Library</h2>
+            <h2 className="text-lg font-semibold">Preview</h2>
             <p className="text-sm text-gray-500">
-              Upload PDFs, Word documents, ZIP files and more.
+              <b>NOTE YOU CAN ONLY UPLOAD:</b>  images, pdf's, videos, and msword",
             </p>
           </div>
 
@@ -141,8 +138,7 @@ const ManageResources = () => {
 
             <button
               onClick={() => inputRef.current?.click()}
-              className="inline-flex items-center gap-2 rounded-xl bg-green-600 px-5 py-3 font-medium text-white transition hover:bg-green-700"
-            >
+              className="inline-flex items-center gap-2 rounded-xl bg-green-600 px-5 py-3 font-medium text-white transition hover:bg-green-700">
               <Upload size={18} />
               Upload Files
             </button>
@@ -165,9 +161,6 @@ const ManageResources = () => {
                 <th className="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-500">
                   Status
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-500">
-                  Actions
-                </th>
               </tr>
             </thead>
 
@@ -175,7 +168,7 @@ const ManageResources = () => {
               {resources.length === 0 && (
                 <tr>
                   <td colSpan={5} className="py-12 text-center text-gray-500">
-                    No resources uploaded yet.
+                    No resource Upload Preview.
                   </td>
                 </tr>
               )}
@@ -189,18 +182,21 @@ const ManageResources = () => {
                       </div>
                       <div>
                         {resource.cloudinaryUrl ? (
-                          <a 
-                            href={resource.cloudinaryUrl} 
-                            target="_blank" 
-                            rel="noreferrer" 
-                            className="font-semibold text-green-700 underline hover:text-green-800"
-                          >
+                          <a
+                            href={resource.cloudinaryUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="font-semibold text-green-700 underline hover:text-green-800">
                             {resource.name}
                           </a>
                         ) : (
-                          <p className="font-semibold text-gray-900">{resource.name}</p>
+                          <p className="font-semibold text-gray-900">
+                            {resource.name}
+                          </p>
                         )}
-                        <p className="text-sm text-gray-500">Downloadable Resource</p>
+                        <p className="text-sm text-gray-500">
+                          Downloadable Resource
+                        </p>
                       </div>
                     </div>
                   </td>
@@ -212,8 +208,13 @@ const ManageResources = () => {
                   <td className="px-6 py-5 text-gray-600">
                     {resource.status === "uploading" && (
                       <div className="flex items-center gap-2">
-                        <Loader2 className="animate-spin text-green-600" size={16} />
-                        <span className="text-xs font-medium text-gray-500">{resource.progress}%</span>
+                        <Loader2
+                          className="animate-spin text-green-600"
+                          size={16}
+                        />
+                        <span className="text-xs font-medium text-gray-500">
+                          {resource.progress}%
+                        </span>
                       </div>
                     )}
                     {resource.status === "success" && (
@@ -227,21 +228,14 @@ const ManageResources = () => {
                       </div>
                     )}
                   </td>
-
-                  <td className="px-6 py-5">
-                    <button
-                      onClick={() => deleteFile(resource.id)}
-                      className="inline-flex items-center gap-2 rounded-lg bg-red-50 px-4 py-2 text-red-600 transition hover:bg-red-100"
-                    >
-                      <Trash2 size={18} />
-                      Delete
-                    </button>
-                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+      </div>
+      <div className="mt-4">
+        <ResourceTable />
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import AddMemberForm from "../../components/admin/AddMemberForm";
+import { Plus, X } from "lucide-react";
 
 type MemberRole = "Software Engineer" | "Admin" | "Manager" | "Reviewer";
 
@@ -39,64 +40,66 @@ const MembersTable = ({
   handleEdit,
   handleDelete,
 }: MembersTableProps) => (
-  <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-    <table className="min-w-full divide-y divide-gray-200">
+  <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+    <table className="min-w-full divide-y divide-gray-200 text-left">
       <thead className="bg-gray-50">
         <tr>
-          <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+          <th className="px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-500">
             Name
           </th>
-          <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+          <th className="px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-500">
             Email
           </th>
-          <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+          <th className="px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-500">
             Role
           </th>
-          <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+          <th className="px-6 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-500">
             Phone
           </th>
-          <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
+          <th className="px-6 py-3.5 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
             Actions
           </th>
         </tr>
       </thead>
-      <tbody className="divide-y divide-gray-200">
+      <tbody className="divide-y divide-gray-200 text-sm text-gray-700">
         {members.length === 0 ? (
           <tr>
             <td
               colSpan={5}
-              className="px-6 py-4 text-center text-sm text-gray-500">
-              No members available.
+              className="px-6 py-12 text-center text-gray-400 font-medium">
+              No members available in the repository index.
             </td>
           </tr>
         ) : (
           members.map((member) => (
-            <tr key={member.id}>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+            <tr
+              key={member.id}
+              className="hover:bg-slate-50/80 transition-colors">
+              <td className="px-6 py-4 font-semibold text-gray-900">
                 {member.fullName}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {member.email}
+              <td className="px-6 py-4 text-gray-500">{member.email}</td>
+              <td className="px-6 py-4">
+                <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-800">
+                  {member.role}
+                </span>
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {member.role}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {member.phone ?? "-"}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <button
-                  type="button"
-                  onClick={() => handleEdit(member)}
-                  className="mr-2 rounded bg-blue-600 px-3 py-1 text-white hover:bg-blue-700">
-                  Edit
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleDelete(member.id)}
-                  className="rounded bg-red-600 px-3 py-1 text-white hover:bg-red-700">
-                  Delete
-                </button>
+              <td className="px-6 py-4 text-gray-500">{member.phone ?? "—"}</td>
+              <td className="px-6 py-4 text-right">
+                <div className="inline-flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleEdit(member)}
+                    className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition">
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(member.id)}
+                    className="rounded-lg bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-100 transition">
+                    Delete
+                  </button>
+                </div>
               </td>
             </tr>
           ))
@@ -107,16 +110,9 @@ const MembersTable = ({
 );
 
 const ManageMembers = () => {
-
-  const [showMemberAddForm, setShowMemberAddForm] = useState(true);
-
-  const toggleMembersForm = () => {
-    setShowMemberAddForm((prev) => !prev);
-  }
-
+  const [showMemberAddForm, setShowMemberAddForm] = useState(false);
   const [members, setMembers] = useState<Member[]>(initialMembers);
   const [editingId, setEditingId] = useState<string | null>(null);
-
   const [form, setForm] = useState({
     fullName: "",
     email: "",
@@ -127,6 +123,18 @@ const ManageMembers = () => {
 
   const isEditing = useMemo(() => editingId !== null, [editingId]);
 
+  // Trap body layout scrollbars when the modal panel is mounted open
+  useEffect(() => {
+    if (showMemberAddForm) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [showMemberAddForm]);
+
   const resetForm = () => {
     setForm({
       fullName: "",
@@ -135,13 +143,12 @@ const ManageMembers = () => {
       role: "Software Engineer",
       phone: "",
     });
-
     setEditingId(null);
+    setShowMemberAddForm(false);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!form.fullName || !form.email || (!isEditing && !form.password)) return;
 
     if (isEditing && editingId) {
@@ -164,18 +171,15 @@ const ManageMembers = () => {
         fullName: form.fullName,
         email: form.email,
         role: form.role,
-        phone: form.phone,
+        phone: form.phone || undefined,
       };
-
       setMembers((prev) => [newMember, ...prev]);
     }
-
     resetForm();
   };
 
   const handleEdit = (member: Member) => {
     setEditingId(member.id);
-
     setForm({
       fullName: member.fullName,
       email: member.email,
@@ -183,52 +187,89 @@ const ManageMembers = () => {
       role: member.role,
       phone: member.phone ?? "",
     });
+    setShowMemberAddForm(true); // Open structural modal instantly on row edit target
   };
 
   const handleDelete = (id: string) => {
+    if (!window.confirm("Delete this staff member entry path?")) return;
     setMembers((prev) => prev.filter((member) => member.id !== id));
-
     if (editingId === id) {
       resetForm();
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="mb-8 flex justify-between items-center">
+    <div className="min-h-screen bg-gray-50/50 p-6 relative">
+      {/* Top Banner Toolbar */}
+      <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Manage Members</h1>
-          <p className="text-gray-600 mt-2">
-            Create and manage member accounts.
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+            Manage Members
+          </h1>
+          <p className="text-xs text-gray-500 mt-1">
+            Create, update permissions, and manage organization profile
+            directories.
           </p>
         </div>
-
-        <div>
-          <button onClick={toggleMembersForm} className="border rounded-2xl p-2 hover:bg-gray-200">Add Member</button>
-        </div>
+        <button
+          onClick={() => setShowMemberAddForm(true)}
+          className="inline-flex items-center gap-2 rounded-xl bg-gray-900 hover:bg-gray-800 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition active:scale-[0.98]">
+          <Plus size={16} />
+          Add Member
+        </button>
       </div>
 
-      <div className="">
-        {showMemberAddForm && (
-          <div className="lg:col-span-4">
-            <AddMemberForm
-              form={form}
-              setForm={setForm}
-              handleSubmit={handleSubmit}
-              resetForm={resetForm}
-              isEditing={isEditing}
-            />
+      {/* Primary Context Data Table Layout */}
+      <div className="w-full">
+        <MembersTable
+          members={members}
+          handleEdit={handleEdit}
+          handleDelete={handleDelete}
+        />
+      </div>
+
+      {/* Global Form Modal Overlay Backdrop */}
+      {showMemberAddForm && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm animate-fade-in"
+          onClick={resetForm} // Closes modal backdrop cleanly on outside workspace clicks
+        >
+          <div
+            className="relative w-full max-w-lg bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden flex flex-col max-h-[90vh]"
+            onClick={(e) => e.stopPropagation()} // Halts bubble intercept execution
+          >
+            {/* Modal Context Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-white sticky top-0 z-10">
+              <div>
+                <h3 className="text-base font-bold text-gray-900">
+                  {isEditing
+                    ? "Modify Member Credentials"
+                    : "Register Corporate Profile"}
+                </h3>
+                <p className="text-[11px] text-gray-400 mt-0.5">
+                  Fill out authorization parameters below.
+                </p>
+              </div>
+              <button
+                onClick={resetForm}
+                className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition">
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Scrollable Inner Panel Form Content Body */}
+            <div className="p-6 overflow-y-auto">
+              <AddMemberForm
+                form={form}
+                setForm={setForm}
+                onSubmit={handleSubmit}
+                resetForm={resetForm}
+                isEditing={isEditing}
+              />
+            </div>
           </div>
-        )}
-
-        <div className="lg:col-span-8">
-          <MembersTable
-            members={members}
-            handleEdit={handleEdit}
-            handleDelete={handleDelete}
-          />
         </div>
-      </div>
+      )}
     </div>
   );
 };

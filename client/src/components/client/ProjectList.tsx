@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { LuRefreshCcw } from "react-icons/lu";
 import { FiSearch } from "react-icons/fi";
+
 interface Project {
   id: string;
   projectName: string;
@@ -29,13 +30,13 @@ interface ProjectsResponse {
 const getBadgeColor = (status: Project["status"]) => {
   switch (status) {
     case "ACTIVE":
-      return "bg-green-100 text-green-700";
+      return "bg-emerald-50 text-emerald-700 border-emerald-200/60";
     case "PENDING":
-      return "bg-yellow-100 text-yellow-700";
+      return "bg-amber-50 text-amber-700 border-amber-200/60";
     case "CLOSED":
-      return "bg-red-100 text-red-700";
+      return "bg-rose-50 text-rose-700 border-rose-200/60";
     default:
-      return "bg-gray-100 text-gray-700";
+      return "bg-slate-50 text-slate-700 border-slate-200/60";
   }
 };
 
@@ -49,12 +50,9 @@ const ProjectList = () => {
     try {
       setLoading(true);
       setError("");
-
       const { data } = await axios.get<ProjectsResponse>(
         "https://mini-invoice.onrender.com/api/v1/projects",
       );
-
-      console.log("API Response:", data);
 
       if (!data.success) {
         throw new Error("Failed to fetch projects.");
@@ -68,11 +66,9 @@ const ProjectList = () => {
         ratePerHour: Number(proj.avg_pay),
         status: proj.status,
       }));
-
       setProjects(mappedProjects);
     } catch (err) {
       console.error(err);
-
       if (axios.isAxiosError(err)) {
         setError(
           (err.response?.data as { message?: string })?.message ?? err.message,
@@ -91,101 +87,105 @@ const ProjectList = () => {
     fetchProjects();
   }, []);
 
+  // Filter project dataset dynamically against name, platform channel, or description parameters
+  const filteredProjects = projects.filter(
+    (project) =>
+      project.projectName.toLowerCase().includes(search.toLowerCase()) ||
+      project.platform.toLowerCase().includes(search.toLowerCase()) ||
+      project.description.toLowerCase().includes(search.toLowerCase()),
+  );
+
   return (
-    <div className="w-full overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-      <div>
-        <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900">
-              All Projects
-            </h2>
-            <p className="text-sm text-gray-500">
-              View and manage all your current projects.
-            </p>
-          </div>
-
-          <button
-            onClick={fetchProjects}
-            disabled={loading}
-            className="rounded flex gap-2 items-center bg-green-600 px-4 py-1 font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50">
-            <LuRefreshCcw  className={loading ? "animate-spin" : ""} />
-            {loading ? "Refreshing..." : "Refresh"}
-          </button>
+    <div className="w-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+      {/* Top Main Header Panel Component Block */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-100 p-6 bg-white">
+        <div>
+          <h2 className="text-xl font-bold text-gray-900 tracking-tight">
+            All Projects
+          </h2>
+          <p className="text-xs text-gray-500 mt-0.5">
+            View, audit, and track active platform invoice workflows.
+          </p>
         </div>
+        <button
+          onClick={fetchProjects}
+          disabled={loading}
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-gray-900 hover:bg-gray-800 disabled:bg-gray-400 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition active:scale-[0.98] disabled:cursor-not-allowed">
+          <LuRefreshCcw size={16} className={loading ? "animate-spin" : ""} />
+          {loading ? "Refreshing..." : "Refresh"}
+        </button>
+      </div>
 
-        <div className="border-b p-6">
-          <div className="flex  border rounded-lg pl-2 items-center">
-            <FiSearch className="text-gray-700" />
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search projects..."
-              className="w-full text-gray-700 rounded-lg py-3 pl-1"
-            />
-          </div>
+      {/* Interactive Sub-Toolbar Filter Input */}
+      <div className="p-4 bg-gray-50/50 border-b border-gray-100">
+        <div className="relative max-w-md">
+          <FiSearch
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            size={18}
+          />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search projects by name, channel, or keywords..."
+            className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-900/5 transition-all"
+          />
         </div>
       </div>
-      {loading && (
-        <div className="p-10 text-center text-gray-500">
-          Loading projects...
+
+      {/* Presentational Status Intercept Handlers */}
+      {loading && projects.length === 0 ? (
+        <div className="p-16 text-center text-gray-500 flex flex-col items-center justify-center gap-3">
+          <LuRefreshCcw className="animate-spin text-gray-400" size={24} />
+          <span className="text-sm font-medium">
+            Syncing layout registry indexes...
+          </span>
         </div>
-      )}
-
-      {!loading && error && (
-        <div className="p-10 text-center text-red-600">{error}</div>
-      )}
-
-      {!loading && !error && projects.length === 0 && (
-        <div className="p-10 text-center text-gray-500">No projects found.</div>
-      )}
-
-      {!loading && !error && projects.length > 0 && (
+      ) : error ? (
+        <div className="p-16 text-center text-rose-600 bg-rose-50/10 flex flex-col items-center gap-3">
+          <span className="text-sm font-medium">{error}</span>
+          <button
+            onClick={fetchProjects}
+            className="px-4 py-2 border border-rose-200 text-rose-700 bg-white rounded-xl text-xs font-semibold hover:bg-rose-50 transition">
+            Retry Call
+          </button>
+        </div>
+      ) : filteredProjects.length === 0 ? (
+        <div className="p-16 text-center text-gray-400 font-medium">
+          No matching operational project tracks discovered.
+        </div>
+      ) : (
+        /* Core Presentational Data Grid Layer */
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                  Project
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                  Platform
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                  Description
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                  Avg Pay
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                  Status
-                </th>
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-gray-100 bg-gray-50 text-[11px] font-bold uppercase tracking-wider text-gray-500">
+                <th className="px-6 py-4">Project Details</th>
+                <th className="px-6 py-4">Platform Channel</th>
+                <th className="px-6 py-4 max-w-xs">Scope Description</th>
+                <th className="px-6 py-4">Avg Hourly Rate</th>
+                <th className="px-6 py-4">Current Status</th>
               </tr>
             </thead>
-
-            <tbody className="divide-y divide-gray-100">
-              {projects.map((project) => (
-                <tr key={project.id} className="hover:bg-green-100 transition">
-                  <td className="px-6 py-5 font-medium text-gray-900">
+            <tbody className="divide-y divide-gray-100 text-sm text-gray-700">
+              {filteredProjects.map((project) => (
+                <tr
+                  key={project.id}
+                  className="hover:bg-slate-50/70 transition-colors">
+                  <td className="px-6 py-4 font-semibold text-gray-900">
                     {project.projectName}
                   </td>
-
-                  <td className="px-6 py-5 text-gray-700">
+                  <td className="px-6 py-4 text-gray-500 font-medium">
                     {project.platform}
                   </td>
-
-                  <td className="px-6 py-5 text-gray-600">
-                    {project.description}
+                  <td className="px-6 py-4 text-gray-400 wrap-break-word max-w-xs text-xs font-medium">
+                    {project.description || "—"}
                   </td>
-
-                  <td className="px-6 py-5 font-semibold">
+                  <td className="px-6 py-4 text-gray-900 font-semibold whitespace-nowrap">
                     KES {project.ratePerHour.toLocaleString()}
                   </td>
-
-                  <td className="px-6 py-5">
+                  <td className="px-6 py-4">
                     <span
-                      className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${getBadgeColor(
-                        project.status,
-                      )}`}>
+                      className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${getBadgeColor(project.status)}`}>
                       {project.status}
                     </span>
                   </td>
