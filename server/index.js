@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import cookieParser from "cookie-parser"; 
+import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
 import bodyParser from "body-parser";
 // import { check_uploaded_files } from "./middleware/Upload.check.file.js";
@@ -12,38 +12,49 @@ const app = express();
 const fileName = path.resolve() + "/views";
 const __dirname = path.resolve(fileName);
 
-const PORT = process.env.PORT || 3001;
-if (!process.env.PORT) {
-  console.log("error accessing connection port..");
-}
-
 // Middlewares
-app.use(express.json()); 
+const allowedOrigins = [
+  "http://localhost:5172",
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "https://vercel.app",
+  "https://vercel.app",
+];
+
+// CRITICAL FIX: Put your CORS configuration options above ALL body parsers
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // If there's no origin (like server-to-server or curl tools), allow it
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error(`CORS Policy Blocked: ${origin}`));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "Accept"],
+    credentials: true,
+    optionsSuccessStatus: 200, // Fixes Render/legacy browser edge cases
+  }),
+);
+
+// Express preflight option fallback catch
+app.options("*", cors());
+
+app.use(express.json());
 app.use(cookieParser());
 app.use(express.json());
 app.use(bodyParser.json());
 // app.use(check_uploaded_files());
-app.use(
-  cors({
-    origin: [
-      "http://localhost:5172",
-      "http://localhost:5173",
-      "http://localhost:5174",
-      "https://mini-invoice-mrlc-alpha.vercel.app",
-      "https://mini-invoice-two.vercel.app",
-    ],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Accept', 'Authorization'],
-    credentials: true,
-  }),
-);
 
 // Routes Imports
 import auth_router from "./routes/auth.route.js";
 import project_router from "./routes/project.route.js";
 import member_router from "./routes/members.route.js";
 import resource_router from "./routes/resources.route.js";
-
 
 app.get("/", (req, res) => {
   res.send("app running");
@@ -55,8 +66,10 @@ app.use("/api/v1/projects", project_router);
 app.use("/api/v1/members", member_router);
 app.use("/api/v1/resources", resource_router);
 
-
-app.listen(PORT, () => {
-  connectDB();
-  console.log(`Server running on port ${PORT}`);
+const PORT = process.env.PORT || 3001;
+if (!process.env.PORT) {
+  console.log("error accessing connection port..");
+}
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server executing successfully on port ${PORT}`);
 });
