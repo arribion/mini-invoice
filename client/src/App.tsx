@@ -44,7 +44,7 @@ const App = () => {
       </Route>
 
       {/* Client Specific Protected Routes */}
-      <Route element={<ProtectedRoute allowedRoles={["client"]} />}>
+      <Route element={<ProtectedRoute allowedRoles={["TASKER"]} />}>
         <Route element={<ClientLayout />}>
           <Route path="/client/dashboard" element={<Dashboard />} />
           <Route path="/client/resources" element={<Resources />} />
@@ -61,7 +61,7 @@ const App = () => {
       </Route>
 
       {/* Admin Specific Protected Routes */}
-      <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+      <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
           <Route path="tasks" element={<Task />} />

@@ -13,7 +13,7 @@ const Login = () => {
   // Redirect users instantly if they are already logged in
   useEffect(() => {
     if (isLoggedIn && user) {
-      if (user.role === "admin") {
+      if (user.role === "ADMIN") {
         navigate("/admin", { replace: true });
       } else {
         navigate("/client/dashboard", { replace: true });

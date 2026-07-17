@@ -9,8 +9,8 @@ type Props = {
   handleDelete: (id: string) => Promise<void> | void;
 };
 
-const getRoleBadgeColor = (role: string) => {
-  const normalized = role?.toUpperCase();
+const getRoleBadgeColor = (role?: string) => {
+  const normalized = (role ?? "").toUpperCase();
   if (normalized === "ADMIN" || normalized === "SUPERADMIN") {
     return "bg-purple-50 text-purple-700 border-purple-200/60";
   }
@@ -29,7 +29,7 @@ const MembersTable = ({ handleEdit, handleDelete }: Props) => {
   const api = axios.create({
     baseURL: import.meta.env.VITE_BASE_URL,
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
   });
 
@@ -59,18 +59,36 @@ const MembersTable = ({ handleEdit, handleDelete }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const filteredMembers = members.filter(
-    (member) =>
-      member.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      member.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      member.role.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  // Normalize search query once
+  const q = (searchTerm ?? "").trim().toLowerCase();
+
+  // Safe accessor for name/email/role fields
+  const safeString = (value: unknown) => {
+    if (value === null || value === undefined) return "";
+    return String(value);
+  };
+
+  const filteredMembers = members.filter((member) => {
+    // support multiple name fields that might exist in different APIs
+    const name = safeString(
+      (member as any).fullName ??
+        (member as any).full_name ??
+        (member as any).name,
+    ).toLowerCase();
+    const email = safeString((member as any).email).toLowerCase();
+    const role = safeString((member as any).role).toLowerCase();
+
+    // if no query, include all
+    if (!q) return true;
+
+    return name.includes(q) || email.includes(q) || role.includes(q);
+  });
 
   const onDelete = async (id: string) => {
     try {
       await handleDelete(id);
       // Optimistically update local state
-      setMembers((prev) => prev.filter((m) => m.id !== id));
+      setMembers((prev) => prev.filter((m) => (m as any).id !== id));
     } catch (err) {
       console.error("Delete failed", err);
     }
@@ -154,45 +172,57 @@ const MembersTable = ({ handleEdit, handleDelete }: Props) => {
                     </td>
                   </tr>
                 ) : (
-                  filteredMembers.map((member) => (
-                    <tr
-                      key={member.id}
-                      className="hover:bg-slate-50/70 transition-colors group">
-                      <td className="p-4 pl-6 font-semibold text-gray-900">
-                        {member.fullName}
-                      </td>
-                      <td className="p-4 text-gray-500 break-all max-w-xs">
-                        {member.email}
-                      </td>
-                      <td className="p-4">
-                        <span
-                          className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider ${getRoleBadgeColor(
-                            member.role,
-                          )}`}>
-                          {member.role}
-                        </span>
-                      </td>
-                      <td className="p-4 text-gray-500 font-medium">
-                        {member.phone || "—"}
-                      </td>
-                      <td className="p-4 pr-6">
-                        <div className="flex items-center justify-center gap-2">
-                          <button
-                            onClick={() => handleEdit(member)}
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition active:scale-[0.97]">
-                            <Edit2 size={13} className="text-gray-400" />
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => onDelete(member.id)}
-                            className="inline-flex items-center gap-1.5 rounded-lg bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-100 transition active:scale-[0.97]">
-                            <Trash2 size={13} />
-                            Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
+                  filteredMembers.map((member) => {
+                    const id = (member as any).id ?? (member as any)._id ?? "";
+                    const name = safeString(
+                      (member as any).fullName ??
+                        (member as any).full_name ??
+                        (member as any).name,
+                    );
+                    const email = safeString((member as any).email);
+                    const role = safeString((member as any).role);
+                    const phone = safeString((member as any).phone);
+
+                    return (
+                      <tr
+                        key={id}
+                        className="hover:bg-slate-50/70 transition-colors group">
+                        <td className="p-4 pl-6 font-semibold text-gray-900">
+                          {name || "—"}
+                        </td>
+                        <td className="p-4 text-gray-500 break-all max-w-xs">
+                          {email || "—"}
+                        </td>
+                        <td className="p-4">
+                          <span
+                            className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider ${getRoleBadgeColor(
+                              role,
+                            )}`}>
+                            {role || "—"}
+                          </span>
+                        </td>
+                        <td className="p-4 text-gray-500 font-medium">
+                          {phone || "—"}
+                        </td>
+                        <td className="p-4 pr-6">
+                          <div className="flex items-center justify-center gap-2">
+                            <button
+                              onClick={() => handleEdit(member)}
+                              className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition active:scale-[0.97]">
+                              <Edit2 size={13} className="text-gray-400" />
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => onDelete(id)}
+                              className="inline-flex items-center gap-1.5 rounded-lg bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-100 transition active:scale-[0.97]">
+                              <Trash2 size={13} />
+                              Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>

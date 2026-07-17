@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import { Oval } from "react-loader-spinner";
 
 type ProtectedRouteProps = {
-  allowedRoles?: ("client" | "admin")[];
+  allowedRoles?: ("TASKER" | "ADMIN")[];
 };
 
 export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
@@ -19,7 +19,7 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
       isLoggedIn &&
       allowedRoles &&
       user &&
-      !allowedRoles.includes(user.role)
+      !allowedRoles.includes(user.role as "TASKER" | "ADMIN")
     ) {
       toast.error("Unauthorized access.");
     }
@@ -52,7 +52,7 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
     // Redirect to  respective dashboards if they land on the wrong route
     return (
       <Navigate
-        to={user.role === "admin" ? "/admin" : "/client/dashboard"}
+        to={user.role === "ADMIN" ? "/admin" : "/client/dashboard"}
         replace
       />
     );

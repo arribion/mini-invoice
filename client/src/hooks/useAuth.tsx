@@ -2,7 +2,10 @@ import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 
-type User = { role: "client" | "admin"; email: string } | null;
+type User = {
+  role: "TASKER" | "ADMIN";
+  email: string
+} | null;
 
 type AuthContextType = {
   user: User;

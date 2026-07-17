@@ -5,7 +5,7 @@ import AddMemberForm from "../../components/admin/AddMemberForm";
 import { Plus, X } from "lucide-react";
 import axios from "axios";
 
-export type MemberRole = "Software Engineer" | "Admin" | "Manager" | "Reviewer";
+import type { MemberRole } from "../../types/role";
 
 export type Member = {
   id: string;
@@ -32,7 +32,7 @@ const ManageMembers = () => {
     fullName: "",
     email: "",
     password: "",
-    role: "Software Engineer",
+    role: "TASKER",
     phone: "",
   });
   const [loading, setLoading] = useState(false);
@@ -51,7 +51,7 @@ const ManageMembers = () => {
     try {
       setLoading(true);
       setError("");
-      const { data } = await api.get("/api/v1/members");
+      const { data } = await api.get("/api/v1/");
 
       if (Array.isArray(data)) {
         setMembers(data);
@@ -73,13 +73,14 @@ const ManageMembers = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+
   // Reset form and close modal
   const resetForm = () => {
     setForm({
       fullName: "",
       email: "",
       password: "",
-      role: "Software Engineer",
+      role: "TASKER",
       phone: "",
     });
     setEditingId(null);
@@ -135,7 +136,7 @@ const ManageMembers = () => {
               fullName: "",
               email: "",
               password: "",
-              role: "Software Engineer",
+              role: "TASKER",
               phone: "",
             });
           }}

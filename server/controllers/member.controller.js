@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
-import { MemberModel } from "../models/member.model.js";
+import UserModel from "../models/userModel.js";
 
-// Create Member
+// Create Member (now using UserModel)
 export const add_member = async (req, res) => {
   try {
     const { full_name, email, password, phone, role, status } = req.body;
@@ -13,18 +13,17 @@ export const add_member = async (req, res) => {
       });
     }
 
-    const existingMember = await MemberModel.findOne({ email });
-
-    if (existingMember) {
+    const existingUser = await UserModel.findOne({ email });
+    if (existingUser) {
       return res.status(409).json({
         success: false,
-        message: "A member with this email already exists.",
+        message: "A user with this email already exists.",
       });
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    const member = await MemberModel.create({
+    const user = await UserModel.create({
       full_name,
       email,
       password: hashedPassword,
@@ -33,13 +32,13 @@ export const add_member = async (req, res) => {
       status,
     });
 
-    const memberResponse = member.toObject();
-    delete memberResponse.password;
+    const userResponse = user.toObject();
+    delete userResponse.password;
 
     return res.status(201).json({
       success: true,
-      message: "Member created successfully.",
-      data: memberResponse,
+      message: "User created successfully.",
+      data: userResponse,
     });
   } catch (error) {
     return res.status(500).json({
@@ -49,23 +48,22 @@ export const add_member = async (req, res) => {
   }
 };
 
-// Get One Member
+// Get One User
 export const get_member = async (req, res) => {
   try {
     const { id } = req.params;
+    const user = await UserModel.findById(id).select("-password");
 
-    const member = await MemberModel.findById(id).select("-password");
-
-    if (!member) {
+    if (!user) {
       return res.status(404).json({
         success: false,
-        message: "Member not found.",
+        message: "User not found.",
       });
     }
 
     return res.status(200).json({
       success: true,
-      data: member,
+      data: user,
     });
   } catch (error) {
     return res.status(500).json({
@@ -75,17 +73,17 @@ export const get_member = async (req, res) => {
   }
 };
 
-// Get All Members
+// Get All Users
 export const get_all_member = async (req, res) => {
   try {
-    const members = await MemberModel.find()
+    const users = await UserModel.find()
       .select("-password")
       .sort({ createdAt: -1 });
 
     return res.status(200).json({
       success: true,
-      count: members.length,
-      data: members,
+      count: users.length,
+      data: users,
     });
   } catch (error) {
     return res.status(500).json({
@@ -95,26 +93,22 @@ export const get_all_member = async (req, res) => {
   }
 };
 
-// Update Member
+// Update User
 export const update_member = async (req, res) => {
   try {
     const { id } = req.params;
-
     const updates = { ...req.body };
 
-    // Hash password if it is being updated
     if (updates.password) {
       updates.password = await bcrypt.hash(updates.password, 12);
     }
 
-    // Prevent duplicate email
     if (updates.email) {
-      const existingMember = await MemberModel.findOne({
+      const existingUser = await UserModel.findOne({
         email: updates.email,
         _id: { $ne: id },
       });
-
-      if (existingMember) {
+      if (existingUser) {
         return res.status(409).json({
           success: false,
           message: "Email is already in use.",
@@ -122,22 +116,22 @@ export const update_member = async (req, res) => {
       }
     }
 
-    const member = await MemberModel.findByIdAndUpdate(id, updates, {
+    const user = await UserModel.findByIdAndUpdate(id, updates, {
       new: true,
       runValidators: true,
     }).select("-password");
 
-    if (!member) {
+    if (!user) {
       return res.status(404).json({
         success: false,
-        message: "Member not found.",
+        message: "User not found.",
       });
     }
 
     return res.status(200).json({
       success: true,
-      message: "Member updated successfully.",
-      data: member,
+      message: "User updated successfully.",
+      data: user,
     });
   } catch (error) {
     return res.status(500).json({
@@ -147,23 +141,22 @@ export const update_member = async (req, res) => {
   }
 };
 
-// Delete Member
+// Delete User
 export const delete_member = async (req, res) => {
   try {
     const { id } = req.params;
+    const user = await UserModel.findByIdAndDelete(id);
 
-    const member = await MemberModel.findByIdAndDelete(id);
-
-    if (!member) {
+    if (!user) {
       return res.status(404).json({
         success: false,
-        message: "Member not found.",
+        message: "User not found.",
       });
     }
 
     return res.status(200).json({
       success: true,
-      message: "Member deleted successfully.",
+      message: "User deleted successfully.",
     });
   } catch (error) {
     return res.status(500).json({

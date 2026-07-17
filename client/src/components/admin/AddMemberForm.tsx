@@ -1,17 +1,18 @@
-// src/components/admin/AddMemberForm.tsx
 import React, { useState } from "react";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
 
-export type MemberRole = "Admin" | "Manager" | "Reviewer" | "Software Engineer";
+export type MemberRole = "TASKER" | "MANAGER" | "ADMIN";
 
 export type FormData = {
   id?: string;
-  fullName: string;
+  fullName: string; // mapped to "full_name" for backend
   email: string;
   password?: string;
   role: MemberRole;
   phone: string;
+  status?: string; // optional
 };
 
 type Props = {
@@ -21,6 +22,15 @@ type Props = {
   resetForm: () => void;
   isEditing: boolean;
 };
+
+const api = axios.create({
+  baseURL: import.meta.env.VITE_BASE_URL ?? "",
+  headers: { "Content-Type": "application/json" },
+  withCredentials: true,
+});
+
+const isValidEmail = (email: string) =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 
 const AddMemberForm = ({
   form,
@@ -32,11 +42,6 @@ const AddMemberForm = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiError, setApiError] = useState("");
 
-  const api = axios.create({
-    baseURL: import.meta.env.VITE_BASE_URL,
-    headers: { "Content-Type": "application/json" },
-  });
-
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
@@ -46,15 +51,36 @@ const AddMemberForm = ({
 
   const internalSubmitHandler = async (e: React.FormEvent) => {
     e.preventDefault();
+    setApiError("");
 
-    // Auto‑generate password from phone if missing on create
-    let passwordToUse = form.password;
-    if (!isEditing && !passwordToUse && form.phone) {
-      passwordToUse = form.phone;
+    const fullName = (form.fullName ?? "").trim();
+    const email = (form.email ?? "").trim();
+    const phone = (form.phone ?? "").trim();
+    let passwordToUse = form.password?.trim();
+
+    if (!fullName) {
+      setApiError("Full name is required.");
+      return;
+    }
+    if (!email || !isValidEmail(email)) {
+      setApiError("A valid email address is required.");
+      return;
     }
 
-    if (!form.fullName || !form.email || (!isEditing && !passwordToUse)) {
-      setApiError("Full name, email and password are required.");
+    // If creating and no password provided, fallback to phone-based password if phone exists
+    if (!isEditing && !passwordToUse) {
+      if (phone) {
+        passwordToUse = `Pass${phone.replace(/\D/g, "").slice(-6) || phone}`;
+      } else {
+        setApiError(
+          "Provide a password or a phone number to auto-generate one.",
+        );
+        return;
+      }
+    }
+
+    if (!isEditing && passwordToUse && passwordToUse.length < 6) {
+      setApiError("Password must be at least 6 characters.");
       return;
     }
 
@@ -64,24 +90,29 @@ const AddMemberForm = ({
 
       if (isEditing && form.id) {
         await api.put(`/api/v1/members/${form.id}`, {
-          fullName: form.fullName,
-          email: form.email,
+          full_name: fullName,
+          email,
           role: form.role,
-          phone: form.phone,
+          phone,
+          status: form.status,
         });
+        toast.success("Member updated.");
       } else {
         await api.post("/api/v1/members", {
-          fullName: form.fullName,
-          email: form.email,
+          full_name: fullName,
+          email,
           password: passwordToUse,
           role: form.role,
-          phone: form.phone,
+          phone,
+          status: form.status,
         });
+        toast.success("Member registered.");
       }
 
       onSuccess();
       resetForm();
     } catch (err: any) {
+      console.error(err);
       setApiError(
         err?.response?.data?.message ??
           err?.message ??
@@ -94,12 +125,6 @@ const AddMemberForm = ({
 
   return (
     <form onSubmit={internalSubmitHandler} className="space-y-4">
-      {apiError && (
-        <div className="p-3 text-xs font-medium bg-rose-50 text-rose-600 rounded-xl border border-rose-100">
-          {apiError}
-        </div>
-      )}
-
       {/* Full Name */}
       <div>
         <label className="block text-xs font-semibold text-gray-600 uppercase mb-1.5">
@@ -133,6 +158,21 @@ const AddMemberForm = ({
         />
       </div>
 
+      {/* Phone */}
+      <div>
+        <label className="block text-xs font-semibold text-gray-600 uppercase mb-1.5">
+          Phone Number
+        </label>
+        <input
+          name="phone"
+          value={form.phone}
+          onChange={handleChange}
+          placeholder="+254 700 000 000"
+          disabled={isSubmitting}
+          className="w-full rounded border px-4 py-2.5 text-sm"
+        />
+      </div>
+
       {/* Password (only for new members) */}
       {!isEditing && (
         <div>
@@ -140,7 +180,7 @@ const AddMemberForm = ({
             Account Password
           </label>
           <div className="px-1 py-2 border-2 border-yellow-500 rounded bg-yellow-50 my-2 text-xs">
-            Leave blank to use phone number as password.
+            Leave blank to auto-generate from phone number.
           </div>
           <input
             name="password"
@@ -162,30 +202,22 @@ const AddMemberForm = ({
         <select
           name="role"
           value={form.role}
-          onChange={handleChange}
+          onChange={(e) =>
+            setForm((prev) => ({ ...prev, role: e.target.value as MemberRole }))
+          }
           disabled={isSubmitting}
           className="w-full rounded border px-4 py-2.5 text-sm">
-          <option value="Reviewer">Reviewer</option>
-          <option value="Manager">Manager</option>
-          <option value="Admin">Admin</option>
-          <option value="Software Engineer">Software Engineer</option>
+          <option value="TASKER">Tasker</option>
+          <option value="MANAGER">Manager</option>
+          <option value="ADMIN">Admin</option>
         </select>
       </div>
 
-      {/* Phone */}
-      <div>
-        <label className="block text-xs font-semibold text-gray-600 uppercase mb-1.5">
-          Phone Number
-        </label>
-        <input
-          name="phone"
-          value={form.phone}
-          onChange={handleChange}
-          placeholder="+254 700 000 000"
-          disabled={isSubmitting}
-          className="w-full rounded border px-4 py-2.5 text-sm"
-        />
-      </div>
+      {apiError && (
+        <div className="p-3 text-xs font-medium bg-rose-50 text-rose-600 rounded-xl border border-rose-100">
+          {apiError}
+        </div>
+      )}
 
       {/* Actions */}
       <div className="flex gap-3 pt-4 border-t mt-6">
@@ -202,7 +234,7 @@ const AddMemberForm = ({
           className="flex-1 rounded bg-sky-900 hover:bg-sky-800 px-4 py-2.5 text-sm font-semibold text-white">
           {isSubmitting ? (
             <>
-              <Loader2 className="animate-spin" size={14} />
+              <Loader2 className="animate-spin inline-block mr-2" size={14} />
               Saving...
             </>
           ) : isEditing ? (

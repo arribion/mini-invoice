@@ -41,9 +41,6 @@ app.use(
   }),
 );
 
-// Express preflight option fallback catch
-app.options("*", cors());
-
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.json());
@@ -56,10 +53,6 @@ import project_router from "./routes/project.route.js";
 import member_router from "./routes/members.route.js";
 import resource_router from "./routes/resources.route.js";
 
-app.get("/", (req, res) => {
-  res.send("app running");
-});
-
 // Route Mounts
 app.use("/api/v1/auth", auth_router);
 app.use("/api/v1/projects", project_router);
@@ -71,5 +64,6 @@ if (!process.env.PORT) {
   console.log("error accessing connection port..");
 }
 app.listen(PORT, "0.0.0.0", () => {
+  connectDB()
   console.log(`Server executing successfully on port ${PORT}`);
 });

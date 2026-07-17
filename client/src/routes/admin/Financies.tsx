@@ -1,6 +1,6 @@
 // src/routes/admin/Financies.tsx
 import { useState, useEffect } from "react";
-import axios from "axios";
+// import axios from "axios";
 
 export type PaymentStatus = "Pending" | "Completed" | "Overdue";
 export type PaymentMethod = "M-PESA" | "Till" | "Bank" | "PayPal";
@@ -23,10 +23,10 @@ const Financies = () => {
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [referenceCode, setReferenceCode] = useState("");
 
-  const api = axios.create({
-    baseURL: import.meta.env.VITE_BASE_URL,
-    headers: { "Content-Type": "application/json" },
-  });
+  // const api = axios.create({
+  //   baseURL: import.meta.env.VITE_BASE_URL,
+  //   headers: { "Content-Type": "application/json" },
+  // });
 
   // Mock data
   const mockMembers: Member[] = [
