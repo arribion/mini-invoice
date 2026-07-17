@@ -1,11 +1,12 @@
+// src/components/admin/AddMemberForm.tsx
 import React, { useState } from "react";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
 
-type MemberRole = "Software Engineer" | "Admin" | "Manager" | "Reviewer";
+export type MemberRole = "Admin" | "Manager" | "Reviewer" | "Software Engineer";
 
-type FormData = {
-  id?: string; // Included to track updates on existing records
+export type FormData = {
+  id?: string;
   fullName: string;
   email: string;
   password?: string;
@@ -15,8 +16,8 @@ type FormData = {
 
 type Props = {
   form: FormData;
-  setForm: React.Dispatch<React.SetStateAction<any>>;
-  onSuccess: () => void; // Parent callback hook to trigger data re-fetching
+  setForm: React.Dispatch<React.SetStateAction<FormData>>;
+  onSuccess: () => void;
   resetForm: () => void;
   isEditing: boolean;
 };
@@ -31,31 +32,37 @@ const AddMemberForm = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiError, setApiError] = useState("");
 
-  // Create isolated instance referencing environment base configuration
   const api = axios.create({
     baseURL: import.meta.env.VITE_BASE_URL,
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
   });
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
-    setForm((prev: FormData) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const internalSubmitHandler = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Auto‑generate password from phone if missing on create
+    let passwordToUse = form.password;
+    if (!isEditing && !passwordToUse && form.phone) {
+      passwordToUse = form.phone;
+    }
+
+    if (!form.fullName || !form.email || (!isEditing && !passwordToUse)) {
+      setApiError("Full name, email and password are required.");
+      return;
+    }
+
     try {
       setIsSubmitting(true);
       setApiError("");
 
-      if (isEditing) {
-        // PUT /api/v1/members/:id for modifying existing data indexes
+      if (isEditing && form.id) {
         await api.put(`/api/v1/members/${form.id}`, {
           fullName: form.fullName,
           email: form.email,
@@ -63,22 +70,22 @@ const AddMemberForm = ({
           phone: form.phone,
         });
       } else {
-        // POST /api/v1/members for creation tracks
         await api.post("/api/v1/members", {
           fullName: form.fullName,
           email: form.email,
-          password: form.password,
+          password: passwordToUse,
           role: form.role,
           phone: form.phone,
         });
       }
 
-      onSuccess(); // Triggers the parent's table listing re-sync function
-      resetForm(); // Closes structural modal windows
+      onSuccess();
+      resetForm();
     } catch (err: any) {
       setApiError(
-        err.response?.data?.message ||
-          "Failed to commit record changes to server indices.",
+        err?.response?.data?.message ??
+          err?.message ??
+          "Failed to commit record changes.",
       );
     } finally {
       setIsSubmitting(false);
@@ -87,16 +94,15 @@ const AddMemberForm = ({
 
   return (
     <form onSubmit={internalSubmitHandler} className="space-y-4">
-      {/* Network Response Dynamic Alert Window */}
       {apiError && (
         <div className="p-3 text-xs font-medium bg-rose-50 text-rose-600 rounded-xl border border-rose-100">
           {apiError}
         </div>
       )}
 
-      {/* Name Input */}
+      {/* Full Name */}
       <div>
-        <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5">
+        <label className="block text-xs font-semibold text-gray-600 uppercase mb-1.5">
           Full Name
         </label>
         <input
@@ -106,13 +112,13 @@ const AddMemberForm = ({
           placeholder="e.g. John Doe"
           required
           disabled={isSubmitting}
-          className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-gray-900 focus:bg-white focus:outline-none focus:ring-4 focus:ring-gray-900/5 transition disabled:opacity-50"
+          className="w-full rounded border px-4 py-2.5 text-sm"
         />
       </div>
 
-      {/* Email Input */}
+      {/* Email */}
       <div>
-        <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5">
+        <label className="block text-xs font-semibold text-gray-600 uppercase mb-1.5">
           Email Address
         </label>
         <input
@@ -123,32 +129,34 @@ const AddMemberForm = ({
           type="email"
           required
           disabled={isSubmitting}
-          className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-gray-900 focus:bg-white focus:outline-none focus:ring-4 focus:ring-gray-900/5 transition disabled:opacity-50"
+          className="w-full rounded border px-4 py-2.5 text-sm"
         />
       </div>
 
-      {/* Password Conditional Input */}
+      {/* Password (only for new members) */}
       {!isEditing && (
         <div>
-          <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5">
+          <label className="block text-xs font-semibold text-gray-600 uppercase mb-1.5">
             Account Password
           </label>
+          <div className="px-1 py-2 border-2 border-yellow-500 rounded bg-yellow-50 my-2 text-xs">
+            Leave blank to use phone number as password.
+          </div>
           <input
             name="password"
             value={form.password || ""}
             onChange={handleChange}
             placeholder="••••••••"
             type="password"
-            required
             disabled={isSubmitting}
-            className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-gray-900 focus:bg-white focus:outline-none focus:ring-4 focus:ring-gray-900/5 transition disabled:opacity-50"
+            className="w-full rounded border px-4 py-2.5 text-sm"
           />
         </div>
       )}
 
-      {/* Role Selector dropdown */}
+      {/* Role */}
       <div>
-        <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5">
+        <label className="block text-xs font-semibold text-gray-600 uppercase mb-1.5">
           Workspace Permissions Role
         </label>
         <select
@@ -156,17 +164,17 @@ const AddMemberForm = ({
           value={form.role}
           onChange={handleChange}
           disabled={isSubmitting}
-          className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-2.5 text-sm text-gray-900 focus:border-gray-900 focus:bg-white focus:outline-none focus:ring-4 focus:ring-gray-900/5 transition cursor-pointer disabled:opacity-50">
-          <option value="Software Engineer">Software Engineer</option>
-          <option value="Admin">Admin</option>
-          <option value="Manager">Manager</option>
+          className="w-full rounded border px-4 py-2.5 text-sm">
           <option value="Reviewer">Reviewer</option>
+          <option value="Manager">Manager</option>
+          <option value="Admin">Admin</option>
+          <option value="Software Engineer">Software Engineer</option>
         </select>
       </div>
 
-      {/* Phone Contact Input */}
+      {/* Phone */}
       <div>
-        <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5">
+        <label className="block text-xs font-semibold text-gray-600 uppercase mb-1.5">
           Phone Number
         </label>
         <input
@@ -175,23 +183,23 @@ const AddMemberForm = ({
           onChange={handleChange}
           placeholder="+254 700 000 000"
           disabled={isSubmitting}
-          className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-gray-900 focus:bg-white focus:outline-none focus:ring-4 focus:ring-gray-900/5 transition disabled:opacity-50"
+          className="w-full rounded border px-4 py-2.5 text-sm"
         />
       </div>
 
-      {/* Action Button Blocks */}
-      <div className="flex gap-3 pt-4 border-t border-gray-100 mt-6">
+      {/* Actions */}
+      <div className="flex gap-3 pt-4 border-t mt-6">
         <button
           type="button"
           onClick={resetForm}
           disabled={isSubmitting}
-          className="flex-1 justify-center inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition active:scale-[0.98] disabled:opacity-50">
+          className="flex-1 rounded border px-4 py-2.5 text-sm font-semibold">
           Cancel
         </button>
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex-1 justify-center inline-flex items-center gap-1.5 rounded-xl bg-gray-900 hover:bg-gray-800 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition active:scale-[0.98] disabled:bg-gray-700 disabled:cursor-not-allowed">
+          className="flex-1 rounded bg-sky-900 hover:bg-sky-800 px-4 py-2.5 text-sm font-semibold text-white">
           {isSubmitting ? (
             <>
               <Loader2 className="animate-spin" size={14} />

@@ -14,7 +14,7 @@ if (!JWT_ACCESS_SECRET || !JWT_REFRESH_SECRET) {
 
 export const register = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body; // 'role' is extracted here
+    const { name, email, password, role } = req.body;
     if (!name || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }

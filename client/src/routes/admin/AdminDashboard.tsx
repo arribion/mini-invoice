@@ -11,7 +11,7 @@ import QuickActions from "../../components/admin/QuickActions";
 const stats = [
   {
     label: "Total Members",
-    value: "128",
+    value: "12",
     change: "+12%",
     trend: "up",
     icon: Users,
@@ -19,7 +19,7 @@ const stats = [
   },
   {
     label: "Total Projects",
-    value: "34",
+    value: "8",
     change: "+4%",
     trend: "up",
     icon: FolderKanban,

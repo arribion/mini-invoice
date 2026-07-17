@@ -25,9 +25,9 @@ import MainLayout from "./layout/MainLayout";
 import Payments from "./routes/client/Payments";
 import Projects from "./routes/client/Projects";
 import Tasks from "./routes/client/Tasks";
-import Task from "./components/admin/Task";
-import Invoicing from "./components/admin/Invoicing";
-import Financies from "./components/admin/Financies";
+import Task from "./routes/admin/Task";
+import Invoicing from "./routes/admin/Invoicing";
+import Financies from "./routes/admin/Financies";
 
 const App = () => {
   return (

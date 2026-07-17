@@ -18,8 +18,11 @@ const projectSchema = new mongoose.Schema(
       maxlength: 50,
     },
 
-    avg_pay: {
+    rate: {
       type: Number,
+      value: Number,
+      currency: "USD" | "KES",
+      rate: ["PER_TASK" | "PER_HOUR" | "PER_BATCH"],
       required: [true, "Average pay is required"],
       min: [0, "Average pay cannot be negative"],
     },
@@ -31,12 +34,24 @@ const projectSchema = new mongoose.Schema(
       minlength: 10,
       maxlength: 1000,
     },
-
+    revenueSplit: {
+      tasker: Number,
+      admin: Number,
+      owner: Number,
+    },
     status: {
       type: String,
       enum: ["ACTIVE", "PENDING", "CLOSED"],
       default: "ACTIVE",
       required: true,
+    },
+    category: String,
+    createdBy: ObjectId,
+    createdAt: Date,
+    updatedAt: Date,
+    status: {
+      type: String,
+      enum: ["DRAFT", "ACTIVE", "PAUSED", "CLOSED"],
     },
   },
   {
@@ -46,3 +61,4 @@ const projectSchema = new mongoose.Schema(
 );
 
 export const ProjectModel = mongoose.model("Project", projectSchema);
+

@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react";
+// src/components/admin/MembersTable.tsx
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { Edit2, Trash2, Search, RefreshCw } from "lucide-react";
 import type { Member } from "../../routes/admin/ManageMembers";
 
 type Props = {
   handleEdit: (member: Member) => void;
-  handleDelete: (id: string) => void;
+  handleDelete: (id: string) => Promise<void> | void;
 };
 
-// Helper function to color code member system roles dynamically
 const getRoleBadgeColor = (role: string) => {
   const normalized = role?.toUpperCase();
   if (normalized === "ADMIN" || normalized === "SUPERADMIN") {
@@ -26,11 +26,10 @@ const MembersTable = ({ handleEdit, handleDelete }: Props) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Setup Axios Client Instance
   const api = axios.create({
     baseURL: import.meta.env.VITE_BASE_URL,
     headers: {
-      "Content-Type": "application/json",
+      "Content-Type": "application/json"
     },
   });
 
@@ -40,7 +39,6 @@ const MembersTable = ({ handleEdit, handleDelete }: Props) => {
       setError("");
       const { data } = await api.get("/api/v1/members");
 
-      // Adapt cleanly to raw array payloads or nested data envelopes
       if (Array.isArray(data)) {
         setMembers(data);
       } else if (Array.isArray(data?.data)) {
@@ -49,7 +47,8 @@ const MembersTable = ({ handleEdit, handleDelete }: Props) => {
         setMembers([]);
       }
     } catch (err) {
-      setError("Failed to stream directory member listings.");
+      setError("Failed to load members from server.");
+      setMembers([]);
     } finally {
       setLoading(false);
     }
@@ -57,9 +56,9 @@ const MembersTable = ({ handleEdit, handleDelete }: Props) => {
 
   useEffect(() => {
     fetchMembers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Filter records dynamically based on search text input matching strings
   const filteredMembers = members.filter(
     (member) =>
       member.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -67,21 +66,19 @@ const MembersTable = ({ handleEdit, handleDelete }: Props) => {
       member.role.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
-  // Wrapped component level delete intercept to safely clean state instantly
-  const localDeleteTrigger = async (id: string) => {
+  const onDelete = async (id: string) => {
     try {
       await handleDelete(id);
-      // Optimistically update view state on success response
+      // Optimistically update local state
       setMembers((prev) => prev.filter((m) => m.id !== id));
     } catch (err) {
-      // Retain state mapping intact if parent execution fails or cancels
-      console.error("Deletion cycle interrupted:", err);
+      console.error("Delete failed", err);
     }
   };
 
   return (
     <div className="space-y-4 w-full">
-      {/* Dynamic Sub-Toolbar Search Container Layout */}
+      {/* Search + Reload */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
         <div className="relative w-full sm:max-w-md">
           <Search
@@ -108,9 +105,8 @@ const MembersTable = ({ handleEdit, handleDelete }: Props) => {
         </button>
       </div>
 
-      {/* Main Core Component Wrapper */}
+      {/* Table */}
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-        {/* Top Header Card Block */}
         <div className="px-6 py-4 border-b border-gray-100 bg-white">
           <h2 className="font-bold text-gray-900 text-lg tracking-tight">
             Members Directory
@@ -120,7 +116,6 @@ const MembersTable = ({ handleEdit, handleDelete }: Props) => {
           </p>
         </div>
 
-        {/* Global Loading / Error presentation layer conditions */}
         {loading && members.length === 0 ? (
           <div className="p-12 text-center text-gray-500 flex flex-col items-center justify-center gap-3">
             <RefreshCw className="animate-spin text-purple-500" size={24} />
@@ -138,7 +133,6 @@ const MembersTable = ({ handleEdit, handleDelete }: Props) => {
             </button>
           </div>
         ) : (
-          /* Main Responsive Table Layer */
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -172,7 +166,9 @@ const MembersTable = ({ handleEdit, handleDelete }: Props) => {
                       </td>
                       <td className="p-4">
                         <span
-                          className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider ${getRoleBadgeColor(member.role)}`}>
+                          className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider ${getRoleBadgeColor(
+                            member.role,
+                          )}`}>
                           {member.role}
                         </span>
                       </td>
@@ -188,7 +184,7 @@ const MembersTable = ({ handleEdit, handleDelete }: Props) => {
                             Edit
                           </button>
                           <button
-                            onClick={() => localDeleteTrigger(member.id)}
+                            onClick={() => onDelete(member.id)}
                             className="inline-flex items-center gap-1.5 rounded-lg bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-100 transition active:scale-[0.97]">
                             <Trash2 size={13} />
                             Delete

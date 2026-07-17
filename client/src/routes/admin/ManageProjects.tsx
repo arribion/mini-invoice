@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { LuCirclePlus, LuX } from "react-icons/lu";
-import ProjectUploadForm from "../../components/admin/ProjectUploadForm";
 import axios from "axios";
+import ProjectUploadForm from "../../components/admin/AddProjectUploadForm";
 import ProjectsTable from "../../components/admin/ProjectTable";
+
 export interface Project {
   id: string;
   projectName: string;
@@ -11,6 +12,7 @@ export interface Project {
   ratePerHour: number;
   status: "ACTIVE" | "PENDING" | "CLOSED";
 }
+
 interface ApiProject {
   _id: string;
   project_name: string;
@@ -21,9 +23,6 @@ interface ApiProject {
 }
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
-if (!BASE_URL) {
-  console.log("Error fetching base url on project admin edit");
-}
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -32,47 +31,65 @@ const api = axios.create({
   },
 });
 
-
 const ManageProjects = () => {
   const [showProjectAddForm, setShowProjectAddForm] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
-   const [projects, setProjects] = useState<Project[]>([]);
-   const [loading, setLoading] = useState(true);
-   const [error, setError] = useState("");
-   const [search, setSearch] = useState("");
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
 
-   const fetchProjects = async () => {
-     try {
-       setLoading(true);
+  const fetchProjects = async () => {
+    try {
+      setLoading(true);
+      setError("");
 
-       const response = await api.get("/api/v1/projects");
+      const response = await api.get("/api/v1/projects");
 
-       const mapped = response.data.data.map((project: ApiProject) => ({
-         id: project._id,
-         projectName: project.project_name,
-         platform: project.platform,
-         description: project.description,
-         ratePerHour: Number(project.avg_pay),
-         status: project.status,
-       }));
+      const mapped: Project[] = response.data.data.map(
+        (project: ApiProject) => ({
+          id: project._id,
+          projectName: project.project_name,
+          platform: project.platform,
+          description: project.description,
+          ratePerHour: Number(project.avg_pay),
+          status: project.status,
+        }),
+      );
 
-       setProjects(mapped);
-     } catch (error) {
-       setError("Failed loading projects");
-     } finally {
-       setLoading(false);
-     }
-   };
+      setProjects(mapped);
+    } catch (err) {
+      setError("Failed loading projects");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-   useEffect(() => {
-     fetchProjects();
-   }, []);
+  useEffect(() => {
+    fetchProjects();
+  }, []);
 
-   const filteredProjects = projects.filter(
-     (project) =>
-       project.projectName.toLowerCase().includes(search.toLowerCase()) ||
-       project.platform.toLowerCase().includes(search.toLowerCase()),
-   );
+  const filteredProjects = projects.filter(
+    (project) =>
+      project.projectName.toLowerCase().includes(search.toLowerCase()) ||
+      project.platform.toLowerCase().includes(search.toLowerCase()),
+  );
+
+  const openCreateModal = () => {
+    setSelectedProject(null);
+    setShowProjectAddForm(true);
+  };
+
+  const openEditModal = (project: Project) => {
+    setSelectedProject(project);
+    setShowProjectAddForm(true);
+  };
+
+  const closeModal = () => {
+    setShowProjectAddForm(false);
+    setSelectedProject(null);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -86,8 +103,8 @@ const ManageProjects = () => {
         </div>
 
         <button
-          onClick={() => setShowProjectAddForm(true)}
-          className="flex items-center gap-2 rounded-xl border bg-white px-4 py-2 shadow-sm hover:bg-sky-50">
+          onClick={openCreateModal}
+          className="flex items-center gap-2 rounded-xl border bg-white px-4 py-2 shadow-sm transition hover:bg-sky-50">
           <LuCirclePlus />
           Add Project
         </button>
@@ -100,19 +117,24 @@ const ManageProjects = () => {
         search={search}
         setSearch={setSearch}
         refresh={fetchProjects}
+        onEdit={openEditModal}
       />
 
       {showProjectAddForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="relative w-full max-w-3xl rounded-2xl bg-white">
+          <div className="relative w-full max-w-3xl rounded-2xl bg-white shadow-xl">
             <button
-              onClick={() => setShowProjectAddForm(false)}
-              className="absolute right-4 top-4">
+              onClick={closeModal}
+              className="absolute right-4 top-4 rounded-lg p-1 hover:bg-gray-200">
               <LuX size={22} />
             </button>
 
             <div className="max-h-[90vh] overflow-y-auto p-6">
-              <ProjectUploadForm />
+              <ProjectUploadForm
+                project={selectedProject}
+                onSuccess={fetchProjects}
+                onClose={closeModal}
+              />
             </div>
           </div>
         </div>
