@@ -124,14 +124,13 @@ export const login = async (req, res) => {
       maxAge: 60 * 60 * 1000,
     });
 
-    // FIX 4: Send user profile details back to your React application's useAuth hook
     res.status(200).json({
       success: true,
       message: "User logged in successfully",
       user: {
         name: user.name,
         email: user.email,
-        role: user.role, // Extremely important for React route checking!
+        role: user.role,
       },
     });
   } catch (error) {
@@ -143,13 +142,41 @@ export const login = async (req, res) => {
   }
 };
 
+
 export const logout = async (req, res) => {
-    try {
-        
-    } catch (error) {
-        
+  try {
+    // Clear cookies that hold JWTs or session IDs
+    res.clearCookie("access_token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
+    res.clearCookie("refresh_token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
+    // If you’re using express-session, also destroy the session:
+    if (req.session) {
+      req.session.destroy(() => {});
     }
-}
+
+    return res.status(200).json({
+      success: true,
+      message: "Logged out successfully",
+    });
+  } catch (error) {
+    console.error("Logout error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error during logout",
+    });
+  }
+};
+
+
 
 export const refreshToken = async (req, res) => {
   try {
@@ -190,7 +217,8 @@ export const refreshToken = async (req, res) => {
 
 
 export default {
-    register,
+  register,
+  logout,
     login,
     refreshToken
 }

@@ -1,21 +1,37 @@
-import { Bell, LogOut, Search, User } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { Bell, LogOut, User } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { useAuth } from "../../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+
 const Header = () => {
   const [showMiniProfileCard, setShowMiniProfileCard] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   const toggleMiniProfileCard = () => {
-    setShowMiniProfileCard(!showMiniProfileCard);
-  }
-  // Move your click handler inside the component
-  const handleLogout = () => {
-    navigate("/logout", {
-      replace: true,
-    });
+    setShowMiniProfileCard((prev) => !prev);
   };
 
+  const handleLogout = async () => {
+    await logout(); 
+    setShowMiniProfileCard(false);
+    navigate("/");
+  };
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowMiniProfileCard(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-gray-200 bg-white px-8">
@@ -29,59 +45,49 @@ const Header = () => {
 
       {/* Right */}
       <div className="flex items-center gap-5">
-        {/* Search */}
-        <div className="relative hidden md:block">
-          <Search
-            size={18}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-          />
-
-          <input
-            type="text"
-            placeholder="Search..."
-            className="w-72 rounded-xl border border-gray-200 bg-gray-50 py-2 pl-10 pr-4 outline-none transition focus:border-green-500 focus:bg-white"
-          />
-        </div>
-
         {/* Notification */}
-        <button className="relative rounded-xl p-2 transition hover:bg-gray-100">
+        <button
+          aria-label="Notifications"
+          className="relative rounded-xl p-2 transition hover:bg-gray-100">
           <Bell size={22} />
           <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500" />
         </button>
 
-        {/* User */}
-        <button
-          onClick={toggleMiniProfileCard}
-          className="flex items-center gap-3 rounded-xl p-2 transition hover:bg-gray-100 relative">
-          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-green-600 font-semibold text-white">
-            JM
-          </div>
+        {/* User Profile */}
+        {user && (
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={toggleMiniProfileCard}
+              className="flex items-center gap-3 rounded-xl p-2 transition hover:bg-gray-100">
+              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-green-600 font-semibold text-white">
+                {user.email[0].toUpperCase()}
+              </div>
+              <div className="hidden text-left lg:block">
+                <p className="text-sm font-semibold text-gray-900">
+                  {user.email}
+                </p>
+                <p className="text-xs text-gray-500">{user.role}</p>
+              </div>
+            </button>
 
-          <div className="hidden text-left lg:block">
-            <p className="text-sm font-semibold text-gray-900">Jeff Mutethia</p>
-            <p className="text-xs text-gray-500">Administrator</p>
-          </div>
-          <div>
             {showMiniProfileCard && (
-              <nav className="absolute left-0 top-15 shadow-lg rounded bg-white p-2">
-                <ul>
-                  <li className="flex gap-2 items-center">
+              <nav className="absolute right-0 mt-2 w-40 rounded-lg border border-gray-100 bg-white shadow-lg">
+                <ul className="py-2 text-sm text-gray-700">
+                  <li className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50 cursor-pointer">
                     <User size={14} />
                     Account
                   </li>
-                  <Link to="/">
-                    <li
-                      onClick={handleLogout}
-                      className="flex gap-2 hover:bg-gray-100 cursor-pointer items-center">
-                      <LogOut size={14} />
-                      Logout
-                    </li>
-                  </Link>
+                  <li
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50 cursor-pointer">
+                    <LogOut size={14} />
+                    Logout
+                  </li>
                 </ul>
               </nav>
             )}
           </div>
-        </button>
+        )}
       </div>
     </header>
   );
