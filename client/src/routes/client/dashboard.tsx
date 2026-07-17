@@ -1,12 +1,10 @@
-
 import { useState } from "react";
 import { ArrowDownLeft, ArrowUpRight, Activity, Plus } from "lucide-react";
-
-import { BalanceCard } from "../../components/BalanceCard";
-import { QuickActions } from "../../components/QuickActions";
-import { TransactionList } from "../../components/TransactionList";
+import { BalanceCard } from "../../components/client/BalanceCard";
+import { QuickActions } from "../../components/client/QuickActions";
+import { TransactionList } from "../../components/client/TransactionList";
 import { SendMoneyDialog } from "../../components/CreateInvoiceDialog";
-import PaymentMethods from "../../components/PaymentMethods";
+import PaymentMethods from "../../components/client/PaymentMethods";
 
 function Dashboard() {
   const [sendOpen, setSendOpen] = useState(false);
@@ -130,7 +128,7 @@ function Dashboard() {
           {/* Sidebar */}
           <aside className="space-y-6 lg:col-span-4">
             <QuickActions
-              // onSendMoney={() => setSendOpen(true)}
+            // onSendMoney={() => setSendOpen(true)}
             />
 
             <PaymentMethods />
@@ -142,4 +140,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard
+export default Dashboard;

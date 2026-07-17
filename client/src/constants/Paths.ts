@@ -4,15 +4,16 @@ export const AdminsideBarLinks = [
     name: "Dashboard",
     link: "/admin",
   },
-  {
-    id: 2,
-    name: "Projects",
-    link: "/admin/projects",
-  },
+
   {
     id: 3,
     name: "Tasks",
     link: "/admin/tasks",
+  },
+  {
+    id: 2,
+    name: "Projects",
+    link: "/admin/projects",
   },
   {
     id: 4,

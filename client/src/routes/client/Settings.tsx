@@ -1,6 +1,6 @@
 
-import { SettingsOverview } from "../../components/SettingsOverview";
-import PaymentMethods from "../../components/PaymentMethods";
+import { SettingsOverview } from "../../components/client/SettingsOverview";
+import PaymentMethods from "../../components/client/PaymentMethods";
 
 function Settings() {
   return (

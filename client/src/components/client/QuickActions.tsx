@@ -6,27 +6,27 @@ export function QuickActions() {
   const actions = [
     {
       icon: Send,
-      label: "Log Task",
+      label: "Task Logging",
       color: "gradient-primary",
       link: "/client/tasks",
     },
     {
       icon: Download,
-      label: "Export Task",
+      label: "Export Invoice",
       color: "bg-success",
       link: "#",
     },
     {
       icon: CreditCard,
-      label: "Request Payment",
+      label: "Google Calenda",
       color: "bg-warning",
-      link: "#",
+      link: "https://calendar.google.com/calendar/u/0/r?cid=ZjI2MmQwYTExZTE4MzY5ZTIxMzA2MTBmMWUxOTRlNGNlYTYyYzA4ODM0NTExMmIyMTM0MWZiNTE0MDIzNTY2OUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t",
     },
     {
       icon: QrCode,
-      label: "Share Task",
+      label: "Google Form",
       color: "bg-black",
-      link: "#",
+      link: "https://docs.google.com/forms/d/e/1FAIpQLSfE3VTctziQDu15Odjr12wgCL6_-B3cfKQJjWuW2BvE5avB-A/closedform",
     },
   ];
 

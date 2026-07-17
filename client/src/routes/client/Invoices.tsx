@@ -1,5 +1,5 @@
 import { Plus, Receipt, ArrowUpRight, Wallet } from "lucide-react";
-import { TransactionList } from "../../components/TransactionList";
+import { TransactionList } from "../../components/client/TransactionList";
 
 function Invoices() {
   return (
@@ -72,9 +72,8 @@ function Invoices() {
           <TransactionList />
         </div>
       </div>
-
     </section>
   );
 }
 
-export default Invoices
+export default Invoices;

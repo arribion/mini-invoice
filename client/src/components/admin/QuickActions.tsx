@@ -51,7 +51,7 @@ const ACTIONS: Action[] = [
   {
     id: 5,
     label: "Google Form",
-    to: "https://forms.google.com",
+    to: "https://docs.google.com/forms/d/e/1FAIpQLSfE3VTctziQDu15Odjr12wgCL6_-B3cfKQJjWuW2BvE5avB-A/closedform",
     icon: ExternalLink,
     variant: "ghost",
     external: true,
@@ -59,7 +59,7 @@ const ACTIONS: Action[] = [
   {
     id: 6,
     label: "Google Calendar",
-    to: "https://calendar.google.com",
+    to: "https://calendar.google.com/calendar/u/0/r?cid=ZjI2MmQwYTExZTE4MzY5ZTIxMzA2MTBmMWUxOTRlNGNlYTYyYzA4ODM0NTExMmIyMTM0MWZiNTE0MDIzNTY2OUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t",
     icon: Calendar,
     variant: "ghost",
     external: true,
@@ -77,8 +77,8 @@ const variantClasses = {
 const QuickActions = ({ compact = false }: { compact?: boolean }) => {
   return (
     <aside
-      className={`rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-md ${
-        compact ? "max-w-[14rem]" : "max-w-[18rem]"
+      className={`rounded-2xl border border-gray-200 bg-linear-to-br from-white to-slate-50 p-6 shadow-md ${
+        compact ? "max-w-56" : "max-w-[18rem]"
       }`}
       aria-labelledby="quick-actions-title">
       <div className="flex items-start justify-between">
@@ -149,7 +149,7 @@ const QuickActions = ({ compact = false }: { compact?: boolean }) => {
       <div className="mt-6 border-t border-gray-100 pt-4">
         <Link to="/admin/members/create" className="block">
           <button
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-emerald-500 to-sky-500 px-4 py-2 text-sm font-semibold text-white shadow hover:from-emerald-600 hover:to-sky-600 focus:outline-none focus:ring-2 focus:ring-emerald-300"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-linear-to-r from-emerald-500 to-sky-500 px-4 py-2 text-sm font-semibold text-white shadow hover:from-emerald-600 hover:to-sky-600 focus:outline-none focus:ring-2 focus:ring-emerald-300"
             aria-label="Create member login">
             <UserPlus size={16} />
             Create Member Login

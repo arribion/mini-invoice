@@ -223,8 +223,8 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-        <p className="mt-2 text-gray-600">
+        <h1 className="text-green-700">Dashboard/</h1>
+        <p className="mb-2 text-gray-600">
           Overview of members, projects, payments, and pending balances.
         </p>
       </div>

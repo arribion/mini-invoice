@@ -1,5 +1,5 @@
 import {  Plus, MoreHorizontal } from "lucide-react";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 const cardLogos: Record<string, string> = {
   visa: "VISA",
   mastercard: "MC",

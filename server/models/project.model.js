@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import ProjectAssignment from "./Project.Assignment.Model";
 
 const projectSchema = new mongoose.Schema(
   {
@@ -61,7 +62,6 @@ const projectSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -73,5 +73,51 @@ const projectSchema = new mongoose.Schema(
     versionKey: false,
   },
 );
+
+// Helper to remove assignments for a given project id
+async function removeAssignmentsForProject(projectId, session = null) {
+  const filter = { project_id: projectId };
+  if (session) {
+    return ProjectAssignment.deleteMany(filter).session(session);
+  }
+  return ProjectAssignment.deleteMany(filter);
+}
+
+// Query middleware for findOneAndDelete / findByIdAndDelete
+ProjectSchema.pre("findOneAndDelete", async function (next) {
+  try {
+    // `this` is the query. Get the document to be deleted.
+    const doc = await this.model.findOne(this.getQuery()).select("_id").lean();
+    if (doc && doc._id) {
+      await removeAssignmentsForProject(doc._id);
+    }
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Query middleware for deleteOne when called with a filter
+ProjectSchema.pre("deleteOne", { document: false, query: true }, async function (next) {
+  try {
+    const doc = await this.model.findOne(this.getQuery()).select("_id").lean();
+    if (doc && doc._id) {
+      await removeAssignmentsForProject(doc._id);
+    }
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Instance middleware for remove()
+ProjectSchema.pre("remove", { document: true, query: false }, async function (next) {
+  try {
+    await removeAssignmentsForProject(this._id);
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
 
 export const ProjectModel = mongoose.model("Project", projectSchema);
