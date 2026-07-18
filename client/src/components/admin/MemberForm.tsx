@@ -98,7 +98,7 @@ const MemberForm = ({
         });
         toast.success("Member updated.");
       } else {
-        await api.post("/api/v1/members", {
+        await api.post("/api/v1/auth/register", {
           full_name: fullName,
           email,
           password: passwordToUse,
@@ -180,6 +180,15 @@ const MemberForm = ({
           <label className="block text-xs font-semibold text-gray-600 uppercase mb-1.5">
             Account Password
           </label>
+          <h1 className="text-red-500">
+            Tumia the actuall password field kulog
+            in wasee i will fix phone number to auto
+            generate working initial password
+            ==== you can include phone but make sure you have filled the password field use something simple or repeate thair 
+            phone number as thier password for security purposes soon i will validate for a strong password.
+            ((07)00000000) or ((+254)0000) iko sawa
+
+          </h1>
           <div className="px-1 py-2 border-2 border-yellow-500 rounded bg-yellow-50 my-2 text-xs">
             Leave blank to auto-generate from phone number.
           </div>

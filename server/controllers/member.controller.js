@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import UserModel from "../models/userModel.js";
 
-// Create Member (now using UserModel)
+// Create Member 
 export const add_member = async (req, res) => {
   try {
     const { full_name, email, password, phone, role, status } = req.body;

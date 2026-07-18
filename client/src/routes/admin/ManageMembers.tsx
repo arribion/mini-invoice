@@ -103,7 +103,7 @@ const ManageMembers = () => {
 
   // Delete handler: calls backend then updates local state
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Delete this staff member entry?")) return;
+    if (!window.confirm("Delete this member entry?")) return;
     try {
       await api.delete(`/api/v1/members/${id}`);
       setMembers((prev) =>
