@@ -32,7 +32,7 @@ const api = axios.create({
 const isValidEmail = (email: string) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 
-const AddMemberForm = ({
+const MemberForm = ({
   form,
   setForm,
   onSuccess,
@@ -67,10 +67,11 @@ const AddMemberForm = ({
       return;
     }
 
-    // If creating and no password provided, fallback to phone-based password if phone exists
+    // Auto-generate password if creating and none provided
     if (!isEditing && !passwordToUse) {
       if (phone) {
-        passwordToUse = `Pass${phone.replace(/\D/g, "").slice(-6) || phone}`;
+        const digits = phone.replace(/\D/g, "");
+        passwordToUse = `Pass${digits.slice(-6) || digits}`;
       } else {
         setApiError(
           "Provide a password or a phone number to auto-generate one.",
@@ -86,7 +87,6 @@ const AddMemberForm = ({
 
     try {
       setIsSubmitting(true);
-      setApiError("");
 
       if (isEditing && form.id) {
         await api.put(`/api/v1/members/${form.id}`, {
@@ -113,11 +113,12 @@ const AddMemberForm = ({
       resetForm();
     } catch (err: any) {
       console.error(err);
-      setApiError(
+      const message =
         err?.response?.data?.message ??
-          err?.message ??
-          "Failed to commit record changes.",
-      );
+        err?.message ??
+        "Failed to commit record changes.";
+      setApiError(message);
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -248,4 +249,4 @@ const AddMemberForm = ({
   );
 };
 
-export default AddMemberForm;
+export default MemberForm;

@@ -1,5 +1,5 @@
 import { ProjectModel } from "../models/project.model.js";
-
+import mongoose from "mongoose";
 // Create Project
 export const add_project = async (req, res) => {
   try {
@@ -118,11 +118,18 @@ export const get_all_project = async (req, res) => {
   }
 };
 
-// Delete Project
+// delete project
 export const delete_project = async (req, res) => {
-  try {
-    const { id } = req.params;
+  const { id } = req.params;
+  // debugg
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid project ID"
+    });
+  }
 
+  try {
     const project = await ProjectModel.findByIdAndDelete(id);
 
     if (!project) {
@@ -137,10 +144,10 @@ export const delete_project = async (req, res) => {
       message: "Project deleted successfully.",
     });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+     return res.status(500).json({
+       success: false,
+       message: error.message,
+     });
   }
 };
 

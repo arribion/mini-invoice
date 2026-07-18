@@ -8,6 +8,7 @@ import {
   Calendar,
   ExternalLink,
   ChevronRight,
+  Bug,
 } from "lucide-react";
 
 type Action = {
@@ -22,22 +23,22 @@ type Action = {
 const ACTIONS: Action[] = [
   {
     id: 1,
-    label: "Create Member",
-    to: "/admin/members/create",
+    label: "Create new Member",
+    to: "/admin/members",
     icon: UserPlus,
     variant: "primary",
   },
   {
     id: 2,
     label: "Add New Project",
-    to: "/admin/projects/create",
+    to: "/admin/projects",
     icon: FolderPlus,
     variant: "primary",
   },
   {
     id: 3,
     label: "Upload Resource",
-    to: "/admin/resources/upload",
+    to: "/admin/resources",
     icon: UploadCloud,
     variant: "accent",
   },
@@ -147,14 +148,17 @@ const QuickActions = ({ compact = false }: { compact?: boolean }) => {
       </div>
 
       <div className="mt-6 border-t border-gray-100 pt-4">
-        <Link to="/admin/members/create" className="block">
+        <a
+          href="https://wa.me/254707468863?text=I would like to report a bug in the qt-online application."
+          target="_blank"
+          className="block">
           <button
             className="flex w-full items-center justify-center gap-2 rounded-lg bg-linear-to-r from-emerald-500 to-sky-500 px-4 py-2 text-sm font-semibold text-white shadow hover:from-emerald-600 hover:to-sky-600 focus:outline-none focus:ring-2 focus:ring-emerald-300"
             aria-label="Create member login">
-            <UserPlus size={16} />
-            Create Member Login
+            <Bug size={16} />
+            REPORT A BUG
           </button>
-        </Link>
+        </a>
       </div>
     </aside>
   );

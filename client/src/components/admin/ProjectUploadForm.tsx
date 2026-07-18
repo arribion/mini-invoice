@@ -38,7 +38,7 @@ const api = axios.create({
   },
 });
 
-const AddProjectUploadForm = ({
+const ProjectUploadForm = ({
   project,
   onSuccess,
   onClose,
@@ -133,7 +133,7 @@ const AddProjectUploadForm = ({
         <input
           {...register("projectName")}
           placeholder="Project Vox"
-          className="w-full rounded-lg border px-4 py-2 outline-none focus:border-sky-500"
+          className="w-full rounded border px-4 py-2 outline-none focus:border-sky-500"
         />
 
         {errors.projectName && (
@@ -149,7 +149,7 @@ const AddProjectUploadForm = ({
         <input
           {...register("platform")}
           placeholder="Handshake"
-          className="w-full rounded-lg border px-4 py-2 outline-none focus:border-sky-500"
+          className="w-full rounded border px-4 py-2 outline-none focus:border-sky-500"
         />
 
         {errors.platform && (
@@ -166,7 +166,7 @@ const AddProjectUploadForm = ({
           type="number"
           {...register("ratePerHour")}
           placeholder="1000"
-          className="w-full rounded-lg border px-4 py-2 outline-none focus:border-sky-500"
+          className="w-full rounded border px-4 py-2 outline-none focus:border-sky-500"
         />
 
         {errors.ratePerHour && (
@@ -181,7 +181,7 @@ const AddProjectUploadForm = ({
 
         <select
           {...register("status")}
-          className="w-full rounded-lg border px-4 py-2 outline-none focus:border-sky-500">
+          className="w-full rounded border px-4 py-2 outline-none focus:border-sky-500">
           <option value="ACTIVE">Active</option>
           <option value="PENDING">Pending</option>
           <option value="CLOSED">Closed</option>
@@ -199,7 +199,7 @@ const AddProjectUploadForm = ({
           rows={5}
           {...register("description")}
           placeholder="AI response review and quality assurance..."
-          className="w-full rounded-lg border px-4 py-3 outline-none focus:border-sky-500"
+          className="w-full rounded border ma px-4 py-3 outline-none focus:border-sky-500"
         />
 
         {errors.description && (
@@ -224,7 +224,7 @@ const AddProjectUploadForm = ({
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full rounded-lg bg-green-600 py-3 font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50">
+        className="w-full rounded bg-green-600 py-3 font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50">
         {isSubmitting
           ? project
             ? "Updating Project..."
@@ -237,4 +237,4 @@ const AddProjectUploadForm = ({
   );
 };
 
-export default AddProjectUploadForm;
+export default ProjectUploadForm;

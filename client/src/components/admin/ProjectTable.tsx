@@ -19,6 +19,7 @@ interface Props {
   setSearch: (value: string) => void;
   refresh: () => void;
   onEdit: (project: Project) => void;
+  onDelete: (project: Project) => void;
 }
 
 const statusColor = (status: Project["status"]) => {
@@ -41,6 +42,7 @@ const ProjectsTable = ({
   search,
   setSearch,
   refresh,
+  onDelete,
   onEdit,
 }: Props) => {
   return (
@@ -59,7 +61,7 @@ const ProjectsTable = ({
         <button
           onClick={refresh}
           disabled={loading}
-          className="inline-flex items-center gap-2 rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-800 disabled:cursor-not-allowed disabled:bg-gray-400">
+          className="inline-flex items-center gap-2 rounded border border-slate-800 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-100 duration-300 disabled:cursor-not-allowed disabled:bg-gray-400">
           <LuRefreshCcw size={16} className={loading ? "animate-spin" : ""} />
           {loading ? "Refreshing..." : "Refresh"}
         </button>
@@ -152,7 +154,9 @@ const ProjectsTable = ({
                         Edit
                       </button>
 
-                      <button className="inline-flex items-center gap-1 rounded-lg bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-100">
+                      <button
+                        onClick={() => onDelete(project)}
+                        className="inline-flex items-center gap-1 rounded-lg bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-100">
                         <Trash2 size={14} />
                         Delete
                       </button>

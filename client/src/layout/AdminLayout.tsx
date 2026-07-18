@@ -7,7 +7,7 @@ const AdminLayout = () => {
         <>
             <div className="flex">
                 <SideBar/>
-                <main className="w-full">
+                <main className="w-full ml-[18%]">
                     <Header/>
                     <Outlet/>
                 </main>

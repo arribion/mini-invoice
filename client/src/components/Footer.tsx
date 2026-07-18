@@ -1,4 +1,4 @@
-import { BugIcon, Mail, Phone, Globe } from "lucide-react";
+import { Mail, Phone, Globe, Bug } from "lucide-react";
 
 export function Footer() {
   return (
@@ -7,9 +7,7 @@ export function Footer() {
         {/* Company Info */}
         <div>
           <h3 className="text-lg font-semibold mb-3">About Us</h3>
-          <p className="text-sky-100 text-sm">
-            GT Tasking Consultation.
-          </p>
+          <p className="text-sky-100 text-sm">GT Tasking Consultation.</p>
         </div>
 
         {/* Quick Links */}
@@ -52,10 +50,19 @@ export function Footer() {
           &copy; {new Date().getFullYear()} GT. All Rights Reserved.
         </p>
         <p className="text-sm text-sky-200">Powered by Arribion Technologies</p>
-        <button className="flex items-center gap-2 mt-4 md:mt-0 px-4 py-2 rounded-lg bg-sky-600 hover:bg-sky-700 text-sm font-medium">
-          <BugIcon className="h-4 w-4" />
-          Bug Report & Suggestions
-        </button>
+        <div className="mt-6 border-t border-gray-100 pt-4">
+          <a
+            href="https://wa.me/254707468863?text=I would like to report a bug in the qt-online application."
+            target="_blank"
+            className="block">
+            <button
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-linear-to-r from-emerald-500 to-sky-500 px-4 py-2 text-sm font-semibold text-white shadow hover:from-emerald-600 hover:to-sky-600 focus:outline-none focus:ring-2 focus:ring-emerald-300"
+              aria-label="Create member login">
+              <Bug size={16} />
+              REPORT A BUG & SUGGETIONs
+            </button>
+          </a>
+        </div>
       </div>
     </footer>
   );

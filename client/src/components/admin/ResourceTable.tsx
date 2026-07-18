@@ -4,7 +4,6 @@ import {
   FileText,
   Download,
   Trash2,
-  Edit,
   RefreshCcw,
   Search,
 } from "lucide-react";
@@ -54,10 +53,6 @@ const ResourceTable: React.FC = () => {
     fetchResources();
   }, []);
 
-  // Action Click Handlers
-  const handleEdit = (id: string) => {
-    console.log("Edit requested for ID:", id);
-  };
 
   const handleDelete = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this resource?"))
@@ -212,11 +207,6 @@ const ResourceTable: React.FC = () => {
                             className="px-3 py-1.5 inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white text-gray-600 transition hover:bg-gray-50 text-xs font-medium">
                             <Download size={14} /> View
                           </a>
-                          <button
-                            onClick={() => handleEdit(item.id)}
-                            className="px-3 py-1.5 inline-flex items-center gap-1.5 rounded-lg bg-sky-50 text-sky-600 transition hover:bg-sky-100 text-xs font-medium">
-                            <Edit size={14} /> Edit
-                          </button>
                           <button
                             onClick={() => handleDelete(item.id)}
                             className="px-3 py-1.5 inline-flex items-center gap-1.5 rounded-lg bg-red-50 text-red-600 transition hover:bg-red-100 text-xs font-medium">

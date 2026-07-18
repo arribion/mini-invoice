@@ -1,11 +1,10 @@
-// src/routes/admin/ManageMembers.tsx
 import { useMemo, useState, useEffect } from "react";
 import MembersTable from "../../components/admin/MembersTable";
-import AddMemberForm from "../../components/admin/AddMemberForm";
+import AddMemberForm from "../../components/admin/MemberForm";
 import { Plus, X } from "lucide-react";
 import axios from "axios";
 
-import type { MemberRole } from "../../types/role";
+export type MemberRole = "TASKER" | "MANAGER" | "ADMIN";
 
 export type Member = {
   id: string;
@@ -44,6 +43,7 @@ const ManageMembers = () => {
   const api = axios.create({
     baseURL: import.meta.env.VITE_BASE_URL,
     headers: { "Content-Type": "application/json" },
+    withCredentials: true,
   });
 
   // Fetch members from backend
@@ -51,7 +51,7 @@ const ManageMembers = () => {
     try {
       setLoading(true);
       setError("");
-      const { data } = await api.get("/api/v1/");
+      const { data } = await api.get("/api/v1/members");
 
       if (Array.isArray(data)) {
         setMembers(data);
@@ -61,6 +61,7 @@ const ManageMembers = () => {
         setMembers([]);
       }
     } catch (err) {
+      console.error(err);
       setError("Failed to load members from server.");
       setMembers([]);
     } finally {
@@ -72,7 +73,6 @@ const ManageMembers = () => {
     fetchMembers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
 
   // Reset form and close modal
   const resetForm = () => {
@@ -106,7 +106,9 @@ const ManageMembers = () => {
     if (!window.confirm("Delete this staff member entry?")) return;
     try {
       await api.delete(`/api/v1/members/${id}`);
-      setMembers((prev) => prev.filter((m) => m.id !== id));
+      setMembers((prev) =>
+        prev.filter((m) => m.id !== id && (m as any)._id !== id),
+      );
       if (editingId === id) resetForm();
     } catch (err) {
       console.error(err);
@@ -140,7 +142,7 @@ const ManageMembers = () => {
               phone: "",
             });
           }}
-          className="inline-flex items-center gap-2 rounded-xl bg-gray-900 hover:bg-gray-800 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition active:scale-[0.98]">
+          className="inline-flex items-center gap-2 rounded-xl bg-sky-500 hover:bg-sky-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition active:scale-[0.98]">
           <Plus size={16} />
           Add Member
         </button>
@@ -148,16 +150,13 @@ const ManageMembers = () => {
 
       {/* Members Table */}
       <div className="w-full">
-        {/* Cast props to any to satisfy differing Props shape in MembersTable */}
         <MembersTable
-          {...({
-            members,
-            handleEdit,
-            handleDelete,
-            fetchMembers,
-            loading,
-            error,
-          } as any)}
+          members={members}
+          loading={loading}
+          error={error}
+          onRefresh={fetchMembers}
+          handleEdit={handleEdit}
+          handleDelete={handleDelete}
         />
       </div>
 

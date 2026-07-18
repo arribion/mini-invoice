@@ -25,7 +25,7 @@ export function Navbar() {
 
     switch (user.role) {
       case "ADMIN":
-        return "/admin/dashboard";
+        return "/admin/";
       case "TASKER":
       default:
         return "/client/dashboard";

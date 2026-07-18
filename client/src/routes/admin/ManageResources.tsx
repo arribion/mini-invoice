@@ -138,7 +138,7 @@ const ManageResources = () => {
 
             <button
               onClick={() => inputRef.current?.click()}
-              className="inline-flex items-center gap-2 rounded-xl bg-green-600 px-5 py-3 font-medium text-white transition hover:bg-green-700">
+              className="inline-flex items-center gap-2 rounded-xl bg-sky-500 px-5 py-3 font-medium text-white transition hover:bg-sky-600">
               <Upload size={18} />
               Upload Files
             </button>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { LuCirclePlus, LuX } from "react-icons/lu";
 import axios from "axios";
-import ProjectUploadForm from "../../components/admin/AddProjectUploadForm";
+import ProjectUploadForm from "../../components/admin/ProjectUploadForm";
 import ProjectsTable from "../../components/admin/ProjectTable";
 
 export interface Project {
@@ -86,6 +86,19 @@ const ManageProjects = () => {
     setShowProjectAddForm(true);
   };
 
+  const deleteProject = async (project: Project) => {
+    if (window.confirm("Are you sure you want to delete this project?")) {
+      try {
+        await api.delete(`/api/v1/projects/${project.id}`);
+        // Refresh the list after deletion
+        fetchProjects();
+      } catch (err) {
+        setError("Failed to delete project");
+      }
+    }
+  };
+
+
   const closeModal = () => {
     setShowProjectAddForm(false);
     setSelectedProject(null);
@@ -104,7 +117,7 @@ const ManageProjects = () => {
 
         <button
           onClick={openCreateModal}
-          className="flex items-center gap-2 rounded-xl border bg-white px-4 py-2 shadow-sm transition hover:bg-sky-50">
+          className="flex items-center gap-2 rounded-xl border bg-sky-500 text-white px-4 py-2 shadow-sm transition hover:bg-sky-600">
           <LuCirclePlus />
           Add Project
         </button>
@@ -118,11 +131,12 @@ const ManageProjects = () => {
         setSearch={setSearch}
         refresh={fetchProjects}
         onEdit={openEditModal}
+        onDelete={deleteProject}
       />
 
       {showProjectAddForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="relative w-full max-w-3xl rounded-2xl bg-white shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/50 br p-4">
+          <div className="relative w-full max-w-3xl rounded bg-white shadow-xl">
             <button
               onClick={closeModal}
               className="absolute right-4 top-4 rounded-lg p-1 hover:bg-gray-200">

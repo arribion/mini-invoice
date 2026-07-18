@@ -1,10 +1,13 @@
 // src/components/admin/MembersTable.tsx
-import { useState, useEffect } from "react";
-import axios from "axios";
+import React from "react";
 import { Edit2, Trash2, Search, RefreshCw } from "lucide-react";
 import type { Member } from "../../routes/admin/ManageMembers";
 
 type Props = {
+  members: Member[];
+  loading: boolean;
+  error: string;
+  onRefresh: () => Promise<void>;
   handleEdit: (member: Member) => void;
   handleDelete: (id: string) => Promise<void> | void;
 };
@@ -20,56 +23,22 @@ const getRoleBadgeColor = (role?: string) => {
   return "bg-slate-50 text-slate-700 border-slate-200/60";
 };
 
-const MembersTable = ({ handleEdit, handleDelete }: Props) => {
-  const [members, setMembers] = useState<Member[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+const safeString = (value: unknown) =>
+  value === null || value === undefined ? "" : String(value);
 
-  const api = axios.create({
-    baseURL: import.meta.env.VITE_BASE_URL,
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+const MembersTable = ({
+  members,
+  loading,
+  error,
+  onRefresh,
+  handleEdit,
+  handleDelete,
+}: Props) => {
+  const [searchTerm, setSearchTerm] = React.useState("");
 
-  const fetchMembers = async () => {
-    try {
-      setLoading(true);
-      setError("");
-      const { data } = await api.get("/api/v1/members");
-
-      if (Array.isArray(data)) {
-        setMembers(data);
-      } else if (Array.isArray(data?.data)) {
-        setMembers(data.data);
-      } else {
-        setMembers([]);
-      }
-    } catch (err) {
-      setError("Failed to load members from server.");
-      setMembers([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchMembers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Normalize search query once
   const q = (searchTerm ?? "").trim().toLowerCase();
 
-  // Safe accessor for name/email/role fields
-  const safeString = (value: unknown) => {
-    if (value === null || value === undefined) return "";
-    return String(value);
-  };
-
   const filteredMembers = members.filter((member) => {
-    // support multiple name fields that might exist in different APIs
     const name = safeString(
       (member as any).fullName ??
         (member as any).full_name ??
@@ -78,21 +47,9 @@ const MembersTable = ({ handleEdit, handleDelete }: Props) => {
     const email = safeString((member as any).email).toLowerCase();
     const role = safeString((member as any).role).toLowerCase();
 
-    // if no query, include all
     if (!q) return true;
-
     return name.includes(q) || email.includes(q) || role.includes(q);
   });
-
-  const onDelete = async (id: string) => {
-    try {
-      await handleDelete(id);
-      // Optimistically update local state
-      setMembers((prev) => prev.filter((m) => (m as any).id !== id));
-    } catch (err) {
-      console.error("Delete failed", err);
-    }
-  };
 
   return (
     <div className="space-y-4 w-full">
@@ -112,7 +69,7 @@ const MembersTable = ({ handleEdit, handleDelete }: Props) => {
           />
         </div>
         <button
-          onClick={fetchMembers}
+          onClick={onRefresh}
           disabled={loading}
           className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition active:scale-[0.98] disabled:opacity-50">
           <RefreshCw
@@ -145,7 +102,7 @@ const MembersTable = ({ handleEdit, handleDelete }: Props) => {
           <div className="p-12 text-center text-red-500 flex flex-col items-center gap-2">
             <p className="text-sm font-medium">{error}</p>
             <button
-              onClick={fetchMembers}
+              onClick={onRefresh}
               className="mt-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition text-xs font-semibold">
               Retry Sync
             </button>
@@ -185,7 +142,7 @@ const MembersTable = ({ handleEdit, handleDelete }: Props) => {
 
                     return (
                       <tr
-                        key={id}
+                        key={id || Math.random().toString(36).slice(2)}
                         className="hover:bg-slate-50/70 transition-colors group">
                         <td className="p-4 pl-6 font-semibold text-gray-900">
                           {name || "—"}
@@ -195,9 +152,7 @@ const MembersTable = ({ handleEdit, handleDelete }: Props) => {
                         </td>
                         <td className="p-4">
                           <span
-                            className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider ${getRoleBadgeColor(
-                              role,
-                            )}`}>
+                            className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider ${getRoleBadgeColor(role)}`}>
                             {role || "—"}
                           </span>
                         </td>
@@ -207,16 +162,22 @@ const MembersTable = ({ handleEdit, handleDelete }: Props) => {
                         <td className="p-4 pr-6">
                           <div className="flex items-center justify-center gap-2">
                             <button
-                              onClick={() => handleEdit(member)}
+                              onClick={() =>
+                                handleEdit({
+                                  id,
+                                  fullName: name,
+                                  email,
+                                  role: (role as any) || "TASKER",
+                                  phone,
+                                })
+                              }
                               className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition active:scale-[0.97]">
-                              <Edit2 size={13} className="text-gray-400" />
-                              Edit
+                              <Edit2 size={13} className="text-gray-400" /> Edit
                             </button>
                             <button
-                              onClick={() => onDelete(id)}
+                              onClick={() => handleDelete(id)}
                               className="inline-flex items-center gap-1.5 rounded-lg bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-100 transition active:scale-[0.97]">
-                              <Trash2 size={13} />
-                              Delete
+                              <Trash2 size={13} /> Delete
                             </button>
                           </div>
                         </td>
