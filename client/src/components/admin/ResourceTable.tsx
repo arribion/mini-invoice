@@ -187,7 +187,8 @@ const ResourceTable: React.FC = () => {
 
                       {/* Content Rows */}
                       <td className="p-4 font-medium text-gray-900 break-all max-w-xs">
-                        {item.name}
+                        <h1 className="text-[18px]">{item.name}</h1>
+                        <p className="text-gray-500">This file short note goes here, a kind of description from the admin</p>
                       </td>
                       <td className="p-4 text-gray-500 capitalize">
                         {item.type}
