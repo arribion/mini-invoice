@@ -1,7 +1,12 @@
-import { useRef, useState } from "react";
-import { FileText, Upload, Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import React, { useCallback, useRef, useState } from "react";
+import {
+  FileText,
+  Upload,
+  Loader2,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
 import axios from "axios";
-import ResourceTable from "../../components/admin/ResourceTable";
 
 interface Resource {
   id: string;
@@ -10,9 +15,9 @@ interface Resource {
   size: string;
   uploadedAt: string;
   file: File;
-  status: "idle" | "uploading" | "success" | "error"; // Tracks file progress
-  progress: number; // Percentage 0-100
-  cloudinaryUrl?: string; // Stored link from backend
+  status: "idle" | "uploading" | "success" | "error";
+  progress: number;
+  cloudinaryUrl?: string;
 }
 
 const formatBytes = (bytes: number) => {
@@ -23,19 +28,19 @@ const formatBytes = (bytes: number) => {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
 };
 
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+const BASE_URL = import.meta.env.VITE_BASE_URL ?? "";
+
 if (!BASE_URL) {
-  console.log("Error accessing resource upload base url...")
+  console.error("VITE_BASE_URL is not defined. Resource uploads will fail.");
 }
 
-const ResourcesUploadForm = () => {
-  const inputRef = useRef<HTMLInputElement>(null);
+const ResourcesUploadForm: React.FC = () => {
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const [resources, setResources] = useState<Resource[]>([]);
+  const [isUploadingAny, setIsUploadingAny] = useState(false);
 
-  // Function to send a single file via Axios
-  const uploadSingleFile = async (id: string, file: File) => {
+  const uploadSingleFile = useCallback(async (id: string, file: File) => {
     const formData = new FormData();
-    // The key name MUST be "file" to match upload.single("file") or your multer field config
     formData.append("file", file);
 
     try {
@@ -43,12 +48,9 @@ const ResourcesUploadForm = () => {
         `${BASE_URL}/api/v1/resources/upload`,
         formData,
         {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-          // Optional tracking of progress percentage
+          headers: { "Content-Type": "multipart/form-data" },
           onUploadProgress: (progressEvent) => {
-            const total = progressEvent.total || file.size;
+            const total = progressEvent.total ?? file.size;
             const percentage = Math.round((progressEvent.loaded * 100) / total);
 
             setResources((prev) =>
@@ -60,179 +62,260 @@ const ResourcesUploadForm = () => {
         },
       );
 
-      // Backend returns success, update status and store URL
-      if (response.data.success) {
+      if (response?.data?.success) {
         setResources((prev) =>
           prev.map((item) =>
             item.id === id
-              ? { ...item, status: "success", cloudinaryUrl: response.data.url }
+              ? {
+                  ...item,
+                  status: "success",
+                  progress: 100,
+                  cloudinaryUrl: response.data.url,
+                }
               : item,
           ),
         );
+      } else {
+        // Treat non-success response as error
+        setResources((prev) =>
+          prev.map((item) =>
+            item.id === id ? { ...item, status: "error" } : item,
+          ),
+        );
+        console.error(
+          "Upload response did not indicate success:",
+          response?.data,
+        );
       }
-    } catch (error: any) {
-      console.error(`Upload failed for ${file.name}:`, error);
+    } catch (err) {
+      console.error(`Upload failed for ${file.name}:`, err);
       setResources((prev) =>
         prev.map((item) =>
           item.id === id ? { ...item, status: "error" } : item,
         ),
       );
     }
-  };
+  }, []);
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
+  const handleUpload = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = e.target.files;
+      if (!files || files.length === 0) return;
 
-    const uploadedFiles = Array.from(e.target.files);
+      const uploadedFiles = Array.from(files);
 
-    // 1. Create fresh state instances for the UI layout
-    const newResources: Resource[] = uploadedFiles.map((file) => ({
-      id: crypto.randomUUID(),
-      name: file.name,
-      type: file.type || "Unknown",
-      size: formatBytes(file.size),
-      uploadedAt: new Date().toLocaleDateString(),
-      file,
-      status: "uploading",
-      progress: 0,
-    }));
+      const newResources: Resource[] = uploadedFiles.map((file) => ({
+        id: crypto?.randomUUID?.() ?? `${Date.now()}-${file.name}`,
+        name: file.name,
+        type: file.type || "Unknown",
+        size: formatBytes(file.size),
+        uploadedAt: new Date().toLocaleString(),
+        file,
+        status: "uploading",
+        progress: 0,
+      }));
 
-    // Add them to state instantly so loaders display
-    setResources((prev) => [...newResources, ...prev]);
-    e.target.value = ""; // Reset input field
+      // Append new resources to the end (older first, newest last)
+      setResources((prev) => [...prev, ...newResources]);
 
-    // 2. Fire off HTTP requests for all selected files simultaneously
-    await Promise.all(
-      newResources.map((resource) =>
-        uploadSingleFile(resource.id, resource.file),
-      ),
-    );
-  };
+      // Reset input so same file can be selected again if needed
+      e.target.value = "";
+
+      if (!BASE_URL) {
+        // Mark all as error immediately if no base URL
+        setResources((prev) =>
+          prev.map((r) =>
+            newResources.some((n) => n.id === r.id)
+              ? { ...r, status: "error" }
+              : r,
+          ),
+        );
+        console.error("Cannot upload: BASE_URL is not configured.");
+        return;
+      }
+
+      setIsUploadingAny(true);
+
+      // Upload all files in parallel
+      await Promise.all(
+        newResources.map(async (resource) => {
+          await uploadSingleFile(resource.id, resource.file);
+        }),
+      );
+
+      setIsUploadingAny(false);
+    },
+    [uploadSingleFile],
+  );
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <h1>RESOURCE FORM</h1>
-      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <div className="flex flex-col gap-4 border-b border-gray-200 p-6 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h2 className="text-lg font-semibold">Preview</h2>
-            <p className="text-sm text-gray-500">
-              <b>NOTE YOU CAN ONLY UPLOAD:</b> images, pdf's, videos, and
-              msword",
+    <form
+      onSubmit={(e) => e.preventDefault()}
+      aria-labelledby="resource-form-title">
+      <h1 id="resource-form-title" className="text-lg font-semibold mb-4">
+        RESOURCE FORM
+      </h1>
+
+      <div className="space-y-4">
+        <div>
+          <label
+            htmlFor="resource-title"
+            className="block text-sm font-medium text-gray-700">
+            Title
+          </label>
+          <input
+            id="resource-title"
+            name="title"
+            type="text"
+            placeholder="project vox instruction"
+            className="border p-2 w-full rounded mt-1"
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="resource-desc"
+            className="block text-sm font-medium text-gray-700">
+            Description / Note
+          </label>
+          <input
+            id="resource-desc"
+            name="description"
+            type="text"
+            placeholder="Review by before 1/1/2030"
+            className="border p-2 w-full rounded mt-1"
+          />
+        </div>
+
+        <div>
+          <div className="bg-red-100 rounded border-2 border-red-400 p-3 mb-3">
+            <p className="text-sm text-gray-700">
+              <strong>NOTE YOU CAN ONLY UPLOAD:</strong> images, PDFs, videos,
+              and MS Word documents
             </p>
           </div>
 
-          <div>
+          <div className="flex items-center gap-3">
             <input
               ref={inputRef}
               hidden
               multiple
               type="file"
+              accept="image/*,application/pdf,video/*,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
               onChange={handleUpload}
+              aria-hidden
             />
 
             <button
+              type="button"
               onClick={() => inputRef.current?.click()}
-              className="inline-flex items-center gap-2 rounded-xl bg-sky-500 px-5 py-3 font-medium text-white transition hover:bg-sky-600">
+              disabled={isUploadingAny}
+              className="inline-flex items-center gap-2 rounded-xl bg-sky-500 px-5 py-3 font-medium text-white transition hover:bg-sky-600 disabled:opacity-60">
               <Upload size={18} />
-              Upload Files
+              Upload
             </button>
+
+            {isUploadingAny && (
+              <span className="text-sm text-gray-500">Uploading files…</span>
+            )}
           </div>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full min-w-225">
-            <thead className="bg-gray-50">
+          <table className="min-w-full bg-white">
+            <thead>
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-500">
+                <th className="text-left px-6 py-3 text-xs font-semibold uppercase text-gray-500">
                   File
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-500">
+                <th className="text-left px-6 py-3 text-xs font-semibold uppercase text-gray-500">
                   Type
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-500">
+                <th className="text-left px-6 py-3 text-xs font-semibold uppercase text-gray-500">
                   Size
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-500">
+                <th className="text-left px-6 py-3 text-xs font-semibold uppercase text-gray-500">
                   Status
                 </th>
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-gray-100">
-              {resources.length === 0 && (
+            <tbody>
+              {resources.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-12 text-center text-gray-500">
+                  <td colSpan={4} className="py-12 text-center text-gray-500">
                     No resource Upload Preview.
                   </td>
                 </tr>
-              )}
-
-              {resources.map((resource) => (
-                <tr key={resource.id} className="transition hover:bg-green-50">
-                  <td className="px-6 py-5">
-                    <div className="flex items-center gap-3">
-                      <div className="rounded-xl bg-green-100 p-3">
-                        <FileText className="text-green-600" size={20} />
-                      </div>
-                      <div>
-                        {resource.cloudinaryUrl ? (
-                          <a
-                            href={resource.cloudinaryUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="font-semibold text-green-700 underline hover:text-green-800">
-                            {resource.name}
-                          </a>
-                        ) : (
-                          <p className="font-semibold text-gray-900">
-                            {resource.name}
+              ) : (
+                resources.map((resource) => (
+                  <tr key={resource.id} className="border-t">
+                    <td className="px-6 py-5">
+                      <div className="flex items-center gap-3">
+                        <div className="rounded-xl bg-green-100 p-3">
+                          <FileText className="text-green-600" size={20} />
+                        </div>
+                        <div>
+                          {resource.cloudinaryUrl ? (
+                            <a
+                              href={resource.cloudinaryUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="font-semibold text-[10px] text-green-700 underline hover:text-green-800">
+                              {resource.name}
+                            </a>
+                          ) : (
+                            <p className="font-semibold text-[10px] text-gray-900">
+                              {resource.name}
+                            </p>
+                          )}
+                          <p className="text-sm text-gray-500">
+                            Downloadable Resource
                           </p>
-                        )}
-                        <p className="text-sm text-gray-500">
-                          Downloadable Resource
-                        </p>
+                        </div>
                       </div>
-                    </div>
-                  </td>
+                    </td>
 
-                  <td className="px-6 py-5 text-gray-600">{resource.type}</td>
-                  <td className="px-6 py-5 text-gray-600">{resource.size}</td>
+                    <td className="px-6 py-5 text-[10px] text-gray-600">
+                      {resource.type}
+                    </td>
+                    <td className="px-6 py-5 text-[6px] text-gray-600">
+                      {resource.size}
+                    </td>
 
-                  {/* Dynamic Status / Progress Bar Column */}
-                  <td className="px-6 py-5 text-gray-600">
-                    {resource.status === "uploading" && (
-                      <div className="flex items-center gap-2">
-                        <Loader2
-                          className="animate-spin text-green-600"
-                          size={16}
-                        />
-                        <span className="text-xs font-medium text-gray-500">
-                          {resource.progress}%
-                        </span>
-                      </div>
-                    )}
-                    {resource.status === "success" && (
-                      <div className="flex items-center gap-1.5 text-green-600 text-sm font-medium">
-                        <CheckCircle size={16} /> Ready
-                      </div>
-                    )}
-                    {resource.status === "error" && (
-                      <div className="flex items-center gap-1.5 text-red-600 text-sm font-medium">
-                        <AlertCircle size={16} /> Failed
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              ))}
+                    <td className="px-6 py-5 text-gray-600">
+                      {resource.status === "uploading" && (
+                        <div className="flex items-center gap-2">
+                          <Loader2
+                            className="animate-spin text-green-600"
+                            size={16}
+                          />
+                          <span className="text-xs font-medium text-gray-500">
+                            {resource.progress}%
+                          </span>
+                        </div>
+                      )}
+
+                      {resource.status === "success" && (
+                        <div className="flex text-[10px] items-center gap-1.5 text-green-600 text-sm font-medium">
+                          <CheckCircle size={16} /> Ready
+                        </div>
+                      )}
+
+                      {resource.status === "error" && (
+                        <div className="flex items-center gap-1.5 text-red-600 text-sm font-medium">
+                          <AlertCircle size={16} /> Failed
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
       </div>
-      <div className="mt-4">
-        <ResourceTable />
-      </div>
-    </div>
+    </form>
   );
 };
 

@@ -2,7 +2,7 @@ import mongooose from "mongoose";
 
 const resourceSchema = mongooose.Schema(
   {
-        projectID: {
+    projectID: {
         type:String,
     },
     title: {
