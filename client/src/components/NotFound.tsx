@@ -20,7 +20,7 @@ function NotFoundComponent() {
         <div className="mt-6 flex flex-col gap-2 justify-center sm:flex-row">
           <button
             onClick={returnPrev}
-            className=" flex gap-3  items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">
+            className=" flex gap-3  items-center justify-center rounded-md bg-sky-500 px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">
             <ArrowLeft size={15} />
             Go Back
           </button>

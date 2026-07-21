@@ -25,7 +25,7 @@ import MainLayout from "./layout/MainLayout";
 import Payments from "./routes/client/Payments";
 import Projects from "./routes/client/Projects";
 import Tasks from "./routes/client/Tasks";
-import Task from "./routes/admin/Task";
+import Task from "./routes/admin/task/Task";
 import Invoicing from "./routes/admin/Invoicing";
 import Financies from "./routes/admin/Financies";
 
@@ -43,7 +43,7 @@ const App = () => {
         <Route path="about" element={<About />} />
       </Route>
 
-      {/* Client Specific Protected Routes */}
+      {/* Client Protected Routes */}
       <Route element={<ProtectedRoute allowedRoles={["TASKER"]} />}>
         <Route element={<ClientLayout />}>
           <Route path="/client/dashboard" element={<Dashboard />} />
@@ -60,7 +60,19 @@ const App = () => {
         </Route>
       </Route>
 
-      {/* Admin Specific Protected Routes */}
+      {/* Manager Protected Routes */}
+      {/* <Route  element={<ProtectedRoute allowedRoles={["MANAGER"]} />} > */}
+      {/* <Route index element={<ManagerDashboard />} /> */}
+      {/* <Route path="tasks" element={<Task />} /> */}
+      {/* <Route path="/client/payments" element={<Payments />} /> */}
+      {/* <Route path="invoicing" element={<Invoicing />} /> */}
+      {/* <Route path="projects" element={<ManageProjects />} /> */}
+      {/* <Route path="resources" element={<ManageResources />} /> */}
+      {/* <Route path="members" element={<ManageMembers />} /> */}
+      {/* <Route path="settings" element={<ManagerSetting />} /> */}
+      {/* </Route> */}
+
+      {/* Admin Protected Routes */}
       <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />

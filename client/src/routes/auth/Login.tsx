@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
 
-  // Destructure matching your AuthContext properties (isLoading instead of loading)
   const { login, isLoading, isLoggedIn, user } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect users instantly if they are already logged in
   useEffect(() => {
     if (isLoggedIn && user) {
       if (user.role === "ADMIN") {
@@ -21,12 +22,36 @@ const Login = () => {
     }
   }, [isLoggedIn, user, navigate]);
 
+  const validateEmail = (email: string) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  // const validatePassword = (password: string) => {
+  //   const regex =
+  //     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  //   return regex.test(password);
+  // };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) return;
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
 
-    // Call the context function passing your local form states
-    login(email, password);
+    if (!validateEmail(trimmedEmail)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+
+    // if (!validatePassword(trimmedPassword)) {
+    //   setError(
+    //     "Password must be at least 8 characters, include uppercase, lowercase, number, and special character."
+    //   );
+    //   return;
+    // }
+
+    setError("");
+    login(trimmedEmail, trimmedPassword);
   };
 
   const btnStyle = isLoading ? { color: "gray" } : undefined;
@@ -39,7 +64,9 @@ const Login = () => {
         <h1 className="text-center font-bold text-2xl text-sky-500">
           GT LOGIN
         </h1>
-
+        {error && (
+          <p className="text-red-500 text-sm text-center mb-2">{error}</p>
+        )}
         <div>
           <label htmlFor="email">Email:</label>
           <br />
@@ -48,25 +75,32 @@ const Login = () => {
             id="email"
             placeholder="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value.trimStart())}
             className="border rounded p-1 w-full"
             required
           />
         </div>
-
-        <div className="mt-4">
+        <div className="mt-4 relative">
           <label htmlFor="password">Password:</label>
           <br />
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             id="password"
             placeholder="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="border rounded p-1 w-full"
+            onChange={(e) => setPassword(e.target.value.trimStart())}
+            className="border rounded p-1 w-full pr-10"
             required
           />
+          {/* Eye toggle button */}
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-2 top-8 text-gray-500 hover:text-gray-700">
+            {showPassword ? <EyeOff/> : <Eye/>}
+          </button>
         </div>
+        
         <button
           type="submit"
           style={btnStyle}
@@ -74,7 +108,6 @@ const Login = () => {
           className="bg-sky-500 text-slate-50 my-6 w-full rounded py-2 font-medium hover:bg-sky-600 transition-colors disabled:bg-slate-300">
           {isLoading ? "Logging in..." : "Login"}
         </button>
-        {/* <p>ARRIBION TECHNOLOGIES</p> */}
       </form>
     </section>
   );
