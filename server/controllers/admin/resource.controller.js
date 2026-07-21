@@ -1,10 +1,10 @@
-import cloudinary from "../config/cloudinary.js";
-import streamUpload from "../utils/cloudinary.upload.js";
+import cloudinary from "../../config/cloudinary.js";
+import streamUpload from "../../utils/cloudinary.upload.js";
 
 export const uploadResource = async (req, res) => {
   const file = req.file;
   const { title, description } = req.body;
-  try { 
+  try {
     // if (!title || !description) {
     //   return res.status(400).json({
     //     success: false,
@@ -124,7 +124,6 @@ export const deleteResource = async (req, res) => {
     });
   }
 };
-
 
 export default {
   uploadResource,

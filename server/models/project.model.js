@@ -1,5 +1,6 @@
+// server/models/project.Model.js
 import mongoose from "mongoose";
-import ProjectAssignment from "./Project.Assignment.Model.js";
+import ProjectAssignment from "./project.Assignment.Model.js";
 
 const projectSchema = new mongoose.Schema(
   {
@@ -48,6 +49,11 @@ const projectSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    taskers: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "User",
+      default: [],
+    },
   },
   {
     timestamps: true,
@@ -67,7 +73,6 @@ async function removeAssignmentsForProject(projectId, session = null) {
 
 // Query middleware for findOneAndDelete
 projectSchema.pre("findOneAndDelete", async function () {
-  // `this` is the query
   const doc = await this.model.findOne(this.getQuery()).select("_id").lean();
   if (doc && doc._id) {
     await removeAssignmentsForProject(doc._id);
@@ -79,7 +84,6 @@ projectSchema.pre(
   "deleteOne",
   { document: false, query: true },
   async function () {
-    // `this` is the query
     const doc = await this.model.findOne(this.getQuery()).select("_id").lean();
     if (doc && doc._id) {
       await removeAssignmentsForProject(doc._id);
@@ -101,4 +105,8 @@ projectSchema.pre(
   },
 );
 
-export const ProjectModel = mongoose.model("Project", projectSchema);
+// Check if the model already exists before creating it
+export const ProjectModel =
+  mongoose.models.Project || mongoose.model("Project", projectSchema);
+
+export default ProjectModel;

@@ -7,7 +7,7 @@ import {
   get_all_member,
   update_member,
   delete_member,
-} from "../controllers/member.controller.js"
+} from "../controllers/admin/member.controller.js"
 
 member_router
     .post("/", add_member)

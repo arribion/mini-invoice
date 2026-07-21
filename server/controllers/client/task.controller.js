@@ -1,4 +1,4 @@
-import taskModel from "../models/task.model.js";
+import taskModel from "../../models/task.model.js";
 
 const taskLogUpload = async (req, res) => {
     try {

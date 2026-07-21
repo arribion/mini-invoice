@@ -1,5 +1,5 @@
 import  multer from "multer";
-import ExcelUploadService from "../services/excel.upload.js";
+import ExcelUploadService from "../../services/excel.upload.js";
 
 const app = express();
 const upload = multer({ storage: multer.memoryStorage() }); // Using memory storage for speed

@@ -24,10 +24,11 @@ import AuthLayout from "./layout/AuthLayout";
 import MainLayout from "./layout/MainLayout";
 import Payments from "./routes/client/Payments";
 import Projects from "./routes/client/Projects";
-import Tasks from "./routes/client/Tasks";
+import TasksLog from "./routes/client/TasksLog";
 import Task from "./routes/admin/task/Task";
 import Invoicing from "./routes/admin/Invoicing";
 import Financies from "./routes/admin/Financies";
+import MyTask from "./routes/client/MyTask";
 
 const App = () => {
   return (
@@ -53,7 +54,8 @@ const App = () => {
             path="/client/transactions/:projectID"
             element={<InvoiceViewer />}
           />
-          <Route path="/client/tasks" element={<Tasks />} />
+          <Route path="/client/tasks-log" element={<TasksLog />} />
+          <Route path="/client/my-tasks" element={<MyTask />} />
           <Route path="/client/projects" element={<Projects />} />
           <Route path="/client/payments" element={<Payments />} />
           <Route path="/client/settings" element={<Settings />} />

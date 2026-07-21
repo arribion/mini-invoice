@@ -1,4 +1,4 @@
-import { ProjectModel } from "../models/project.model.js";
+import { ProjectModel } from "../../models/project.model.js";
 import mongoose from "mongoose";
 // Create Project
 export const add_project = async (req, res) => {
@@ -125,7 +125,7 @@ export const delete_project = async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({
       success: false,
-      message: "Invalid project ID"
+      message: "Invalid project ID",
     });
   }
 
@@ -144,10 +144,10 @@ export const delete_project = async (req, res) => {
       message: "Project deleted successfully.",
     });
   } catch (error) {
-     return res.status(500).json({
-       success: false,
-       message: error.message,
-     });
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 

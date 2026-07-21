@@ -1,11 +1,7 @@
-// src/components/admin/task/MembersOverview.tsx
 import React, { useMemo } from "react";
 import type { Member, ProjectAssignment } from "../../../types/task";
 
-type Props = {
-  members: Member[];
-  assignments: ProjectAssignment[];
-};
+type Props = { members: Member[]; assignments: ProjectAssignment[] };
 
 const MembersOverview: React.FC<Props> = ({ members, assignments }) => {
   const memberStats = useMemo(() => {
@@ -41,11 +37,7 @@ const MembersOverview: React.FC<Props> = ({ members, assignments }) => {
           {memberStats.map((member) => (
             <div
               key={member._id}
-              className={`rounded p-4 border ${
-                member.role === "ADMIN"
-                  ? "border-slate-300 bg-slate-50"
-                  : "border-slate-400 bg-white"
-              } shadow-sm hover:shadow-md transition-shadow`}>
+              className={`rounded p-4 border ${member.role === "ADMIN" ? "border-slate-300 bg-slate-50" : "border-slate-400 bg-white"} shadow-sm hover:shadow-md transition-shadow`}>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium text-slate-800">
@@ -84,4 +76,4 @@ const MembersOverview: React.FC<Props> = ({ members, assignments }) => {
   );
 };
 
-export default MembersOverview;
+export default React.memo(MembersOverview);

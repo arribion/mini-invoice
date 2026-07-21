@@ -1,3 +1,4 @@
+// server/models/project.Assignment.Model.js
 import mongoose from "mongoose";
 
 const { Schema, model, Types } = mongoose;
@@ -13,7 +14,7 @@ const ProjectAssignmentSchema = new Schema(
 
     tasker_id: {
       type: Types.ObjectId,
-      ref: "Member", // ensure this matches your user model name
+      ref: "User",
       required: true,
       index: true,
     },
@@ -89,5 +90,9 @@ ProjectAssignmentSchema.statics.assignTasker = async function (
   }
 };
 
-const ProjectAssignment = model("ProjectAssignment", ProjectAssignmentSchema);
+// Check if the model already exists before creating it
+const ProjectAssignment =
+  mongoose.models.ProjectAssignment ||
+  model("ProjectAssignment", ProjectAssignmentSchema);
+
 export default ProjectAssignment;

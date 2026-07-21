@@ -1,3 +1,4 @@
+// server/models/user.Model.js
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
@@ -22,7 +23,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Password is required"],
       minlength: 6,
-      select: false, // don’t return password by default
+      select: false,
     },
 
     phone: {
@@ -82,6 +83,7 @@ const userSchema = new mongoose.Schema(
   },
 );
 
-const UserModel = mongoose.model("User", userSchema);
+// Check if the model already exists before creating it
+const UserModel = mongoose.models.User || mongoose.model("User", userSchema);
 
 export default UserModel;

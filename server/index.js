@@ -12,6 +12,8 @@ import authRouter from "./routes/auth.route.js";
 import projectRouter from "./routes/project.route.js";
 import memberRouter from "./routes/members.route.js";
 import resourceRouter from "./routes/resources.route.js";
+import projectAssignmentRoutes from "./routes/project.assignment.route.js";
+import { protect } from "./middleware/auth.middleware.js";
 
 const app = express();
 
@@ -90,25 +92,25 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 
-// ---------- Parsers ----------
+//  Parsers 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-
-// ---------- Routes ----------
+//  Routes 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/projects", projectRouter);
 app.use("/api/v1/members", memberRouter);
 app.use("/api/v1/resources", resourceRouter);
+app.use("/api/v1/project-assignments", projectAssignmentRoutes);
 
-// ---------- Health check ----------
+//  Health check 
 app.get("/api/v1/health", (req, res) => {
   res.json({ status: "ok", env: NODE_ENV });
 });
 
-// ---------- Error handling ----------
+// Error handling 
 app.use((err, req, res, next) => {
   console.error("Unhandled error:", err?.message || err);
   // If CORS origin rejected, send a clear response for debugging

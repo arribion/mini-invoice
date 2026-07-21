@@ -3,7 +3,7 @@ import TaskForm from "../../components/client/TaskForm";
 import TaskLogExcelUpload from "../../components/client/TaskLogExcelUpload";
 import { useState } from "react";
 
-const Tasks = () => {
+const TasksLog = () => {
   const [showManualTaskForm, setShowManualTaskForm] = useState(false);
   return (
     <div className="p-2">
@@ -51,4 +51,4 @@ const Tasks = () => {
   );
 }
 
-export default Tasks
+export default TasksLog

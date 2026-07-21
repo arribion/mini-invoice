@@ -1,15 +1,15 @@
-export type ProjectStatus = "ACTIVE" | "PENDING" | "CLOSED" | "ON_HOLD";
-
 export type Project = {
-  id: number | string;
+  id: string;
   name: string;
-  description?: string;
-  status: ProjectStatus;
+  status?: string;
   colorClass?: string;
   tags?: string[];
-  taskers?: string[]; // array of Member.id
+  taskers?: string[]; // array of user ids
   rate?: number;
+  avg_pay?: number;
+  description?: string;
+  revenueSplit?: any;
   createdAt?: string;
   updatedAt?: string;
-  meta?: Record<string, unknown>;
+  [key: string]: any;
 };

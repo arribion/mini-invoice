@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import UserModel from "../models/userModel.js";
+import UserModel from "../../models/userModel.js";
 
 // Create Member 
 export const add_member = async (req, res) => {

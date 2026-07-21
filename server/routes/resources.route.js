@@ -3,10 +3,10 @@ import upload from "../middleware/multer.js";
 const resource_router = express.Router();
 
 import {
-    uploadResource,
-    getResources,
-    deleteResource
-} from "../controllers/resource.controller.js";
+  uploadResource,
+  getResources,
+  deleteResource,
+} from "../controllers/admin/resource.controller.js";
 
 resource_router
   .post("/upload", upload.single("file"), uploadResource)

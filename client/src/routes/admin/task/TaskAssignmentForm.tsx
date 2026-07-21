@@ -29,7 +29,6 @@ const TaskAssignmentForm: React.FC<Props> = ({
 
   const handleSubmit = async () => {
     if (selectedTaskers.length === 0) return;
-
     setSubmitting(true);
     try {
       await onAssign(selectedTaskers, customRate);
@@ -43,12 +42,9 @@ const TaskAssignmentForm: React.FC<Props> = ({
     }
   };
 
+  const allIds = availableMembers.map((m) => m._id);
   const handleSelectAll = () => {
-    if (selectedTaskers.length === availableMembers.length) {
-      setSelectedTaskers([]);
-    } else {
-      setSelectedTaskers(availableMembers.map((m) => m._id));
-    }
+    setSelectedTaskers((prev) => (prev.length === allIds.length ? [] : allIds));
   };
 
   return (
@@ -57,12 +53,13 @@ const TaskAssignmentForm: React.FC<Props> = ({
         <h4 className="font-semibold mb-2">Project Custom Rate</h4>
         <div className="flex items-center gap-3">
           <input
+            id="customRate"
             type="number"
             placeholder="Custom Rate (KES/hr)"
             className="w-48 px-3 py-2 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-sky-500"
             value={customRate ?? ""}
             onChange={(e) =>
-              setCustomRate(e.target.value ? parseFloat(e.target.value) : null)
+              setCustomRate(e.target.value ? Number(e.target.value) : null)
             }
           />
           <span className="text-sm text-gray-500">
@@ -76,7 +73,8 @@ const TaskAssignmentForm: React.FC<Props> = ({
         {availableMembers.length > 0 && (
           <button
             onClick={handleSelectAll}
-            className="text-sm text-sky-600 hover:text-sky-800">
+            className="text-sm text-sky-600 hover:text-sky-800"
+            aria-label="Select all taskers">
             {selectedTaskers.length === availableMembers.length
               ? "Deselect All"
               : "Select All"}

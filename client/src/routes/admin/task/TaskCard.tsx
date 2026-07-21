@@ -1,37 +1,26 @@
-// src/components/admin/task/TaskCard.tsx
-import React, { useState } from "react";
-import { Edit, Users } from "lucide-react";
+import React, { useState, useCallback } from "react";
+// import { Edit, Users, X, Check, Loader2 } from "lucide-react";
 import type { Project } from "../../../types/projects";
 import type { TaskerWithAssignment, Member } from "../../../types/task";
 import TaskAssignmentForm from "./TaskAssignmentForm";
 import TaskersList from "./TaskersList";
+import { UserPen } from "lucide-react";
 
 type Props = {
   project: Project;
   projectTaskers: TaskerWithAssignment[];
   availableMembers: Member[];
+  customRate: number | null;
   onAssignTaskers: (
     projectId: string,
     taskerIds: string[],
     customRate: number | null,
   ) => Promise<void>;
   onRemoveTasker: (assignmentId: string) => Promise<void>;
+  onUpdateStatus: (assignmentId: string, status: string) => Promise<void>;
+  isSubmitting?: boolean;
 };
 
-const statusBadgeClass = (status: string) => {
-  switch ((status || "").toUpperCase()) {
-    case "ACTIVE":
-      return "bg-emerald-100 text-emerald-800 border-emerald-200";
-    case "PENDING":
-      return "bg-amber-100 text-amber-800 border-amber-200";
-    case "CLOSED":
-      return "bg-slate-100 text-slate-700 border-slate-200";
-    case "ON_HOLD":
-      return "bg-yellow-50 text-yellow-800 border-yellow-200";
-    default:
-      return "bg-slate-100 text-slate-700 border-slate-200";
-  }
-};
 
 const TaskCard: React.FC<Props> = ({
   project,
@@ -41,74 +30,60 @@ const TaskCard: React.FC<Props> = ({
   onRemoveTasker,
 }) => {
   const [openFormFor, setOpenFormFor] = useState<Project["id"] | null>(null);
-  const [openTaskersFor, setOpenTaskersFor] = useState<Project["id"] | null>(
-    null,
+  const handleAssign = useCallback(
+    async (taskerIds: string[], rate: number | null) => {
+      await onAssignTaskers(String(project.id), taskerIds, rate);
+    },
+    [onAssignTaskers, project.id],
   );
 
   return (
     <div
-      className={`bg-white border-2 ${project.colorClass ?? "border-slate-300"} rounded p-4 shadow`}>
-      <div className="flex justify-between items-start">
-        <span
-          className={`inline-flex items-center px-3 py-1 text-xs font-semibold rounded ${statusBadgeClass(project.status)}`}>
-          {project.status}
-        </span>
-        <div className="text-sm text-gray-600">
-          {projectTaskers.length} tasker(s)
+      className={`p-4 bg-white rounded border-2 ${project.colorClass || "border-slate-200"}`}>
+      <div className="flex items-start justify-between">
+        <div>
+          <h3 className="text-lg font-semibold">{project.name}</h3>
+          <p className="text-sm text-gray-500 mt-1">
+            {project.description || "No description"}
+          </p>
+          <div className="mt-2 text-xs text-gray-600">
+            <span className="mr-3">
+              Rate: <strong>{project.rate ?? "N/A"}</strong>
+            </span>
+            <span>
+              Status: <strong className="text-green-500">{project.status}</strong>
+            </span>
+          </div>
         </div>
-      </div>
-
-      <div className="flex justify-between items-center mt-3">
-        <h3 className="text-2xl text-slate-700 font-semibold">
-          {project.name}
-        </h3>
-        <div className="text-sm text-gray-500">
-          {project.rate && project.rate > 0
-            ? `${project.rate.toLocaleString()} KES/hr`
-            : "Rate N/A"}
+        <div className="flex flex-col items-end gap-2">
+          <button
+            type="button"
+            onClick={() => setOpenFormFor((s) => (!s ? project.id : null))}
+            className="bg-sky-600 text-white px-3 py-1 rounded text-sm hover:bg-sky-700">
+            {openFormFor === project.id ? (
+              "Close"
+            ) : (
+              <button className="flex items-center gap-2"><UserPen size={16} /> Assign</button>
+            )}
+          </button>
         </div>
-      </div>
-
-      <div className="flex gap-4 mt-4">
-        <button
-          onClick={() => {
-            setOpenTaskersFor((prev) =>
-              prev === project.id ? null : project.id,
-            );
-            setOpenFormFor(null);
-          }}
-          className="bg-slate-50 hover:translate-x-1 duration-200 flex items-center gap-2 shadow px-4 py-1 rounded text-sky-700">
-          <Users size={16} /> View Taskers
-        </button>
-
-        <button
-          onClick={() => {
-            setOpenFormFor((prev) => (prev === project.id ? null : project.id));
-            setOpenTaskersFor(null);
-          }}
-          className="border hover:border-sky-800 flex items-center gap-2 px-4 py-1 rounded text-sky-800">
-          <Edit size={15} /> Edit
-        </button>
       </div>
 
       {openFormFor === project.id && (
         <TaskAssignmentForm
           projectRate={project.rate ?? 0}
           availableMembers={availableMembers}
-          onAssign={(taskerIds, customRate) =>
-            onAssignTaskers(String(project.id), taskerIds, customRate)
-          }
-          onCancel={() => {
-            setOpenFormFor(null);
-          }}
+          onAssign={handleAssign}
+          onCancel={() => setOpenFormFor(null)}
         />
       )}
 
-      {openTaskersFor === project.id && (
+      <div className="mt-4">
+        <h4 className="font-semibold mb-2">Assigned Taskers</h4>
         <TaskersList taskers={projectTaskers} onRemove={onRemoveTasker} />
-      )}
+      </div>
     </div>
   );
 };
 
-export default TaskCard;
+export default React.memo(TaskCard);

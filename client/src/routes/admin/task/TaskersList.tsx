@@ -1,6 +1,5 @@
-// src/components/admin/task/TaskersList.tsx
-import React from "react";
-import { X } from "lucide-react";
+import React, { useState } from "react";
+import { Loader2, Trash2,  } from "lucide-react";
 import type { TaskerWithAssignment } from "../../../types/task";
 
 type Props = {
@@ -9,13 +8,17 @@ type Props = {
 };
 
 const TaskersList: React.FC<Props> = ({ taskers, onRemove }) => {
+  const [removing, setRemoving] = useState<Record<string, boolean>>({});
+
   const handleRemove = async (assignmentId: string) => {
-    if (window.confirm("Are you sure you want to remove this tasker?")) {
-      try {
-        await onRemove(assignmentId);
-      } catch (err) {
-        console.error("Error removing tasker:", err);
-      }
+    if (!window.confirm("Are you sure you want to remove this tasker?")) return;
+    try {
+      setRemoving((s) => ({ ...s, [assignmentId]: true }));
+      await onRemove(assignmentId);
+    } catch (err) {
+      console.error("Error removing tasker:", err);
+    } finally {
+      setRemoving((s) => ({ ...s, [assignmentId]: false }));
     }
   };
 
@@ -24,10 +27,18 @@ const TaskersList: React.FC<Props> = ({ taskers, onRemove }) => {
       <table className="w-full bg-white shadow-md border border-gray-200">
         <thead className="bg-slate-100 text-slate-700">
           <tr>
-            <th className="p-3 text-left text-sm font-semibold">Tasker</th>
-            <th className="p-3 text-left text-sm font-semibold">Status</th>
-            <th className="p-3 text-left text-sm font-semibold">Rate</th>
-            <th className="p-3 text-left text-sm font-semibold">Actions</th>
+            <th scope="col" className="p-3 text-left text-sm font-semibold">
+              Tasker
+            </th>
+            <th scope="col" className="p-3 text-left text-sm font-semibold">
+              Status
+            </th>
+            <th scope="col" className="p-3 text-left text-sm font-semibold">
+              Rate
+            </th>
+            <th scope="col" className="p-3 text-left text-sm font-semibold">
+              Actions
+            </th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100 text-sm">
@@ -67,10 +78,18 @@ const TaskersList: React.FC<Props> = ({ taskers, onRemove }) => {
                 </td>
                 <td className="p-3">
                   <button
+                    type="button"
+                    aria-label={`Remove ${member?.full_name || "tasker"}`}
                     onClick={() => handleRemove(assignment._id)}
-                    className="text-red-600 hover:text-red-800 transition-colors p-1 hover:bg-red-50 rounded"
-                    title="Remove tasker">
-                    <X size={16} />
+                    disabled={!!removing[assignment._id]}
+                    className="text-red-600 hover:text-red-800 transition-colors p-1 hover:bg-red-50 rounded">
+                    {removing[assignment._id] ? (
+                      <Loader2 className="animate-spin" size={16} />
+                    ) : (
+                      <button className="gap-2 bg-red-100 hover:bg-red-200 rounded px-2 py-1">
+                        <Trash2 size={16} />
+                      </button>
+                    )}
                   </button>
                 </td>
               </tr>
@@ -88,4 +107,4 @@ const TaskersList: React.FC<Props> = ({ taskers, onRemove }) => {
   );
 };
 
-export default TaskersList;
+export default React.memo(TaskersList);
