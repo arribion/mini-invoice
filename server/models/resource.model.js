@@ -1,32 +1,34 @@
-import mongooose from "mongoose";
+import mongoose from "mongoose";
 
-const resourceSchema = mongooose.Schema(
+const resourceSchema = new mongoose.Schema(
   {
     projectID: {
-        type:String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Project",
+      required: true,
     },
     title: {
       type: String,
-      required: true,
+      required: true
     },
     description: {
       type: String,
-      required: true,
+      required: true
     },
     type: {
       type: String,
-      required: true,
+      required: true
     },
     fileUrl: {
       type: String,
-      required: true,
+      required: true
     },
     version: {
       type: String,
-      required: true,
+      required: true
     },
   },
-  { timeStamp: true },
+  { timestamps: true },
 );
 
-//    projectId: ObjectId,
+export const ResourceModel = mongoose.models.Resource || mongoose.model("Resource", resourceSchema);

@@ -1,10 +1,9 @@
+// server/middleware/multer.js
 import multer from "multer";
+
 const storage = multer.memoryStorage();
 
 const filter_files = (req, file, cb) => {
-  console.log("Incoming file MIME type:", file.mimetype);
-  console.log("Incoming file Name:", file.originalname);
-
   const allowedMimeTypes = [
     "image/jpeg",
     "image/png",
@@ -18,7 +17,6 @@ const filter_files = (req, file, cb) => {
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   ];
 
-  // 2. Add a fallback check for OS-specific mislabeling
   const isPdfExtension = file.originalname.toLowerCase().endsWith(".pdf");
   const isAllowedMime = allowedMimeTypes.includes(file.mimetype);
 
@@ -37,12 +35,10 @@ const filter_files = (req, file, cb) => {
   }
 };
 
-
-const upload = multer(
-    {
-        storage,
-        fileFilter: filter_files,
-        limits: { fileSize: 20 * 1024 * 1024 }, // Limit to 20MB
-    });
+const upload = multer({
+  storage,
+  fileFilter: filter_files,
+  limits: { fileSize: 20 * 1024 * 1024 },
+});
 
 export default upload;

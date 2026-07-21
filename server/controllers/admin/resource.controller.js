@@ -1,127 +1,130 @@
+// server/controllers/admin/resource.controller.js
 import cloudinary from "../../config/cloudinary.js";
 import streamUpload from "../../utils/cloudinary.upload.js";
+import { ResourceModel } from "../../models/resource.model.js";
 
+// Upload resource, save DB record and return Cloudinary URL and publicId
 export const uploadResource = async (req, res) => {
   const file = req.file;
-  const { title, description } = req.body;
+  const { projectID, title, description, version } = req.body;
+
   try {
-    // if (!title || !description) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     message: "Title and description is required",
-    //   });
-    // }
     if (!file) {
+      return res
+        .status(400)
+        .json({ success: false, message: "No file uploaded" });
+    }
+
+    if (!projectID || !title || !description || !version) {
       return res.status(400).json({
         success: false,
-        message: "No file uploaded",
-      });
-    }
-    // Upload the buffer stream to Cloudinary
-    const uploadResult = await streamUpload(req.file);
-    return res.status(200).json({
-      success: true,
-      message: "File uploaded successfully",
-      url: uploadResult.secure_url,
-      publicId: uploadResult.public_id,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Error uploading file",
-      error: error.message,
-    });
-  }
-};
-
-export const getResources = async (req, res) => {
-  try {
-    // Query Cloudinary for files inside your specific folder
-    const { resources } = await cloudinary.search
-      .expression("folder:user_uploads")
-      .sort_by("created_at", "desc") // Get newest files first
-      .max_results(30) // Limit the results per request
-      .execute();
-
-    // Map the complex Cloudinary response to clean, usable objects for your frontend
-    const formattedFiles = resources.map((asset) => ({
-      id: asset.public_id,
-      name: asset.filename || asset.public_id.split("/").pop(), // Extract file name
-      type: asset.resource_type === "raw" ? asset.format : asset.resource_type,
-      size: `${(asset.bytes / (1024 * 1024)).toFixed(2)} MB`, // Convert bytes to MB
-      uploadedAt: new Date(asset.created_at).toLocaleDateString(),
-      url: asset.secure_url,
-    }));
-
-    return res.status(200).json({
-      success: true,
-      count: formattedFiles.length,
-      data: formattedFiles,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Error retrieving files from Cloudinary",
-      error: error.message,
-    });
-  }
-};
-
-export const deleteResource = async (req, res) => {
-  const { publicId, resourceType } = req.params;
-
-  // 1. Validate incoming payload
-  if (!publicId) {
-    return res.status(400).json({
-      success: false,
-      message: "Missing publicId in request body.",
-    });
-  }
-
-  try {
-    // 2. Map file types cleanly to what Cloudinary expects
-    // Images/Videos map directly, but PDFs/Word Docs must be classified as "raw"
-    let cldResourceType = "image";
-
-    if (resourceType === "video" || resourceType?.startsWith("video/")) {
-      cldResourceType = "video";
-    } else if (
-      resourceType === "raw" ||
-      resourceType === "pdf" ||
-      resourceType?.includes("pdf") ||
-      resourceType?.includes("document") ||
-      resourceType?.includes("msword")
-    ) {
-      cldResourceType = "raw";
-    }
-
-    // 3. Execute the deletion on Cloudinary
-    const result = await cloudinary.uploader.destroy(publicId, {
-      resource_type: cldResourceType,
-      invalidate: true, // Clears the file from Cloudinary's global CDN cache instantly
-    });
-
-    // 4. Handle edge case where publicId was completely wrong or missing
-    if (result.result === "not_found") {
-      return res.status(404).json({
-        success: false,
         message:
-          "Resource not found on Cloudinary. It may have already been deleted.",
+          "Missing required fields: projectID, title, description, version",
       });
     }
 
+    const uploadResult = await streamUpload(file);
+
+    let resourceType = "raw";
+    if (file.mimetype.startsWith("image/")) resourceType = "image";
+    else if (file.mimetype.startsWith("video/")) resourceType = "video";
+
+    const resource = await ResourceModel.create({
+      projectID,
+      title,
+      description,
+      type: resourceType,
+      fileUrl: uploadResult.secure_url,
+      publicId: uploadResult.public_id,
+      version,
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "Resource uploaded and saved",
+      data: {
+        resourceId: resource._id,
+        fileUrl: uploadResult.secure_url,
+        publicId: uploadResult.public_id,
+      },
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({
+        success: false,
+        message: "Error uploading resource",
+        error: error.message,
+      });
+  }
+};
+
+// Get resources for a project or all resources if no projectID provided
+export const getResources = async (req, res) => {
+  const { projectID } = req.query;
+
+  try {
+    const filter = projectID ? { projectID } : {};
+    const resources = await ResourceModel.find(filter).sort({ createdAt: -1 });
+
+    return res
+      .status(200)
+      .json({ success: true, count: resources.length, data: resources });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({
+        success: false,
+        message: "Error retrieving resources",
+        error: error.message,
+      });
+  }
+};
+
+// Delete resource by MongoDB id. Removes Cloudinary file using stored publicId then deletes DB doc
+export const deleteResource = async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Missing resource id" });
+  }
+
+  try {
+    const resource = await ResourceModel.findById(id);
+    if (!resource) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Resource not found" });
+    }
+
+    // Determine Cloudinary resource_type for destroy
+    let cldResourceType = "raw";
+    if (resource.type === "image") cldResourceType = "image";
+    else if (resource.type === "video") cldResourceType = "video";
+
+    const result = await cloudinary.uploader.destroy(resource.publicId, {
+      resource_type: cldResourceType,
+      invalidate: true,
+    });
+
+    // If cloudinary reports not_found, still remove DB record to avoid orphaned DB entries
+    await resource.deleteOne();
+
     return res.status(200).json({
       success: true,
-      message: "Resource deleted successfully from Cloudinary.",
+      message: "Resource deleted",
       cloudResult: result,
     });
   } catch (error) {
-    // Also fixed the generic copy-paste "Error uploading file" typo message here
-    return res.status(500).json({
-      success: false,
-      message: "Error deleting file from Cloudinary",
-      error: error.message,
-    });
+    return res
+      .status(500)
+      .json({
+        success: false,
+        message: "Error deleting resource",
+        error: error.message,
+      });
   }
 };
 

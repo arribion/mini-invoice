@@ -1,6 +1,8 @@
 // server/models/project.Model.js
 import mongoose from "mongoose";
 import ProjectAssignment from "./project.Assignment.Model.js";
+import { ResourceModel } from "./resource.model.js";
+import cloudinary from "../config/cloudinary.js";
 
 const projectSchema = new mongoose.Schema(
   {
@@ -61,21 +63,78 @@ const projectSchema = new mongoose.Schema(
   },
 );
 
-// Helper to remove assignments for a given project id
+// -----------------------------
+// Helpers
+// -----------------------------
+
+// Remove assignments for a given project id
 async function removeAssignmentsForProject(projectId, session = null) {
   if (!projectId) return;
-  const filter = { project_id: projectId };
+  const filter = { project_id: projectId }; // adjust if your ProjectAssignment uses a different field name
   if (session) {
     return ProjectAssignment.deleteMany(filter).session(session);
   }
   return ProjectAssignment.deleteMany(filter);
 }
 
-// Query middleware for findOneAndDelete
+// Remove resource documents for a given project id (DB-only)
+async function removeResourcesForProject(projectId, session = null) {
+  if (!projectId) return;
+  const filter = { projectID: projectId };
+  if (session) {
+    return ResourceModel.deleteMany(filter).session(session);
+  }
+  return ResourceModel.deleteMany(filter);
+}
+
+// Best-effort: remove Cloudinary files for a project's resources, then remove DB docs
+async function removeResourcesAndCloudFiles(projectId) {
+  if (!projectId) return;
+
+  // Fetch resources with publicId and type
+  const resources = await ResourceModel.find({ projectID: projectId })
+    .select("publicId type")
+    .lean();
+
+  if (resources && resources.length) {
+    // Delete Cloudinary files in parallel (best-effort)
+    await Promise.all(
+      resources.map(async (r) => {
+        if (!r.publicId) return;
+        try {
+          const resourceType =
+            r.type === "image" ? "image" : r.type === "video" ? "video" : "raw";
+          await cloudinary.uploader.destroy(r.publicId, {
+            resource_type: resourceType,
+            invalidate: true,
+          });
+        } catch (err) {
+          // Log and continue; do not throw to avoid blocking DB cleanup
+          // Replace console.error with your logger if available
+          console.error(
+            `Failed to delete Cloudinary file ${r.publicId}:`,
+            err?.message || err,
+          );
+        }
+      }),
+    );
+  }
+
+  // Remove DB documents for resources
+  await ResourceModel.deleteMany({ projectID: projectId });
+}
+
+// -----------------------------
+// Middleware: cascade deletes
+// -----------------------------
+
+// Query middleware for findOneAndDelete (e.g., Model.findByIdAndDelete triggers this)
 projectSchema.pre("findOneAndDelete", async function () {
   const doc = await this.model.findOne(this.getQuery()).select("_id").lean();
   if (doc && doc._id) {
+    // remove assignments and resources (Cloudinary + DB)
     await removeAssignmentsForProject(doc._id);
+    await removeResourcesAndCloudFiles(doc._id);
   }
 });
 
@@ -87,6 +146,7 @@ projectSchema.pre(
     const doc = await this.model.findOne(this.getQuery()).select("_id").lean();
     if (doc && doc._id) {
       await removeAssignmentsForProject(doc._id);
+      await removeResourcesAndCloudFiles(doc._id);
     }
   },
 );
@@ -98,6 +158,7 @@ projectSchema.pre(
   async function (next) {
     try {
       await removeAssignmentsForProject(this._id);
+      await removeResourcesAndCloudFiles(this._id);
       next();
     } catch (err) {
       next(err);
@@ -105,7 +166,9 @@ projectSchema.pre(
   },
 );
 
-// Check if the model already exists before creating it
+// -----------------------------
+// Export model
+// -----------------------------
 export const ProjectModel =
   mongoose.models.Project || mongoose.model("Project", projectSchema);
 
