@@ -14,10 +14,9 @@ function Settings() {
               Manage your currencies, payment methods, and security
             </p>
           </div>
-
           <div className="space-y-6">
-            <SettingsOverview />
             <PaymentMethods />
+            <SettingsOverview />
           </div>
         </div>
       </main>

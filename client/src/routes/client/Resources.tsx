@@ -80,7 +80,7 @@ function Resources() {
         )}
 
         {!loading && !error && resources.length > 0 && (
-          <div className="grid gap-6 grid-cols-[repeat(auto-fill,minmax(300px,1fr))]">
+          <div className="grid gap-6 grid-cols-[repeat(auto-fill,minmax(250px,1fr))]">
             {resources.map((resource) => (
               <ResourceCard key={resource.id} resource={resource} />
             ))}

@@ -35,13 +35,13 @@ const paymentMethods: PaymentMethod[] = [
     expiry: "03/27",
     isDefault: false,
   },
-//   {
-//     id: "3",
-//     type: "bank",
-//     last4: "6789",
-//     name: "Chase Checking ••6789",
-//     isDefault: false,
-//   },
+  {
+    id: "3",
+    type: "bank",
+    last4: "6789",
+    name: "Chase Checking ••6789",
+    isDefault: false,
+  },
 ];
 
 export default function PaymentMethods() {
@@ -52,7 +52,7 @@ export default function PaymentMethods() {
           <h3 className="font-semibold text-card-foreground">
             Payment Methods
           </h3>
-          <Button variant="outline" size="sm" className="rounded-xl gap-1.5">
+          <Button variant="outline" size="sm" className="rounded-xl text-slate-700 gap-1.5">
             <Plus className="h-3.5 w-3.5" />
             Add
           </Button>

@@ -1,21 +1,26 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import {
-  FileText,
-  Download,
-  Trash2,
-  RefreshCcw,
-  Search,
-} from "lucide-react";
+import { FileText, Download, Trash2, RefreshCcw, Search } from "lucide-react";
 
 export type Resource = {
   id: string;
   name: string;
   type: string;
-  size: string;
+  size: string; // backend may not provide size; we show placeholder when missing
   uploadedAt: string;
   url: string;
+  version?: string;
+  publicId?: string;
 };
+
+const DEFAULT_BASE = import.meta.env.VITE_BASE_URL ?? "";
+
+if (!DEFAULT_BASE) {
+  // eslint-disable-next-line no-console
+  console.warn(
+    "VITE_BASE_URL is not defined. API calls will use relative URLs.",
+  );
+}
 
 const ResourceTable: React.FC = () => {
   const [resources, setResources] = useState<Resource[]>([]);
@@ -24,26 +29,66 @@ const ResourceTable: React.FC = () => {
   const [error, setError] = useState("");
 
   const api = axios.create({
-    baseURL: import.meta.env.VITE_BASE_URL,
+    baseURL: DEFAULT_BASE || "",
     headers: {
       "Content-Type": "application/json",
     },
   });
 
+  const mapBackendToResource = (r: any): Resource => {
+    // Backend resource shape examples:
+    // { _id, title, type, fileUrl, createdAt, version, publicId }
+    const id = r._id ?? r.id ?? r.publicId ?? String(Math.random());
+    const name =
+      r.title ?? (r.fileUrl ? r.fileUrl.split("/").pop() : "unknown");
+    const type = r.type ?? "file";
+    const size = r.size ? String(r.size) : "—";
+    const uploadedAt = r.createdAt ?? r.uploadedAt ?? new Date().toISOString();
+    const url = r.fileUrl ?? r.url ?? r.secure_url ?? "";
+
+    return {
+      id,
+      name,
+      type,
+      size,
+      uploadedAt,
+      url,
+      version: r.version,
+      publicId: r.publicId,
+    };
+  };
+
   const fetchResources = async () => {
     try {
       setLoading(true);
       setError("");
-      const { data } = await api.get("/api/v1/resources/get");
-      if (Array.isArray(data)) {
-        setResources(data);
-      } else if (Array.isArray(data?.data)) {
-        setResources(data.data);
+      const res = await api.get("/api/v1/resources/get");
+
+      // Support multiple response shapes:
+      // 1) { success: true, data: [...] }
+      // 2) [...] (array)
+      // 3) { data: [...] }
+      const payload = res?.data;
+      let list: any[] = [];
+
+      if (Array.isArray(payload)) {
+        list = payload;
+      } else if (Array.isArray(payload?.data)) {
+        list = payload.data;
+      } else if (Array.isArray(payload?.resources)) {
+        // in case backend returns { resources: [...] }
+        list = payload.resources;
       } else {
-        setResources([]);
+        list = [];
       }
+
+      const mapped = list.map(mapBackendToResource);
+      setResources(mapped);
     } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("Failed to load resources:", err);
       setError("Failed to load resources.");
+      setResources([]);
     } finally {
       setLoading(false);
     }
@@ -51,17 +96,19 @@ const ResourceTable: React.FC = () => {
 
   useEffect(() => {
     fetchResources();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
 
   const handleDelete = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this resource?"))
       return;
     try {
-      // Example endpoint path configuration
       await api.delete(`/api/v1/resources/delete/${id}`);
+      // remove locally for snappy UI
       setResources((prev) => prev.filter((item) => item.id !== id));
     } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("Failed to delete resource:", err);
       alert("Failed to delete the resource item.");
     }
   };
@@ -135,6 +182,7 @@ const ResourceTable: React.FC = () => {
                   <th className="p-4">Type</th>
                   <th className="p-4">Size</th>
                   <th className="p-4">Uploaded At</th>
+                  <th className="p-4">Version</th>
                   <th className="p-4 text-right">Actions</th>
                 </tr>
               </thead>
@@ -188,7 +236,10 @@ const ResourceTable: React.FC = () => {
                       {/* Content Rows */}
                       <td className="p-4 font-medium text-gray-900 break-all max-w-xs">
                         <h1 className="text-[18px]">{item.name}</h1>
-                        <p className="text-gray-500">This file short note goes here, a kind of description from the admin</p>
+                        <p className="text-gray-500">
+                          This file short note goes here, a kind of description
+                          from the admin
+                        </p>
                       </td>
                       <td className="p-4 text-gray-500 capitalize">
                         {item.type}
@@ -196,6 +247,10 @@ const ResourceTable: React.FC = () => {
                       <td className="p-4 text-gray-500">{item.size}</td>
                       <td className="p-4 text-gray-500">
                         {new Date(item.uploadedAt).toLocaleDateString()}
+                      </td>
+
+                      <td className="p-4 text-gray-500">
+                        {item.version}
                       </td>
 
                       {/* Actions Column */}
