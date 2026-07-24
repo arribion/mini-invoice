@@ -149,7 +149,7 @@ const QuickActions = ({ compact = false }: { compact?: boolean }) => {
 
       <div className="mt-6 border-t border-gray-100 pt-4">
         <a
-          href="https://wa.me/254707468863?text=I would like to report a bug in the qt-online application."
+          href="https://wa.me/254707468863?text=I would like to report a bug/suggetion in the qt-online application."
           target="_blank"
           className="block">
           <button
