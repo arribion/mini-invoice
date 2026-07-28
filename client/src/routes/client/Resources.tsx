@@ -22,13 +22,27 @@ function Resources() {
       setError("");
       const { data } = await api.get("/api/v1/resources/get");
 
+      // Extract array from response
+      let list: any[] = [];
       if (Array.isArray(data)) {
-        setResources(data);
+        list = data;
       } else if (Array.isArray(data?.data)) {
-        setResources(data.data);
-      } else {
-        setResources([]);
+        list = data.data;
       }
+
+      // Map backend fields to frontend Resource type
+      const mapped = list.map((item) => ({
+        id: item._id || item.id, // use _id from backend
+        title: item.title,
+        description: item.description,
+        version: item.version,
+        type: item.type || "raw", // image | video | raw
+        fileUrl: item.fileUrl || item.url || item.secure_url,
+        publicId: item.publicId,
+        createdAt: item.createdAt,
+      }));
+
+      setResources(mapped);
     } catch (err) {
       setError("Failed to load resources.");
     } finally {

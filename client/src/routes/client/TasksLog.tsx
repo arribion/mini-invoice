@@ -1,4 +1,4 @@
-import { X as Cancel } from "lucide-react";
+import { X as Cancel, Plus } from "lucide-react";
 import TaskForm from "../../components/client/TaskForm";
 import TaskLogExcelUpload from "../../components/client/TaskLogExcelUpload";
 import { useState } from "react";
@@ -25,7 +25,8 @@ const TasksLog = () => {
         <div>
           <button
             onClick={() => setShowManualTaskForm(!showManualTaskForm)}
-            className="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 rounded">
+            className="bg-sky-500 hover:bg-sky-600 text-white flex gap-2 items-center font-semibold py-1 px-4 rounded">
+            <Plus/>
             Create Task
           </button>
         </div>

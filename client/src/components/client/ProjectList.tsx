@@ -137,7 +137,7 @@ const ProjectList = () => {
         <div className="p-16 text-center text-gray-500 flex flex-col items-center justify-center gap-3">
           <LuRefreshCcw className="animate-spin text-gray-400" size={24} />
           <span className="text-sm font-medium">
-            Syncing layout registry indexes...
+            Fetching projects ...
           </span>
         </div>
       ) : error ? (

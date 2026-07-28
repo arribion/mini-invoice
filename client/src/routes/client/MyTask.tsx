@@ -6,7 +6,7 @@ import { useAuth } from "../../hooks/useAuth";
 
 type Props = {
   currentUserId?: string | number | null;
-  authToken?: string | null; // optional bearer token for APIs that require auth
+  // authToken?: string | null; // optional bearer token for APIs that require auth
   initialMembers?: Member[];
   initialProjects?: Project[];
   fetchTimeoutMs?: number;
@@ -53,7 +53,7 @@ async function fetchWithTimeout(
 
 const MyTask: React.FC<Props> = ({
   currentUserId,
-  authToken = null,
+  // authToken = null,
   initialMembers = [],
   initialProjects = [],
   fetchTimeoutMs = 12000,
@@ -127,7 +127,7 @@ const MyTask: React.FC<Props> = ({
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
     };
-    if (authToken) headers["Authorization"] = `Bearer ${authToken}`;
+    // if (authToken) headers["Authorization"] = `Bearer ${authToken}`;
 
     const controllerProjects = new AbortController();
     const controllerMembers = new AbortController();

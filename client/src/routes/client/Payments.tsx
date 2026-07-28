@@ -3,23 +3,20 @@
 const Payments = () => {
   return (
     <>
-      <div>
-        <p className="text-sm font-medium text-green-600">
-          Dashboard / Invoices
-        </p>
+      <section>
+        <div className="mx-4">
+          <p className="text-sm font-medium text-green-600">
+            Dashboard / Invoices
+          </p>
+          <h1 className="mt-2 text-2xl font-bold tracking-tight text-sky-500">
+            PAYMENTS
+          </h1>
+        </div>
 
-        <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900">
-          PROJECT <span className="text-sky-500">PAYMENTS</span>
-        </h1>
-
-        <p className="mt-2 text-slate-500">
-          Track invoices, payments and money transfers in one place.
-        </p>
-          </div>
-          
-          <section>
-              payments
-          </section>
+        <div>
+          <h1>payments</h1>
+        </div>
+      </section>
     </>
   );
 }

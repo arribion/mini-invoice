@@ -6,7 +6,7 @@ const ClientLayout = () => {
     <>
       <div className="flex  text-slate-50">
         <SideBar/>
-        <main className="w-full">
+        <main className="w-full ml-[250px]">
           <ClientHeader />
           <Outlet />
         </main>

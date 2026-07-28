@@ -31,13 +31,16 @@ import Financies from "./routes/admin/Financies";
 import MyTask from "./routes/client/MyTask";
 
 import { Bug } from "lucide-react";
+import ContactUs from "./routes/ContactUs";
 
 const App = () => {
   return (
     <>
       <div className="m-2">
-        <span className="font-bold text-sky-500">APPLICATION IS UNDER DEVELOPMENT</span>, Your suggestions are very
-        much appreciated leave a message below{" "}
+        <span className="font-bold text-sky-500">
+          APPLICATION IS UNDER DEVELOPMENT
+        </span>
+        , Your suggestions are very much appreciated leave a message below{" "}
         <div className="mt-6 border-t border-gray-100 pt-1">
           <a
             href="https://wa.me/254707468863?text=I would like to report a bug/suggetion in the qt-online application."
@@ -62,6 +65,7 @@ const App = () => {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Index />} />
           <Route path="about" element={<About />} />
+          <Route path="contact-us" element={<ContactUs />} />
         </Route>
 
         {/* Client Protected Routes */}

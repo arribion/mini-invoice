@@ -42,7 +42,7 @@ const getLinkStyle = ({ isActive }: { isActive: boolean }) =>
 
 const SideBar: React.FC = () => {
   return (
-    <aside className="gradient-primary h-screen p-4 w-56 md:w-56 lg:w-62.5">
+    <aside className="gradient-primary fixed h-screen p-4 w-56 md:w-56 lg:w-62.5">
       <Link to="/" className="mb-6 inline-block">
         <h1 className="text-slate-50 text-[12px] font-semibold">GT-ONLINE</h1>
       </Link>

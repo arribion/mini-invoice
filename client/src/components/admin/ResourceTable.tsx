@@ -3,10 +3,10 @@ import axios from "axios";
 import { FileText, Download, Trash2, RefreshCcw, Search } from "lucide-react";
 
 export type Resource = {
-  id: string;
+  id: string; // will always be the MongoDB _id
   name: string;
   type: string;
-  size: string; // backend may not provide size; we show placeholder when missing
+  size: string;
   uploadedAt: string;
   url: string;
   version?: string;
@@ -16,10 +16,7 @@ export type Resource = {
 const DEFAULT_BASE = import.meta.env.VITE_BASE_URL ?? "";
 
 if (!DEFAULT_BASE) {
-  // eslint-disable-next-line no-console
-  console.warn(
-    "VITE_BASE_URL is not defined. API calls will use relative URLs.",
-  );
+  console.warn("VITE_BASE_URL is not defined.");
 }
 
 const ResourceTable: React.FC = () => {
@@ -30,15 +27,15 @@ const ResourceTable: React.FC = () => {
 
   const api = axios.create({
     baseURL: DEFAULT_BASE || "",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
   });
 
   const mapBackendToResource = (r: any): Resource => {
-    // Backend resource shape examples:
-    // { _id, title, type, fileUrl, createdAt, version, publicId }
-    const id = r._id ?? r.id ?? r.publicId ?? String(Math.random());
+    // The backend returns _id from MongoDB. Use it as the primary identifier.
+    const id = r._id;
+    if (!id) {
+      console.warn("Backend resource missing _id; using fallback", r);
+    }
     const name =
       r.title ?? (r.fileUrl ? r.fileUrl.split("/").pop() : "unknown");
     const type = r.type ?? "file";
@@ -47,7 +44,7 @@ const ResourceTable: React.FC = () => {
     const url = r.fileUrl ?? r.url ?? r.secure_url ?? "";
 
     return {
-      id,
+      id: id || r.publicId || String(Math.random()), // fallback, but _id is primary
       name,
       type,
       size,
@@ -63,11 +60,6 @@ const ResourceTable: React.FC = () => {
       setLoading(true);
       setError("");
       const res = await api.get("/api/v1/resources/get");
-
-      // Support multiple response shapes:
-      // 1) { success: true, data: [...] }
-      // 2) [...] (array)
-      // 3) { data: [...] }
       const payload = res?.data;
       let list: any[] = [];
 
@@ -76,16 +68,12 @@ const ResourceTable: React.FC = () => {
       } else if (Array.isArray(payload?.data)) {
         list = payload.data;
       } else if (Array.isArray(payload?.resources)) {
-        // in case backend returns { resources: [...] }
         list = payload.resources;
-      } else {
-        list = [];
       }
 
       const mapped = list.map(mapBackendToResource);
       setResources(mapped);
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.error("Failed to load resources:", err);
       setError("Failed to load resources.");
       setResources([]);
@@ -96,20 +84,18 @@ const ResourceTable: React.FC = () => {
 
   useEffect(() => {
     fetchResources();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleDelete = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this resource?"))
       return;
     try {
+      // Delete using the MongoDB _id
       await api.delete(`/api/v1/resources/delete/${id}`);
-      // remove locally for snappy UI
       setResources((prev) => prev.filter((item) => item.id !== id));
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.error("Failed to delete resource:", err);
-      alert("Failed to delete the resource item.");
+      alert("Failed to delete the resource item. Check console for details.");
     }
   };
 
@@ -118,7 +104,6 @@ const ResourceTable: React.FC = () => {
   const isVideo = (url: string) => /\.(mp4|mov|avi|webm|mkv)$/i.test(url);
   const isPdf = (url: string) => /\.pdf$/i.test(url);
 
-  // Client-side text matching filter logic
   const filteredResources = resources.filter(
     (item) =>
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -127,7 +112,7 @@ const ResourceTable: React.FC = () => {
 
   return (
     <div className="space-y-4 w-full">
-      {/* Search Bar Toolbar Component */}
+      {/* Search Bar */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
         <div className="relative w-full sm:max-w-md">
           <Search
@@ -154,14 +139,12 @@ const ResourceTable: React.FC = () => {
         </button>
       </div>
 
-      {/* Main Container Wrapper */}
+      {/* Table */}
       <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
         {loading ? (
           <div className="p-12 text-center text-gray-500 flex flex-col items-center justify-center gap-3">
             <RefreshCcw className="animate-spin text-sky-500" size={24} />
-            <span className="text-sm font-medium">
-              Syncing file index storage...
-            </span>
+            <span className="text-sm font-medium">Loading resources...</span>
           </div>
         ) : error ? (
           <div className="p-12 text-center text-red-500 flex flex-col items-center gap-3">
@@ -169,7 +152,7 @@ const ResourceTable: React.FC = () => {
             <button
               onClick={fetchResources}
               className="px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition text-xs font-semibold">
-              Retry Connection
+              Retry
             </button>
           </div>
         ) : (
@@ -189,7 +172,7 @@ const ResourceTable: React.FC = () => {
               <tbody className="divide-y divide-gray-100 text-sm text-gray-700">
                 {filteredResources.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="p-12 text-center text-gray-400">
+                    <td colSpan={7} className="p-12 text-center text-gray-400">
                       No matching resource records located.
                     </td>
                   </tr>
@@ -198,7 +181,6 @@ const ResourceTable: React.FC = () => {
                     <tr
                       key={item.id}
                       className="hover:bg-sky-50/50 transition-colors group">
-                      {/* Dynamic Media Preview Window */}
                       <td className="p-4">
                         <div className="h-16 w-24 overflow-hidden rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center group-hover:border-sky-200 transition-colors">
                           {isImage(item.url) && (
@@ -233,12 +215,10 @@ const ResourceTable: React.FC = () => {
                         </div>
                       </td>
 
-                      {/* Content Rows */}
                       <td className="p-4 font-medium text-gray-900 break-all max-w-xs">
                         <h1 className="text-[18px]">{item.name}</h1>
                         <p className="text-gray-500">
-                          This file short note goes here, a kind of description
-                          from the admin
+                          This file short note goes here
                         </p>
                       </td>
                       <td className="p-4 text-gray-500 capitalize">
@@ -248,12 +228,8 @@ const ResourceTable: React.FC = () => {
                       <td className="p-4 text-gray-500">
                         {new Date(item.uploadedAt).toLocaleDateString()}
                       </td>
+                      <td className="p-4 text-gray-500">{item.version}</td>
 
-                      <td className="p-4 text-gray-500">
-                        {item.version}
-                      </td>
-
-                      {/* Actions Column */}
                       <td className="p-4">
                         <div className="flex justify-end gap-2 whitespace-nowrap">
                           <a

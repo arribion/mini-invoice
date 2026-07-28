@@ -1,9 +1,53 @@
-// server/controllers/admin/resource.controller.js
 import cloudinary from "../../config/cloudinary.js";
 import streamUpload from "../../utils/cloudinary.upload.js";
 import { ResourceModel } from "../../models/resource.model.js";
+import path from "path";
 
-// Upload resource, save DB record and return Cloudinary URL and publicId
+// Helper to detect resource type (image, video, raw)
+const detectResourceType = (file) => {
+  const mimetype = file.mimetype;
+  const ext = path.extname(file.originalname).toLowerCase();
+
+  // Check by MIME type first
+  if (mimetype.startsWith("image/")) return "image";
+  if (mimetype.startsWith("video/")) return "video";
+
+  // Then fallback to extension for common video formats
+  const videoExtensions = [
+    ".mp4",
+    ".mov",
+    ".mkv",
+    ".webm",
+    ".avi",
+    ".mpeg",
+    ".mpg",
+    ".3gp",
+  ];
+  if (videoExtensions.includes(ext)) return "video";
+
+  // PDF, Word, etc.
+  if (
+    mimetype === "application/pdf" ||
+    mimetype === "application/msword" ||
+    mimetype ===
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+    (mimetype === "application/octet-stream" && ext === ".pdf")
+  ) {
+    return "raw";
+  }
+
+  // Default to raw
+  return "raw";
+};
+
+// Helper to determine Cloudinary resource_type
+const getCloudinaryResourceType = (file) => {
+  const type = detectResourceType(file);
+  if (type === "image") return "image";
+  if (type === "video") return "video";
+  return "raw";
+};
+
 export const uploadResource = async (req, res) => {
   const file = req.file;
   const { projectID, title, description, version } = req.body;
@@ -23,17 +67,18 @@ export const uploadResource = async (req, res) => {
       });
     }
 
-    const uploadResult = await streamUpload(file);
+    // Determine the correct Cloudinary resource type
+    const cldResourceType = getCloudinaryResourceType(file);
+    const uploadResult = await streamUpload(file, cldResourceType);
 
-    let resourceType = "raw";
-    if (file.mimetype.startsWith("image/")) resourceType = "image";
-    else if (file.mimetype.startsWith("video/")) resourceType = "video";
+    // Determine DB resource type
+    const dbResourceType = detectResourceType(file);
 
     const resource = await ResourceModel.create({
       projectID,
       title,
       description,
-      type: resourceType,
+      type: dbResourceType,
       fileUrl: uploadResult.secure_url,
       publicId: uploadResult.public_id,
       version,
@@ -46,20 +91,18 @@ export const uploadResource = async (req, res) => {
         resourceId: resource._id,
         fileUrl: uploadResult.secure_url,
         publicId: uploadResult.public_id,
+        type: dbResourceType, // ✅ now included in the response
       },
     });
   } catch (error) {
-    return res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error uploading resource",
-        error: error.message,
-      });
+    return res.status(500).json({
+      success: false,
+      message: "Error uploading resource",
+      error: error.message,
+    });
   }
 };
 
-// Get resources for a project or all resources if no projectID provided
 export const getResources = async (req, res) => {
   const { projectID } = req.query;
 
@@ -71,17 +114,14 @@ export const getResources = async (req, res) => {
       .status(200)
       .json({ success: true, count: resources.length, data: resources });
   } catch (error) {
-    return res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error retrieving resources",
-        error: error.message,
-      });
+    return res.status(500).json({
+      success: false,
+      message: "Error retrieving resources",
+      error: error.message,
+    });
   }
 };
 
-// Delete resource by MongoDB id. Removes Cloudinary file using stored publicId then deletes DB doc
 export const deleteResource = async (req, res) => {
   const { id } = req.params;
 
@@ -99,7 +139,6 @@ export const deleteResource = async (req, res) => {
         .json({ success: false, message: "Resource not found" });
     }
 
-    // Determine Cloudinary resource_type for destroy
     let cldResourceType = "raw";
     if (resource.type === "image") cldResourceType = "image";
     else if (resource.type === "video") cldResourceType = "video";
@@ -109,7 +148,6 @@ export const deleteResource = async (req, res) => {
       invalidate: true,
     });
 
-    // If cloudinary reports not_found, still remove DB record to avoid orphaned DB entries
     await resource.deleteOne();
 
     return res.status(200).json({
@@ -118,13 +156,11 @@ export const deleteResource = async (req, res) => {
       cloudResult: result,
     });
   } catch (error) {
-    return res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error deleting resource",
-        error: error.message,
-      });
+    return res.status(500).json({
+      success: false,
+      message: "Error deleting resource",
+      error: error.message,
+    });
   }
 };
 

@@ -1,121 +1,79 @@
-import React from "react";
-import { Download, ExternalLink, FileText } from "lucide-react";
+import { FileText, Image, Video, Download, Eye } from "lucide-react";
 
-export type Resource = {
+export interface Resource {
   id: string;
-  name: string;
-  type: string;
-  size: string;
-  uploadedAt: string;
-  url: string;
-  title?: string;
+  title: string;
   description?: string;
   version?: string;
-};
+  type: "image" | "video" | "raw";
+  fileUrl: string;
+  publicId?: string;
+  createdAt?: string;
+}
 
-type Props = {
+interface Props {
   resource: Resource;
-};
+}
 
-const ResourceCard: React.FC<Props> = ({ resource }) => {
-  // Safe validation guards checking both type string and URL extensions
-  const isImage =
-    resource.type === "image" ||
-    /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(resource.url);
-  const isVideo =
-    resource.type === "video" ||
-    /\.(mp4|mov|avi|webm|mkv)$/i.test(resource.url);
-  const isPdf = resource.type === "pdf" || /\.pdf$/i.test(resource.url);
+const ResourceCard = ({ resource }: Props) => {
+  const { title, description, version, type, fileUrl } = resource;
+
+  // Helper to get file extension from URL
+  const getFileExtension = (url: string) => {
+    const parts = url.split(".");
+    return parts.length > 1 ? parts.pop()?.toLowerCase() : "";
+  };
+
+  const ext = getFileExtension(fileUrl);
+  const isPDF = ext === "pdf";
+  const isWord = ext === "doc" || ext === "docx";
 
   return (
-    <article className=" w-full gap-4 rounded-lg border border-gray-200 bg-slate-200 shadow-sm transition hover:shadow-md">
-      {/* Compact Preview (minimized) */}
-      <div className="shrink-0 h-20 w- 8 overflow-hidden rounded-t-lg bg-gray-300 border-r border-gray-200 flex items-center justify-center">
-        {isImage && (
+    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:shadow-md">
+      {/* Preview area */}
+      <div className="relative mb-3 flex h-40 items-center border border-sky-200 justify-center overflow-hidden rounded-lg bg-gray-100">
+        {type === "image" && (
           <img
-            src={resource.url || "https://placehold.net/400x400.png"}
-            alt={resource.name}
+            src={fileUrl}
+            alt={title}
             className="h-full w-full object-cover"
-            loading="lazy"
           />
         )}
-
-        {isVideo && (
+        {type === "video" && (
           <video
-            src={resource.url}
+            controls
             className="h-full w-full object-cover"
-            muted
-            playsInline
-            preload="metadata"
+            src={fileUrl}
           />
         )}
-
-        {isPdf && (
-          <div className="flex flex-col items-center justify-center text-red-500">
-            <FileText size={28} />
-            <span className="mt-1 text-[10px] font-semibold">PDF</span>
-          </div>
-        )}
-
-        {!isImage && !isVideo && !isPdf && (
-          <div className="flex items-center justify-center">
-            <FileText size={28} className="text-gray-400" />
+        {(type === "raw" || !type) && (
+          <div className="flex flex-col items-center justify-center text-gray-500">
+            <FileText size={48} className="mb-1" />
+            <span className="text-xs uppercase">{ext || "file"}</span>
+            {isPDF && <span className="text-xs text-red-500">PDF</span>}
+            {isWord && <span className="text-xs text-blue-500">Word</span>}
           </div>
         )}
       </div>
 
-      {/* Compact Content */}
-      <div className="flex flex-1 flex-col justify-between p-3">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <h4 className="truncate text-sm font-semibold text-gray-900">
-              {resource.title ?? resource.name}
-            </h4>
-
-            <p className="mt-1 truncate text-xs text-gray-500">
-              {resource.description ?? "No description provided"}
-            </p>
-          </div>
-
-          <div className="flex flex-col items-end text-right">
-            <span className="text-xs font-medium text-gray-600">
-              {resource.version ?? "v—"}
-            </span>
-            <span className="mt-1 text-[11px] text-gray-400">
-              {resource.size}
-            </span>
-          </div>
-        </div>
-
-        <div className="mt-3 flex items-center justify-between gap-3">
-          <div className="text-xs text-gray-400">
-            <time dateTime={resource.uploadedAt}>
-              {new Date(resource.uploadedAt).toLocaleDateString()}
-            </time>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <a
-              href={resource.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`Open ${resource.name}`}
-              className="inline-flex items-center gap-2 rounded px-3 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-50 border border-gray-200">
-              <ExternalLink size={14} /> View
-            </a>
-
-            <a
-              href={resource.url}
-              target="_blank"
-              download
-              aria-label={`Download ${resource.name}`}
-              className="inline-flex items-center gap-2 rounded bg-sky-600 px-3 py-1 text-xs font-semibold text-white hover:bg-sky-700">
-              <Download size={14} /> Download
-            </a>
-          </div>
+      {/* Meta info */}
+      <div className="space-y-1">
+        <h3 className="font-semibold text-gray-900 line-clamp-1">{title}</h3>
+        {description && (
+          <p className="text-sm text-gray-500 line-clamp-2">{description}</p>
+        )}
+        {version && <p className="text-xs text-gray-400">Version: {version}</p>}
+        <div className="flex items-center gap-3 pt-2 text-sm">
+          {/* Download */}
+          <a
+            href={fileUrl}
+            download
+            className="inline-flex items-center gap-1 w-full border rounded p-2 text-gray-600 hover:underline">
+            <Download size={16} /> Download
+          </a>
         </div>
       </div>
-    </article>
+    </div>
   );
 };
 
