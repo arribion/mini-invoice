@@ -3,16 +3,16 @@ import streamUpload from "../../utils/cloudinary.upload.js";
 import { ResourceModel } from "../../models/resource.model.js";
 import path from "path";
 
-// Helper to detect resource type (image, video, raw)
+// ----------------------------
+// Helper: Detect resource type from file
+// ----------------------------
 const detectResourceType = (file) => {
   const mimetype = file.mimetype;
   const ext = path.extname(file.originalname).toLowerCase();
 
-  // Check by MIME type first
   if (mimetype.startsWith("image/")) return "image";
   if (mimetype.startsWith("video/")) return "video";
 
-  // Then fallback to extension for common video formats
   const videoExtensions = [
     ".mp4",
     ".mov",
@@ -22,10 +22,12 @@ const detectResourceType = (file) => {
     ".mpeg",
     ".mpg",
     ".3gp",
+    ".flv",
+    ".wmv",
   ];
   if (videoExtensions.includes(ext)) return "video";
 
-  // PDF, Word, etc.
+  // PDF / Word / raw
   if (
     mimetype === "application/pdf" ||
     mimetype === "application/msword" ||
@@ -36,11 +38,10 @@ const detectResourceType = (file) => {
     return "raw";
   }
 
-  // Default to raw
   return "raw";
 };
 
-// Helper to determine Cloudinary resource_type
+// Helper to get Cloudinary resource_type
 const getCloudinaryResourceType = (file) => {
   const type = detectResourceType(file);
   if (type === "image") return "image";
@@ -48,6 +49,9 @@ const getCloudinaryResourceType = (file) => {
   return "raw";
 };
 
+// ----------------------------
+// Upload resource
+// ----------------------------
 export const uploadResource = async (req, res) => {
   const file = req.file;
   const { projectID, title, description, version } = req.body;
@@ -67,11 +71,9 @@ export const uploadResource = async (req, res) => {
       });
     }
 
-    // Determine the correct Cloudinary resource type
     const cldResourceType = getCloudinaryResourceType(file);
     const uploadResult = await streamUpload(file, cldResourceType);
 
-    // Determine DB resource type
     const dbResourceType = detectResourceType(file);
 
     const resource = await ResourceModel.create({
@@ -80,7 +82,7 @@ export const uploadResource = async (req, res) => {
       description,
       type: dbResourceType,
       fileUrl: uploadResult.secure_url,
-      publicId: uploadResult.public_id,
+      publicId: uploadResult.public_id, // ✅ stored now
       version,
     });
 
@@ -91,7 +93,7 @@ export const uploadResource = async (req, res) => {
         resourceId: resource._id,
         fileUrl: uploadResult.secure_url,
         publicId: uploadResult.public_id,
-        type: dbResourceType, // ✅ now included in the response
+        type: dbResourceType,
       },
     });
   } catch (error) {
@@ -103,6 +105,9 @@ export const uploadResource = async (req, res) => {
   }
 };
 
+// ----------------------------
+// Get resources (with optional project filter)
+// ----------------------------
 export const getResources = async (req, res) => {
   const { projectID } = req.query;
 
@@ -122,6 +127,9 @@ export const getResources = async (req, res) => {
   }
 };
 
+// ----------------------------
+// Delete resource (by MongoDB _id or publicId fallback)
+// ----------------------------
 export const deleteResource = async (req, res) => {
   const { id } = req.params;
 
@@ -132,22 +140,56 @@ export const deleteResource = async (req, res) => {
   }
 
   try {
-    const resource = await ResourceModel.findById(id);
+    // 1. Find resource – first by _id, then by publicId (fallback)
+    let resource = await ResourceModel.findById(id);
+    if (!resource) {
+      resource = await ResourceModel.findOne({ publicId: id });
+    }
+
     if (!resource) {
       return res
         .status(404)
         .json({ success: false, message: "Resource not found" });
     }
 
+    // 2. Determine publicId – use stored field, or extract from fileUrl
+    let publicId = resource.publicId;
+    if (!publicId && resource.fileUrl) {
+      // Fallback extraction from Cloudinary URL
+      try {
+        const url = new URL(resource.fileUrl);
+        const pathParts = url.pathname.split("/");
+        const uploadIdx = pathParts.indexOf("upload");
+        if (uploadIdx !== -1) {
+          const parts = pathParts
+            .slice(uploadIdx + 1)
+            .filter((p) => p && !p.startsWith("v"));
+          publicId = parts.join("/");
+        }
+      } catch (_) {
+        // If URL parsing fails, we'll handle below
+      }
+    }
+
+    if (!publicId) {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot determine publicId for this resource",
+      });
+    }
+
+    // 3. Determine Cloudinary resource_type
     let cldResourceType = "raw";
     if (resource.type === "image") cldResourceType = "image";
     else if (resource.type === "video") cldResourceType = "video";
 
-    const result = await cloudinary.uploader.destroy(resource.publicId, {
+    // 4. Delete from Cloudinary
+    const result = await cloudinary.uploader.destroy(publicId, {
       resource_type: cldResourceType,
       invalidate: true,
     });
 
+    // 5. Remove from MongoDB
     await resource.deleteOne();
 
     return res.status(200).json({

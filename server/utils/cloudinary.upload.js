@@ -13,7 +13,6 @@ const streamUpload = (file, resourceType = "auto") => {
     const uploadOptions = {
       public_id: publicId,
       resource_type: resourceType,
-      flags: "attachment",
     };
 
     const stream = cloudinary.uploader.upload_stream(

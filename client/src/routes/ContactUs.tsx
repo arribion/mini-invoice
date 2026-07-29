@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
+// import React, { useState } from 'react'
 
 const ContactUs = () => {
-    const [name, setName] = useState<string>("");
-    const [email, setEmail] = useState<string>("");
-    const [phone, setPhone] = useState<string>("");
-    const [message, setMessage] = useState<string>("");
+    // const [name, setName] = useState<string>("");
+    // const [email, setEmail] = useState<string>("");
+    // const [phone, setPhone] = useState<string>("");
+    // const [message, setMessage] = useState<string>("");
 
     const how_did_u_know_about_us = [
         "Google search",

@@ -9,26 +9,31 @@ const resourceSchema = new mongoose.Schema(
     },
     title: {
       type: String,
-      required: true
+      required: true,
     },
     description: {
       type: String,
-      required: true
+      required: true,
     },
     type: {
       type: String,
-      required: true
+      required: true,
     },
     fileUrl: {
       type: String,
-      required: true
+      required: true,
     },
     version: {
       type: String,
-      required: true
+      required: true,
+    },
+    publicId: {
+      type: String,
+      required: true,
     },
   },
   { timestamps: true },
 );
 
-export const ResourceModel = mongoose.models.Resource || mongoose.model("Resource", resourceSchema);
+export const ResourceModel =
+  mongoose.models.Resource || mongoose.model("Resource", resourceSchema);

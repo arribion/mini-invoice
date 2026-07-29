@@ -1,4 +1,4 @@
-import { FileText, Image, Video, Download, Eye } from "lucide-react";
+import { FileText, Download, Eye } from "lucide-react";
 
 export interface Resource {
   id: string;
@@ -69,6 +69,13 @@ const ResourceCard = ({ resource }: Props) => {
             href={fileUrl}
             download
             className="inline-flex items-center gap-1 w-full border rounded p-2 text-gray-600 hover:underline">
+            <Eye size={16} /> View
+          </a>
+          {/* Download */}
+          <a
+            href={fileUrl}
+            download
+            className="inline-flex items-center gap-1 w-full border rounded p-2 text-slate-50 bg-sky-500 hover:bg-sky-600">
             <Download size={16} /> Download
           </a>
         </div>

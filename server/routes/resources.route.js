@@ -1,16 +1,16 @@
 import express from "express";
-import upload from "../middleware/multer.js";
-const resource_router = express.Router();
-
 import {
   uploadResource,
   getResources,
   deleteResource,
 } from "../controllers/admin/resource.controller.js";
+import upload from "../middleware/multer.js";
 
-resource_router
+const resourceRouter = express.Router();
+
+resourceRouter
   .post("/upload", upload.single("file"), uploadResource)
   .get("/get", getResources)
-  .delete("/delete/:publicID", deleteResource);
+  .delete("/delete/:id", deleteResource);
 
-export default resource_router;
+export default resourceRouter;

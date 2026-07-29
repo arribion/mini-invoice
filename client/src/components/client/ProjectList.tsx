@@ -51,7 +51,7 @@ const ProjectList = () => {
       setLoading(true);
       setError("");
       const { data } = await axios.get<ProjectsResponse>(
-        "https://mini-invoice.onrender.com/api/v1/projects",
+        `${import.meta.env.VITE_BASE_URL}/api/v1/projects`,
       );
 
       if (!data.success) {
