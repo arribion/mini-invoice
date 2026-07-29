@@ -5,8 +5,19 @@ import "dotenv/config";
 
 const { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } = process.env;
 if (!JWT_ACCESS_SECRET || !JWT_REFRESH_SECRET) {
-  console.log("Unable to access JWT secrets...");
+  console.warn("JWT secrets are missing!");
 }
+
+// Cookie options based on environment
+const getCookieOptions = (maxAge) => {
+  const isProduction = process.env.NODE_ENV === "production";
+  return {
+    httpOnly: true,
+    secure: isProduction, // HTTPS only in production
+    sameSite: isProduction ? "none" : "lax",
+    maxAge,
+  };
+};
 
 export const register = async (req, res) => {
   try {
@@ -40,19 +51,12 @@ export const register = async (req, res) => {
       { expiresIn: "7d" },
     );
 
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 60 * 60 * 1000,
-    });
+    res.cookie(
+      "refreshToken",
+      refreshToken,
+      getCookieOptions(7 * 24 * 60 * 60 * 1000),
+    );
+    res.cookie("accessToken", accessToken, getCookieOptions(60 * 60 * 1000));
 
     res.status(201).json({
       success: true,
@@ -95,18 +99,12 @@ export const login = async (req, res) => {
       { expiresIn: "7d" },
     );
 
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 60 * 60 * 1000,
-    });
+    res.cookie(
+      "refreshToken",
+      refreshToken,
+      getCookieOptions(7 * 24 * 60 * 60 * 1000),
+    );
+    res.cookie("accessToken", accessToken, getCookieOptions(60 * 60 * 1000));
 
     res.status(200).json({
       success: true,
@@ -124,16 +122,14 @@ export const login = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    res.clearCookie("accessToken", {
+    const clearOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-    });
-    res.clearCookie("refreshToken", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-    });
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    };
+
+    res.clearCookie("accessToken", clearOptions);
+    res.clearCookie("refreshToken", clearOptions);
 
     if (req.session) {
       req.session.destroy(() => {});
@@ -165,23 +161,47 @@ export const refreshToken = async (req, res) => {
         { expiresIn: "1h" },
       );
 
-      res.cookie("accessToken", accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 60 * 60 * 1000,
-      });
+      res.cookie("accessToken", accessToken, getCookieOptions(60 * 60 * 1000));
 
-      res
-        .status(200)
-        .json({
-          success: true,
-          message: "Access token refreshed successfully",
-        });
+      res.status(200).json({
+        success: true,
+        message: "Access token refreshed successfully",
+      });
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-export default { register, login, logout, refreshToken };
+
+export const verify = async (req, res) => {
+  try {
+    const token = req.cookies.accessToken;
+    if (!token) {
+      return res.status(401).json({ success: false, message: "No token" });
+    }
+
+    const decoded = jwt.verify(token, JWT_ACCESS_SECRET);
+    const user = await userModel
+      .findOne({ email: decoded.email })
+      .select("-password");
+    if (!user) {
+      return res
+        .status(401)
+        .json({ success: false, message: "User not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      user: {
+        full_name: user.full_name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    res.status(401).json({ success: false, message: "Invalid token" });
+  }
+};
+
+export default { register, login, logout, refreshToken, verify };

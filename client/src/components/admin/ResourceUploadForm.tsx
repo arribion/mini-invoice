@@ -78,6 +78,7 @@ const ResourceUploadForm = () => {
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
+          withCredentials: true,
         },
       );
 
@@ -195,7 +196,7 @@ const ResourceUploadForm = () => {
           />
         </div>
 
-        {/* File Input */}
+        {/* File Input – now supports ZIP and audio */}
         <div>
           <label className="block text-sm font-medium text-gray-700">
             File
@@ -204,12 +205,23 @@ const ResourceUploadForm = () => {
             type="file"
             ref={fileInputRef}
             onChange={handleFileChange}
-            accept="image/*,application/pdf,video/*,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            accept="
+              image/*,
+              application/pdf,
+              video/*,
+              audio/*,
+              application/msword,
+              application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+              application/zip,
+              application/x-zip-compressed,
+              .zip
+            "
             className="mt-1 w-full border rounded p-2"
             required
           />
           <p className="text-xs text-gray-500 mt-1">
-            Allowed: Images, PDFs, videos, Word documents (max 20MB)
+            Allowed: Images, PDFs, videos, audio files, Word documents, ZIP
+            archives (max 20MB)
           </p>
         </div>
 

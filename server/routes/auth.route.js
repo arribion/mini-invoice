@@ -1,29 +1,12 @@
 import express from "express";
-import { protect } from "../middleware/auth.middleware.js"; // Imported as requested
-const auth_router = express.Router();
-import {
-  register,
-  login,
-  logout,
-  refreshToken,
-} from "../controllers/auth.user.controller.js";
+import authController from "../controllers/auth.user.controller.js";
 
-// Public authentication routes
-auth_router
-  .post("/login", login)
-  .post("/logout", logout)
-  .post("/refresh-token", refreshToken)
-  .post("/register", register);
+const authRouter = express.Router();
 
-// Protected token verification route for React frontend
-auth_router.get("/verify", protect, (req, res) => {
-  return res.status(200).json({
-    success: true,
-    user: {
-      email: req.user.email,
-      role: req.user.role,
-    },
-  });
-});
+authRouter.post("/register", authController.register);
+authRouter.post("/login", authController.login);
+authRouter.post("/logout", authController.logout);
+authRouter.post("/refresh", authController.refreshToken);
+authRouter.get("/verify", authController.verify); // <-- new
 
-export default auth_router;
+export default authRouter;

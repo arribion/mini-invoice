@@ -4,7 +4,6 @@ import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 import helmet from "helmet";
 import "dotenv/config";
-import path from "path";
 import connectDB from "./config/db.js";
 
 // Route imports
@@ -13,68 +12,63 @@ import projectRouter from "./routes/project.route.js";
 import memberRouter from "./routes/members.route.js";
 import resourceRouter from "./routes/resources.route.js";
 import projectAssignmentRoutes from "./routes/project.assignment.route.js";
-import { protect } from "./middleware/auth.middleware.js";
+
 
 const app = express();
 
-// Static path helper (if you serve views/static files)
-const fileName = path.resolve() + "/views";
-const __dirname = path.resolve(fileName);
+app.set("trust proxy", 1);
 
-// ---------- Configuration ----------
+//  Configuration 
 const PORT = process.env.PORT || 3001;
 const NODE_ENV = process.env.NODE_ENV || "development";
 
-// Comma-separated allowed origins in env (e.g., "https://app.example.com,https://mini-invoice-two.vercel.app")
+// Comma-separated allowed origins from env
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || "")
   .split(",")
   .map((s) => s.trim())
   .filter(Boolean);
 
-// ---------- Security middleware ----------
-app.use(helmet()); // sets common security headers
+//  Security headers
+app.use(helmet());
 
 // ---------- CORS ----------
-// Build a flexible origin checker that allows:
-// - explicit origins from ALLOWED_ORIGINS env var
-// - any vercel.app subdomain (useful for preview deployments)
-// - localhost dev ports
+// Allows: explicit origins from env, *.vercel.app, localhost dev ports
 const corsOptions = {
   origin: (origin, callback) => {
-    // allow non-browser requests (curl, server-to-server)
+    // Allow non-browser requests (e.g., curl, server-to-server)
     if (!origin) return callback(null, true);
 
     try {
-      const url = new URL(origin);
-      const hostname = url.hostname;
+      const { hostname } = new URL(origin);
 
-      // allow explicit origins from env
-      if (
-        ALLOWED_ORIGINS.includes(origin) ||
-        ALLOWED_ORIGINS.includes(hostname)
-      ) {
+      // 1. Explicitly allowed origins (full URL)
+      if (ALLOWED_ORIGINS.includes(origin)) {
         return callback(null, true);
       }
 
-      // allow vercel preview/prod subdomains
+      // 2. Vercel preview/production deployments
       if (hostname.endsWith(".vercel.app") || hostname === "vercel.app") {
         return callback(null, true);
       }
 
-      // allow localhost dev ports commonly used by Vite
-      if (
-        hostname === "localhost" ||
-        hostname === "127.0.0.1" ||
-        hostname === "0.0.0.0"
-      ) {
+      // allow render.com subdomains
+      if (hostname.endsWith(".onrender.com") || hostname === "onrender.com") {
         return callback(null, true);
       }
 
+      // 3. Local development
+      if (["localhost", "127.0.0.1", "0.0.0.0"].includes(hostname)) {
+        return callback(null, true);
+      }
+
+      // 4. (Optional) allow any origin in development – but we keep it strict
+      // if (NODE_ENV === "development") return callback(null, true);
+
       return callback(
-        new Error(`CORS policy: origin ${origin} not allowed`),
+        new Error(`CORS policy: origin "${origin}" not allowed`),
         false,
       );
-    } catch (err) {
+    } catch {
       return callback(new Error("CORS policy: invalid origin"), false);
     }
   },
@@ -91,44 +85,50 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-
-//  Parsers 
+// ---------- Parsers ----------
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-//  Routes 
+// ---------- Routes ----------
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/projects", projectRouter);
 app.use("/api/v1/members", memberRouter);
 app.use("/api/v1/resources", resourceRouter);
 app.use("/api/v1/project-assignments", projectAssignmentRoutes);
 
-//  Health check 
+// ---------- Health check ----------
 app.get("/api/v1/health", (req, res) => {
   res.json({ status: "ok", env: NODE_ENV });
 });
 
-// Error handling 
+// ---------- 404 handler ----------
+app.use((req, res, next) => {
+  res.status(404).json({ error: "Route not found" });
+});
+
+// ---------- Global error handler ----------
 app.use((err, req, res, next) => {
   console.error("Unhandled error:", err?.message || err);
-  // If CORS origin rejected, send a clear response for debugging
-  if (err && err.message && err.message.startsWith("CORS policy")) {
+
+  // CORS errors
+  if (err.message?.startsWith("CORS policy")) {
     return res.status(403).json({ error: err.message });
   }
-  res
-    .status(err?.status || 500)
-    .json({ error: err?.message || "Internal Server Error" });
+
+  const status = err?.status || 500;
+  const message = err?.message || "Internal Server Error";
+  res.status(status).json({ error: message });
 });
 
 // ---------- Start server ----------
 app.listen(PORT, "0.0.0.0", async () => {
   try {
     await connectDB();
-    console.log(`Server running on port ${PORT} (env: ${NODE_ENV})`);
+    console.log(`Server running on port ${PORT} (${NODE_ENV})`);
     console.log(
-      `Allowed origins: ${ALLOWED_ORIGINS.join(", ") || "vercel.app and localhost allowed"}`,
+      `Allowed origins: ${ALLOWED_ORIGINS.join(", ") || "vercel.app, localhost"}`,
     );
   } catch (err) {
     console.error("Failed to connect to DB:", err);

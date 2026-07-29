@@ -3,7 +3,7 @@ import axios from "axios";
 import { FileText, Download, Trash2, RefreshCcw, Search } from "lucide-react";
 
 export type Resource = {
-  id: string; // will always be the MongoDB _id
+  id: string; // MongoDB _id
   name: string;
   type: string;
   size: string;
@@ -11,10 +11,10 @@ export type Resource = {
   url: string;
   version?: string;
   publicId?: string;
+  description?: string;
 };
 
 const DEFAULT_BASE = import.meta.env.VITE_BASE_URL ?? "";
-
 if (!DEFAULT_BASE) {
   console.warn("VITE_BASE_URL is not defined.");
 }
@@ -25,17 +25,15 @@ const ResourceTable: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+
   const api = axios.create({
     baseURL: DEFAULT_BASE || "",
     headers: { "Content-Type": "application/json" },
+    withCredentials: true,
   });
 
   const mapBackendToResource = (r: any): Resource => {
-    // The backend returns _id from MongoDB. Use it as the primary identifier.
-    const id = r._id;
-    if (!id) {
-      console.warn("Backend resource missing _id; using fallback", r);
-    }
+    const id = r._id ?? r.publicId ?? String(Math.random());
     const name =
       r.title ?? (r.fileUrl ? r.fileUrl.split("/").pop() : "unknown");
     const type = r.type ?? "file";
@@ -44,7 +42,7 @@ const ResourceTable: React.FC = () => {
     const url = r.fileUrl ?? r.url ?? r.secure_url ?? "";
 
     return {
-      id: id || r.publicId || String(Math.random()), // fallback, but _id is primary
+      id,
       name,
       type,
       size,
@@ -52,6 +50,7 @@ const ResourceTable: React.FC = () => {
       url,
       version: r.version,
       publicId: r.publicId,
+      description: r.description || "",
     };
   };
 
@@ -90,7 +89,6 @@ const ResourceTable: React.FC = () => {
     if (!window.confirm("Are you sure you want to delete this resource?"))
       return;
     try {
-      // Delete using the MongoDB _id
       await api.delete(`/api/v1/resources/delete/${id}`);
       setResources((prev) => prev.filter((item) => item.id !== id));
     } catch (err) {
@@ -107,7 +105,9 @@ const ResourceTable: React.FC = () => {
   const filteredResources = resources.filter(
     (item) =>
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.type.toLowerCase().includes(searchTerm.toLowerCase()),
+      item.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.description &&
+        item.description.toLowerCase().includes(searchTerm.toLowerCase())),
   );
 
   return (
@@ -121,7 +121,7 @@ const ResourceTable: React.FC = () => {
           />
           <input
             type="text"
-            placeholder="Search by file name or file type..."
+            placeholder="Search by file name, type or description..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-colors"
@@ -162,6 +162,7 @@ const ResourceTable: React.FC = () => {
                 <tr className="border-b border-gray-200 bg-gray-50 text-xs font-semibold uppercase tracking-wider text-gray-600">
                   <th className="p-4">Preview</th>
                   <th className="p-4">File Name</th>
+                  <th className="p-4">Description</th>
                   <th className="p-4">Type</th>
                   <th className="p-4">Size</th>
                   <th className="p-4">Uploaded At</th>
@@ -172,7 +173,7 @@ const ResourceTable: React.FC = () => {
               <tbody className="divide-y divide-gray-100 text-sm text-gray-700">
                 {filteredResources.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="p-12 text-center text-gray-400">
+                    <td colSpan={8} className="p-12 text-center text-gray-400">
                       No matching resource records located.
                     </td>
                   </tr>
@@ -196,6 +197,7 @@ const ResourceTable: React.FC = () => {
                             <video
                               src={item.url}
                               className="h-full w-full object-cover"
+                              controls
                               muted
                             />
                           )}
@@ -217,9 +219,9 @@ const ResourceTable: React.FC = () => {
 
                       <td className="p-4 font-medium text-gray-900 break-all max-w-xs">
                         <h1 className="text-[18px]">{item.name}</h1>
-                        <p className="text-gray-500">
-                          This file short note goes here
-                        </p>
+                      </td>
+                      <td className="p-4 text-gray-500 max-w-xs wrap-break-word">
+                        {item.description || "—"}
                       </td>
                       <td className="p-4 text-gray-500 capitalize">
                         {item.type}
@@ -228,7 +230,9 @@ const ResourceTable: React.FC = () => {
                       <td className="p-4 text-gray-500">
                         {new Date(item.uploadedAt).toLocaleDateString()}
                       </td>
-                      <td className="p-4 text-gray-500">{item.version}</td>
+                      <td className="p-4 text-gray-500">
+                        {item.version || "—"}
+                      </td>
 
                       <td className="p-4">
                         <div className="flex justify-end gap-2 whitespace-nowrap">
