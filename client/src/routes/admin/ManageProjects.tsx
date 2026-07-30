@@ -108,7 +108,7 @@ const ManageProjects = () => {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-sky-700">Manage Projects</h1>
+          <h1 className="text-2xl font-bold text-sky-500">Manage Projects</h1>
 
           <p className="mt-2 text-green-600">
             Create new projects and manage existing ones.
@@ -117,7 +117,7 @@ const ManageProjects = () => {
 
         <button
           onClick={openCreateModal}
-          className="flex items-center gap-2 rounded-xl border bg-sky-500 text-white px-4 py-2 shadow-sm transition hover:bg-sky-600">
+          className="flex items-center gap-2 rounded border bg-sky-500 text-white px-4 py-2 shadow-sm transition hover:bg-sky-600">
           <LuCirclePlus />
           Add Project
         </button>

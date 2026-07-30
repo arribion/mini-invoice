@@ -363,11 +363,9 @@ const Task: React.FC<Props> = ({ initialProjects = [] }) => {
 
   return (
     <div className="mx-4 my-5">
-      <h3 className="text-green-500">Dashboard / Tasks</h3>
-      <h1 className="text-4xl my-4 text-slate-800 font-bold">TASKS</h1>
+      <h1 className="text-2xl my-4 text-sky-500 font-bold">TASKS</h1>
 
       <TaskStats projects={projects} />
-
       <section className="mx-4 my-12">
         <h2 className="text-xl font-bold mb-2">Task Assignment</h2>
         <p className="mb-4 text-gray-600">

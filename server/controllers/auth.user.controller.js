@@ -193,11 +193,13 @@ export const verify = async (req, res) => {
         .json({ success: false, message: "User not found" });
     }
 
+    // include phone in verify response so frontend can pre-fill phone field
     res.status(200).json({
       success: true,
       user: {
         full_name: user.full_name,
         email: user.email,
+        phone: user.phone ?? null,
         role: user.role,
       },
     });
@@ -211,5 +213,5 @@ export default {
   login,
   logout,
   refreshToken,
-  verify
+  verify,
 };

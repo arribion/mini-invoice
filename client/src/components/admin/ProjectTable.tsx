@@ -46,7 +46,7 @@ const ProjectsTable = ({
   onEdit,
 }: Props) => {
   return (
-    <div className="w-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+    <div className="w-full  mb-[2em] overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
       {/* Header */}
       <div className="flex flex-col items-start justify-between gap-4 border-b border-gray-100 p-6 sm:flex-row sm:items-center">
         <div>

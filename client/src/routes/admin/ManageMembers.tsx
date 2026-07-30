@@ -122,7 +122,7 @@ const ManageMembers = () => {
       {/* Top Banner Toolbar */}
       <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+          <h1 className="text-2xl font-bold text-sky-500 tracking-tight">
             Manage Members
           </h1>
           <p className="text-xs text-gray-500 mt-1">

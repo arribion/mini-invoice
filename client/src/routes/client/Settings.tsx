@@ -1,5 +1,7 @@
 
-import { SettingsOverview } from "../../components/client/SettingsOverview";
+import AccountDelection from "../../components/client/bio/AccountDelection";
+import PasswordUpdate from "../../components/client/bio/PasswordUpdate";
+import { SettingsOverview } from "../../components/client/bio/SettingsOverview";
 import PaymentMethods from "../../components/client/PaymentMethods";
 
 function Settings() {
@@ -17,6 +19,8 @@ function Settings() {
           <div className="space-y-6">
             <PaymentMethods />
             <SettingsOverview />
+            <PasswordUpdate />
+            <AccountDelection/>
           </div>
         </div>
       </main>

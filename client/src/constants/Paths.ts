@@ -7,6 +7,7 @@ import {
   Users,
   Settings,
   CreditCard,
+  MessageCircle,
 } from "lucide-react";
 
 /**
@@ -68,9 +69,14 @@ export const AdminsideBarLinks: AdminSidebarLink[] = [
     name: "Members",
     link: "/admin/members",
   },
-
   {
     id: 8,
+    icon: MessageCircle,
+    name: "Communication",
+    link: "#",
+  },
+  {
+    id: 9,
     icon: Settings,
     name: "Settings",
     link: "/admin/settings",

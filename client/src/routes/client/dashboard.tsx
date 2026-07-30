@@ -14,7 +14,7 @@ function Dashboard() {
         {/* Header */}
         <div className="mb-8 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-sm text-slate-500">Dashboard Overview</p>
+            <p className="text-sm text-green-500">Dashboard Overview</p>
 
             <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">
               Welcome back,

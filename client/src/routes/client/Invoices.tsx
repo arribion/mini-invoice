@@ -3,17 +3,12 @@ import { Plus } from "lucide-react";
 
 function Invoices() {
   return (
-    <section className="min-h-screen mx-auto max-w-7xl px-6 py-10 bg-slate-50">
+    <section className="min-h-screen mx-auto max-w-7xl px-6 pb-10 pt-3 bg-slate-50">
       <div className="mb-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
         <div>
-          <p className="text-sm font-medium text-green-600">
-            Dashboard / Invoices
-          </p>
-
-          <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900">
-            PROJECT <span className="text-sky-500">INVOICES</span>
+          <h1 className="mt-2 text-2xl font-bold tracking-tight text-sky-500">
+            INVOICES
           </h1>
-
           <p className="mt-2 text-slate-500">
             Track invoices, payments and money transfers in one place.
           </p>
@@ -24,13 +19,6 @@ function Invoices() {
           Add Invoice
         </button>
       </div>
-
-  
-
-       
-
-         
-
     </section>
   );
 }

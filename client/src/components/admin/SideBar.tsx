@@ -1,4 +1,3 @@
-// src/components/admin/SideBar.tsx
 import { Link, NavLink } from "react-router-dom";
 import gt_logo from "../../assets/gt-logo.png";
 import { AdminsideBarLinks } from "../../constants/Paths";

@@ -37,19 +37,21 @@ const Invoicing = () => {
   return (
     <div className="p-6">
       {/* Header */}
-      <h1 className="text-2xl font-bold mb-6">Invoicing - FANYA MAJOR REVISION HAPA</h1>
+      <h1 className="text-2xl text-sky-500 font-bold mb-6">
+        Invoice Management
+      </h1>
 
       {/* Quick Stats */}
       <div className="grid grid-cols-3 gap-4 mb-8 text-center">
-        <div className="bg-yellow-100 p-4 rounded shadow">
+        <div className="shadow-card border-yellow-100 p-4 rounded shadow">
           <h2 className="font-semibold">Pending Invoices</h2>
           <p className="text-2xl font-bold">2</p>
         </div>
-        <div className="bg-green-100 p-4 rounded shadow">
+        <div className="shadow-card border-green-100 p-4 rounded shadow">
           <h2 className="font-semibold">Paid Invoices</h2>
           <p className="text-2xl font-bold">1</p>
         </div>
-        <div className="bg-red-100 p-4 rounded shadow">
+        <div className="shadow-card border-red-100 p-4 rounded shadow">
           <h2 className="font-semibold">Overdue Invoices</h2>
           <p className="text-2xl font-bold">0</p>
         </div>

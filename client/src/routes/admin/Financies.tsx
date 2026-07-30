@@ -63,7 +63,7 @@ const Financies = () => {
       setError("");
       // const { data } = await api.get("/api/v1/payments");
       // setMembers(Array.isArray(data) ? data : data?.data || []);
-      setMembers(mockMembers); // ✅ use mock data for now
+      setMembers(mockMembers); //  use mock data for now
     } catch (err) {
       setError("Failed to load payments.");
     } finally {
@@ -100,7 +100,7 @@ const Financies = () => {
 
   return (
     <div className="p-6 bg-gray-50">
-      <h1 className="text-2xl font-bold mb-6">Member Payments</h1>
+      <h1 className="text-2xl text-sky-500 font-bold mb-6">Member Payments</h1>
 
       {/* Quick Stats */}
       <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4 mb-12">

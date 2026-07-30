@@ -55,12 +55,9 @@ function Resources() {
   }, []);
 
   return (
-    <section className="min-h-[80.8vh] bg-gray-50 px-4 py-10">
+    <section className="min-h-[80.8vh] bg-gray-50 px-4 pb-10 pt-2">
       <div className="mx-auto max-w-7xl">
         <div className="mb-4">
-          <p className="text-sm font-medium text-green-600">
-            Dashboard / Resources
-          </p>
           <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900">
             PROJECT <span className="text-sky-500">RESOURCES</span>
           </h1>

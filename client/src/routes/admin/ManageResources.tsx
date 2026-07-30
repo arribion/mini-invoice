@@ -24,8 +24,8 @@ const ManageResources = () => {
       {/* Header Section */}
       <section className="flex justify-between mb-6">
         <div>
-          <h1 className="text-3xl text-slate-700 font-semibold">Resources</h1>
-          <p>PDF, DOCX, VIDEOS, AUDIO, (ZIP)</p>
+          <h1 className="text-2xl text-sky-500 font-semibold">Resources</h1>
+          <p>PDF, DOCX, VIDEOS, AUDIO, ZIP</p>
         </div>
         <div>
           <button
