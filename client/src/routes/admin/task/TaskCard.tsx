@@ -1,5 +1,4 @@
 import React, { useState, useCallback } from "react";
-// import { Edit, Users, X, Check, Loader2 } from "lucide-react";
 import type { Project } from "../../../types/projects";
 import type { TaskerWithAssignment, Member } from "../../../types/task";
 import TaskAssignmentForm from "./TaskAssignmentForm";
@@ -21,7 +20,6 @@ type Props = {
   isSubmitting?: boolean;
 };
 
-
 const TaskCard: React.FC<Props> = ({
   project,
   projectTaskers,
@@ -37,6 +35,8 @@ const TaskCard: React.FC<Props> = ({
     [onAssignTaskers, project.id],
   );
 
+  const isClosed = project.status === "CLOSED";
+
   return (
     <div
       className={`p-4 bg-white rounded border-2 ${project.colorClass || "border-slate-200"}`}>
@@ -51,25 +51,31 @@ const TaskCard: React.FC<Props> = ({
               Rate: <strong>{project.rate ?? "N/A"}</strong>
             </span>
             <span>
-              Status: <strong className="text-green-500">{project.status}</strong>
+              Status:{" "}
+              <strong className="text-green-500">{project.status}</strong>
             </span>
           </div>
         </div>
+
+        {/* Assign button or red "Closed" badge */}
         <div className="flex flex-col items-end gap-2">
-          <button
-            type="button"
-            onClick={() => setOpenFormFor((s) => (!s ? project.id : null))}
-            className="bg-sky-600 text-white px-3 py-1 rounded text-sm hover:bg-sky-700">
-            {openFormFor === project.id ? (
-              "Close"
-            ) : (
-              <button className="flex items-center gap-2"><UserPen size={16} /> Assign</button>
-            )}
-          </button>
+          {!isClosed ? (
+            <button
+              type="button"
+              onClick={() => setOpenFormFor((s) => (!s ? project.id : null))}
+              className="bg-sky-600 text-white px-3 py-1 rounded text-sm hover:bg-sky-700 flex items-center gap-2">
+              <UserPen size={16} />
+              {openFormFor === project.id ? "Close" : "Assign"}
+            </button>
+          ) : (
+            <span className="text-sm font-semibold text-red-600 bg-red-50 border border-red-200 px-3 py-1 rounded">
+              Closed
+            </span>
+          )}
         </div>
       </div>
 
-      {openFormFor === project.id && (
+      {openFormFor === project.id && !isClosed && (
         <TaskAssignmentForm
           projectRate={project.rate ?? 0}
           availableMembers={availableMembers}

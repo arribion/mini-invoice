@@ -258,16 +258,11 @@ const Task: React.FC<Props> = ({ initialProjects = [] }) => {
         if (isMounted.current) setAssignments(refreshed);
         toast.success(`${taskerIds.length} tasker(s) assigned successfully`);
       } catch (err: any) {
-        console.error("Error assigning taskers:", err);
-        if (err.response?.data?.data?.already_assigned_names) {
-          const names =
-            err.response.data.data.already_assigned_names.join(", ");
-          toast.error(
-            `Some taskers are already assigned to this project: ${names}`,
-          );
-        } else {
-          toast.error("Failed to assign taskers. Please try again.");
-        }
+        console.error("Error assigning taskers:", err.response?.data);
+        const msg =
+          err.response?.data?.message ||
+          "Failed to assign taskers. Please try again.";
+        toast.error(msg);
         throw err;
       } finally {
         if (isMounted.current) setSubmitting(false);
