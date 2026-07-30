@@ -63,12 +63,11 @@ const projectSchema = new mongoose.Schema(
 
 // -----------------------------
 // Helpers
-// -----------------------------
 
 // Remove assignments for a given project id
 async function removeAssignmentsForProject(projectId, session = null) {
   if (!projectId) return;
-  const filter = { project_id: projectId }; // adjust if your ProjectAssignment uses a different field name
+  const filter = { project_id: projectId };
   if (session) {
     return ProjectAssignment.deleteMany(filter).session(session);
   }
@@ -164,9 +163,7 @@ projectSchema.pre(
   },
 );
 
-// -----------------------------
-// Export model
-// -----------------------------
+
 export const ProjectModel =
   mongoose.models.Project || mongoose.model("Project", projectSchema);
 
