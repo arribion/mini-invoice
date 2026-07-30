@@ -1,6 +1,4 @@
-// server/models/project.Model.js
 import mongoose from "mongoose";
-import ProjectAssignment from "./project.Assignment.Model.js";
 import { ResourceModel } from "./resource.model.js";
 import cloudinary from "../config/cloudinary.js";
 
