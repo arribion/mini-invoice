@@ -108,11 +108,6 @@ const MyTask: React.FC = () => {
       {error && (
         <div className="mb-4 bg-red-50 border-l-4 border-red-400 p-3 rounded">
           <p className="text-red-700 text-sm">{error}</p>
-          <button
-            onClick={fetchAssignments}
-            className="mt-2 bg-sky-600 text-white px-3 py-1 rounded text-sm">
-            Retry
-          </button>
         </div>
       )}
 
