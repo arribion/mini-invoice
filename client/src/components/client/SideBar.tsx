@@ -10,6 +10,7 @@ import {
   CreditCard,
   BookOpen,
   Settings,
+  Notebook,
 } from "lucide-react";
 
 export type IconComponent = React.ComponentType<React.ComponentProps<typeof Grid>>;
@@ -30,7 +31,8 @@ const clientLinks: ClientLink[] = [
   { id: 5, label: "Projects", link: "/client/projects", icon: FolderOpen },
   { id: 6, label: "Payments", link: "/client/payments", icon: CreditCard },
   { id: 7, label: "Resources", link: "/client/resources", icon: BookOpen },
-  { id: 8, label: "Settings", link: "/client/settings", icon: Settings },
+  { id: 8, label: "Quick Note", link: "/client/note", icon: Notebook },
+  { id: 9, label: "Settings", link: "/client/settings", icon: Settings },
 ];
 
 const linkBaseStyle =

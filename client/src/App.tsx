@@ -31,6 +31,7 @@ import Financies from "./routes/admin/Financies";
 import MyTask from "./routes/client/MyTask";
 
 import ContactUs from "./routes/ContactUs";
+import Note from "./components/client/Note";
 
 const App = () => {
   return (
@@ -64,6 +65,8 @@ const App = () => {
             <Route path="/client/projects" element={<Projects />} />
             <Route path="/client/payments" element={<Payments />} />
             <Route path="/client/settings" element={<Settings />} />
+
+            <Route path="/client/note" element={ <Note/> } />
           </Route>
         </Route>
 

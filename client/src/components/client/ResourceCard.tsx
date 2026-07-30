@@ -67,6 +67,7 @@ const ResourceCard = ({ resource }: Props) => {
           {/* Download */}
           <a
             href={fileUrl}
+            target="_blank"
             download
             className="inline-flex items-center gap-1 w-full border rounded p-2 text-gray-600 hover:underline">
             <Eye size={16} /> View
@@ -74,6 +75,7 @@ const ResourceCard = ({ resource }: Props) => {
           {/* Download */}
           <a
             href={fileUrl}
+            target="_blank"
             download
             className="inline-flex items-center gap-1 w-full border rounded p-2 text-slate-50 bg-sky-500 hover:bg-sky-600">
             <Download size={16} /> Download
