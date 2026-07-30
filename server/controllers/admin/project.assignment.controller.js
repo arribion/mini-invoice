@@ -1,5 +1,5 @@
 import ProjectAssignment from "../../models/project.Assignment.Model.js";
-import { ProjectModel } from "../../models/project.Model.js";
+import { ProjectModel } from "../../models/project.model.js"; // ✅ lowercase ‘model’
 import UserModel from "../../models/userModel.js";
 import mongoose from "mongoose";
 
@@ -12,12 +12,10 @@ export const assignTaskersToProject = async (req, res) => {
     !Array.isArray(tasker_ids) ||
     tasker_ids.length === 0
   ) {
-    return res
-      .status(400)
-      .json({
-        success: false,
-        message: "Please provide project_id and tasker_ids array",
-      });
+    return res.status(400).json({
+      success: false,
+      message: "Please provide project_id and tasker_ids array",
+    });
   }
 
   const session = await mongoose.startSession();
@@ -36,12 +34,10 @@ export const assignTaskersToProject = async (req, res) => {
     if (project.status === "CLOSED") {
       await session.abortTransaction();
       session.endSession();
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Cannot assign taskers to a closed project",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Cannot assign taskers to a closed project",
+      });
     }
 
     const taskers = await UserModel.find({
@@ -52,13 +48,11 @@ export const assignTaskersToProject = async (req, res) => {
     if (taskers.length !== tasker_ids.length) {
       await session.abortTransaction();
       session.endSession();
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message:
-            "One or more taskers are invalid, not active, or not TASKER role",
-        });
+      return res.status(400).json({
+        success: false,
+        message:
+          "One or more taskers are invalid, not active, or not TASKER role",
+      });
     }
 
     const existingAssignments = await ProjectAssignment.find({
@@ -132,23 +126,19 @@ export const assignTaskersToProject = async (req, res) => {
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
-    // console.error("Error assigning taskers:", error);
+    console.error("Error assigning taskers:", error);
     if (error.code === 11000) {
-      return res
-        .status(409)
-        .json({
-          success: false,
-          message:
-            "Duplicate assignment detected. Tasker already assigned to this project.",
-        });
-    }
-    return res
-      .status(500)
-      .json({
+      return res.status(409).json({
         success: false,
-        message: "Error assigning taskers",
-        error: error.message,
+        message:
+          "Duplicate assignment detected. Tasker already assigned to this project.",
       });
+    }
+    return res.status(500).json({
+      success: false,
+      message: "Error assigning taskers",
+      error: error.message,
+    });
   }
 };
 
@@ -162,12 +152,10 @@ export const removeTaskerFromProject = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Assignment not found" });
     if (assignment.status === "REMOVED")
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Tasker is already removed from this project",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Tasker is already removed from this project",
+      });
 
     assignment.status = "REMOVED";
     assignment.removed_at = new Date();
@@ -181,27 +169,23 @@ export const removeTaskerFromProject = async (req, res) => {
       await project.save();
     }
 
-    return res
-      .status(200)
-      .json({
-        success: true,
-        message: "Tasker removed from project successfully",
-        data: {
-          assignment_id: assignment._id,
-          project_id: assignment.project_id,
-          tasker_id: assignment.tasker_id,
-          status: assignment.status,
-        },
-      });
+    return res.status(200).json({
+      success: true,
+      message: "Tasker removed from project successfully",
+      data: {
+        assignment_id: assignment._id,
+        project_id: assignment.project_id,
+        tasker_id: assignment.tasker_id,
+        status: assignment.status,
+      },
+    });
   } catch (error) {
-    // console.error("Error removing tasker:", error);
-    return res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error removing tasker from project",
-        error: error.message,
-      });
+    console.error("Error removing tasker:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error removing tasker from project",
+      error: error.message,
+    });
   }
 };
 
@@ -242,14 +226,12 @@ export const getProjectAssignments = async (req, res) => {
       },
     });
   } catch (error) {
-    // console.error("Error fetching assignments:", error);
-    return res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error fetching assignments",
-        error: error.message,
-      });
+    console.error("Error fetching assignments:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching assignments",
+      error: error.message,
+    });
   }
 };
 
@@ -291,14 +273,12 @@ export const getAllAssignments = async (req, res) => {
 
     return res.status(200).json({ success: true, data });
   } catch (error) {
-    // console.error("Error fetching all assignments:", error);
-    return res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error fetching assignments",
-        error: error.message,
-      });
+    console.error("Error fetching all assignments:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching assignments",
+      error: error.message,
+    });
   }
 };
 
@@ -308,13 +288,11 @@ export const updateAssignmentStatus = async (req, res) => {
   const { status } = req.body;
   const validStatuses = ["ASSIGNED", "IN_PROGRESS", "COMPLETED", "CANCELLED"];
   if (!validStatuses.includes(status)) {
-    return res
-      .status(400)
-      .json({
-        success: false,
-        message:
-          "Invalid status. Valid statuses: ASSIGNED, IN_PROGRESS, COMPLETED, CANCELLED",
-      });
+    return res.status(400).json({
+      success: false,
+      message:
+        "Invalid status. Valid statuses: ASSIGNED, IN_PROGRESS, COMPLETED, CANCELLED",
+    });
   }
   try {
     const assignment = await ProjectAssignment.findById(assignmentId);
@@ -324,26 +302,22 @@ export const updateAssignmentStatus = async (req, res) => {
         .json({ success: false, message: "Assignment not found" });
     assignment.status = status;
     await assignment.save();
-    return res
-      .status(200)
-      .json({
-        success: true,
-        message: "Assignment status updated successfully",
-        data: {
-          assignment_id: assignment._id,
-          status: assignment.status,
-          updated_at: assignment.updatedAt,
-        },
-      });
+    return res.status(200).json({
+      success: true,
+      message: "Assignment status updated successfully",
+      data: {
+        assignment_id: assignment._id,
+        status: assignment.status,
+        updated_at: assignment.updatedAt,
+      },
+    });
   } catch (error) {
-    // console.error("Error updating assignment:", error);
-    return res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error updating assignment status",
-        error: error.message,
-      });
+    console.error("Error updating assignment:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error updating assignment status",
+      error: error.message,
+    });
   }
 };
 
@@ -382,14 +356,12 @@ export const getMyProjects = async (req, res) => {
       .status(200)
       .json({ success: true, data: { projects, total: projects.length } });
   } catch (error) {
-    // console.error("Error fetching my projects:", error);
-    return res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error fetching your projects",
-        backend_error: error.message,
-      });
+    console.error("Error fetching my projects:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching your projects",
+      backend_error: error.message,
+    });
   }
 };
 
@@ -404,12 +376,10 @@ export const getProjectTaskers = async (req, res) => {
       status: { $nin: ["REMOVED", "CANCELLED"] },
     });
     if (!userAssignment)
-      return res
-        .status(403)
-        .json({
-          success: false,
-          message: "You are not authorized to view this project's taskers",
-        });
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to view this project's taskers",
+      });
 
     const assignments = await ProjectAssignment.find({
       project_id: projectId,
@@ -445,14 +415,12 @@ export const getProjectTaskers = async (req, res) => {
       },
     });
   } catch (error) {
-    // console.error("Error fetching project taskers:", error);
-    return res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error fetching project taskers",
-        error: error.message,
-      });
+    console.error("Error fetching project taskers:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching project taskers",
+      error: error.message,
+    });
   }
 };
 
