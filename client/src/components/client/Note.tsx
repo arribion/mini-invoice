@@ -5,7 +5,12 @@ const Note = () => {
       <p>
         {" "}
         feel free to update your credentials(name email phone) also contact me
-        via <a href="">WhatsApp</a>
+        via{" "}
+        <a
+          href="https://wa.me/254707468863?text=I would like to report a bug/suggestion in the qt-online application."
+          target="_blank">
+          WhatsApp
+        </a>
         if you fell there is anything we can add or improve to give you a better
         user experience
       </p>
