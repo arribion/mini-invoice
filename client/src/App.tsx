@@ -30,31 +30,12 @@ import Invoicing from "./routes/admin/Invoicing";
 import Financies from "./routes/admin/Financies";
 import MyTask from "./routes/client/MyTask";
 
-import { Bug } from "lucide-react";
 import ContactUs from "./routes/ContactUs";
 
 const App = () => {
   return (
     <>
-      <div className="m-2">
-        <span className="font-bold text-sky-500">
-          APPLICATION IS UNDER DEVELOPMENT
-        </span>
-        , Your suggestions are very much appreciated leave a message below{" "}
-        <div className="mt-6 border-t border-gray-100 pt-1">
-          <a
-            href="https://wa.me/254707468863?text=I would like to report a bug/suggetion in the qt-online application."
-            target="_blank"
-            className="block">
-            <button
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-linear-to-r from-emerald-500 to-sky-500 px-4 py-2 text-sm font-semibold text-white shadow hover:from-emerald-600 hover:to-sky-600 focus:outline-none focus:ring-2 focus:ring-emerald-300"
-              aria-label="Create member login">
-              <Bug size={16} />
-              REPORT A BUG & SUGGETIONs
-            </button>
-          </a>
-        </div>
-      </div>
+     
       <Routes>
         {/* Public Auth Layout */}
         <Route element={<AuthLayout />}>
