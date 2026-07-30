@@ -40,13 +40,14 @@ export const register = async (req, res) => {
       role: role || "TASKER",
     });
 
+    // include _id in JWT payload
     const accessToken = jwt.sign(
-      { email: newUser.email, role: newUser.role },
+      { _id: newUser._id, email: newUser.email, role: newUser.role },
       JWT_ACCESS_SECRET,
       { expiresIn: "1h" },
     );
     const refreshToken = jwt.sign(
-      { email: newUser.email, role: newUser.role },
+      { _id: newUser._id, email: newUser.email, role: newUser.role },
       JWT_REFRESH_SECRET,
       { expiresIn: "7d" },
     );
@@ -88,13 +89,14 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    // include _id in JWT payload
     const accessToken = jwt.sign(
-      { email: user.email, role: user.role },
+      { _id: user._id, email: user.email, role: user.role },
       JWT_ACCESS_SECRET,
       { expiresIn: "1h" },
     );
     const refreshToken = jwt.sign(
-      { email: user.email, role: user.role },
+      { _id: user._id, email: user.email, role: user.role },
       JWT_REFRESH_SECRET,
       { expiresIn: "7d" },
     );
@@ -155,8 +157,9 @@ export const refreshToken = async (req, res) => {
         return res.status(403).json({ message: "Invalid refresh token" });
       }
 
+      // include _id in refreshed access token
       const accessToken = jwt.sign(
-        { email: decoded.email, role: decoded.role },
+        { _id: decoded._id, email: decoded.email, role: decoded.role },
         JWT_ACCESS_SECRET,
         { expiresIn: "1h" },
       );
@@ -172,7 +175,6 @@ export const refreshToken = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
-
 
 export const verify = async (req, res) => {
   try {
@@ -204,4 +206,10 @@ export const verify = async (req, res) => {
   }
 };
 
-export default { register, login, logout, refreshToken, verify };
+export default {
+  register,
+  login,
+  logout,
+  refreshToken,
+  verify
+};

@@ -1,4 +1,5 @@
 import express from "express";
+import { protect } from "../middleware/auth.middleware.js";
 import {
   assignTaskersToProject,
   removeTaskerFromProject,
@@ -11,27 +12,18 @@ import {
 const project_assignment_router = express.Router();
 
 // Create assignment(s)
-project_assignment_router.post("/assign", assignTaskersToProject);
+project_assignment_router
+  .post("/assign", assignTaskersToProject)
+  .delete("/:assignmentId/remove", removeTaskerFromProject);// Delete / remove assignment
 
-// Delete / remove assignment
-project_assignment_router.delete(
-  "/:assignmentId/remove",
-  removeTaskerFromProject,
-);
+// Get all assignments
+project_assignment_router
+  .get("/", getAllAssignments)
+  .get("/project/:projectId", getProjectAssignments) // Get assignments for a specific project (admin view)
+  .patch("/:assignmentId", updateAssignmentStatus) // Update assignment status
 
-// Get all assignments (new top-level route)
-project_assignment_router.get("/", getAllAssignments);
+  .get("/my-projects",protect, getMyProjects) // Get my projects (tasker)
+  .get("/project/:projectId/taskers", protect, getProjectTaskers);// Get project taskers (tasker view)
 
-// Get assignments for a specific project (admin view)
-project_assignment_router.get("/project/:projectId", getProjectAssignments);
-
-// Update assignment status
-project_assignment_router.patch("/:assignmentId", updateAssignmentStatus);
-
-// Get my projects (tasker)
-project_assignment_router.get("/my-projects", getMyProjects);
-
-// Get project taskers (tasker view)
-project_assignment_router.get("/project/:projectId/taskers", getProjectTaskers);
 
 export default project_assignment_router;

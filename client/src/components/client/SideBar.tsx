@@ -1,4 +1,4 @@
-// src/components/client/SideBar.tsx
+import gt_logo from "../../assets/gt-logo.png";
 import React from "react";
 import { Link, NavLink } from "react-router-dom";
 import {
@@ -43,7 +43,8 @@ const getLinkStyle = ({ isActive }: { isActive: boolean }) =>
 const SideBar: React.FC = () => {
   return (
     <aside className="gradient-primary fixed h-screen p-4 w-56 md:w-56 lg:w-62.5">
-      <Link to="/" className="mb-6 inline-block">
+      <Link to="/" className="flex items-center gap-2.5 mb-4">
+        <img src={gt_logo} alt="GT-ONLINE" className="max-w-[2em]" />
         <h1 className="text-slate-50 text-[12px] font-semibold">GT-ONLINE</h1>
       </Link>
 

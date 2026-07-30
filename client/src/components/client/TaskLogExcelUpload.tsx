@@ -98,14 +98,14 @@ const TaskLogExcelUpload = () => {
   return (
     /* Changed max-w-xl to w-full max-w-[95vw] to allow full stretch expansion */
     <article className="w-full max-w-[75vw] mx-auto p-4 transition-all duration-300">
-      <h1 className="text-2xl font-bold text-slate-900 mb-6 text-center">
+      <h1 className="text-2xl font-bold text-slate-800 mb-6 text-center">
         Upload Task Log
       </h1>
 
       {!previewData ? (
-        /* Isolated inner container keeps file selector entry clean and centered */
+      
         <div className="max-w-xl mx-auto">
-          <form className="border-2 border-dashed border-slate-300 rounded-2xl p-8 flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 transition-colors">
+          <form className="border-2 border-dashed border-slate-300 rounded-lg p-8 flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 transition-colors">
             <Upload className="w-8 h-8 text-sky-500 mb-4" />
             <p className="text-slate-600 text-sm mb-2">
               Drag & drop your file here, or

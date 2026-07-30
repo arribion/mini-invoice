@@ -75,7 +75,12 @@ function Resources() {
 
         {!loading && error && (
           <div className="rounded-[10px] border border-red-200 bg-red-50 p-6 text-center text-red-700">
-            {error}
+            <p>{error}</p>
+            <button
+              onClick={fetchResources}
+              className="mt-4 inline-flex items-center rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700">
+              Retry
+            </button>
           </div>
         )}
 
@@ -90,6 +95,11 @@ function Resources() {
             <p className="mt-2 text-gray-500">
               The admin has not uploaded any files yet.
             </p>
+            <button
+              onClick={fetchResources}
+              className="mt-6 inline-flex items-center rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-700">
+              Retry
+            </button>
           </div>
         )}
 

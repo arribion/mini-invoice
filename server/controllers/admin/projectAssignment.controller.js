@@ -3,18 +3,28 @@ import { ProjectModel } from "../../models/project.model.js";
 import UserModel from "../../models/userModel.js";
 import mongoose from "mongoose";
 
-// Assign taskers to a project (admin)
+// -------------------- Admin endpoints --------------------
+
 export const assignTaskersToProject = async (req, res) => {
-  const { project_id, tasker_ids, custom_rate = null } = req.body;
-  if (
-    !project_id ||
-    !tasker_ids ||
-    !Array.isArray(tasker_ids) ||
-    tasker_ids.length === 0
-  ) {
+  let { project_id, tasker_ids, custom_rate = null } = req.body;
+  if (!project_id && req.body.projectId) project_id = req.body.projectId;
+  if (!tasker_ids && req.body.taskerIds) {
+    tasker_ids = req.body.taskerIds;
+  }
+  if (tasker_ids && !Array.isArray(tasker_ids)) {
+    tasker_ids = [tasker_ids];
+  }
+
+  if (!project_id) {
     return res.status(400).json({
       success: false,
-      message: "Please provide project_id and tasker_ids array",
+      message: "Missing project_id (or projectId) in request body",
+    });
+  }
+  if (!tasker_ids || !Array.isArray(tasker_ids) || tasker_ids.length === 0) {
+    return res.status(400).json({
+      success: false,
+      message: "tasker_ids must be a non-empty array (or a single ID)",
     });
   }
 
@@ -45,13 +55,19 @@ export const assignTaskersToProject = async (req, res) => {
       role: "TASKER",
       status: "ACTIVE",
     }).session(session);
+
     if (taskers.length !== tasker_ids.length) {
+      const foundIds = taskers.map((t) => t._id.toString());
+      const missing = tasker_ids.filter(
+        (id) => !foundIds.includes(id.toString()),
+      );
       await session.abortTransaction();
       session.endSession();
       return res.status(400).json({
         success: false,
         message:
-          "One or more taskers are invalid, not active, or not TASKER role",
+          "One or more tasker IDs are invalid, inactive, or not TASKER role",
+        missingIds: missing,
       });
     }
 
@@ -63,20 +79,12 @@ export const assignTaskersToProject = async (req, res) => {
 
     if (existingAssignments.length > 0) {
       const existingTaskerIds = existingAssignments.map((a) => a.tasker_id);
-      const existingTaskerNames = existingAssignments.map(
-        (a) =>
-          taskers.find((t) => t._id.toString() === a.tasker_id.toString())
-            ?.full_name || "Unknown",
-      );
       await session.abortTransaction();
       session.endSession();
       return res.status(409).json({
         success: false,
         message: "Some taskers are already assigned to this project",
-        data: {
-          already_assigned: existingTaskerIds,
-          already_assigned_names: existingTaskerNames,
-        },
+        already_assigned: existingTaskerIds,
       });
     }
 
@@ -142,7 +150,6 @@ export const assignTaskersToProject = async (req, res) => {
   }
 };
 
-// Remove tasker from project (admin)
 export const removeTaskerFromProject = async (req, res) => {
   const { assignmentId } = req.params;
   try {
@@ -189,7 +196,6 @@ export const removeTaskerFromProject = async (req, res) => {
   }
 };
 
-// Get assignments for a specific project (admin)
 export const getProjectAssignments = async (req, res) => {
   const { projectId } = req.params;
   try {
@@ -235,7 +241,6 @@ export const getProjectAssignments = async (req, res) => {
   }
 };
 
-//  Get all assignments (top-level) — returns flat array of assignments
 export const getAllAssignments = async (req, res) => {
   try {
     const assignments = await ProjectAssignment.find({
@@ -245,7 +250,6 @@ export const getAllAssignments = async (req, res) => {
       .populate("project_id", "project_name status avg_pay")
       .sort({ assigned_at: -1 });
 
-    // Return a simple array for frontend convenience
     const data = assignments.map((a) => ({
       _id: a._id,
       project_id: a.project_id?._id || a.project_id,
@@ -282,7 +286,6 @@ export const getAllAssignments = async (req, res) => {
   }
 };
 
-// Update assignment status (admin)
 export const updateAssignmentStatus = async (req, res) => {
   const { assignmentId } = req.params;
   const { status } = req.body;
@@ -321,19 +324,43 @@ export const updateAssignmentStatus = async (req, res) => {
   }
 };
 
-// Get my projects (tasker)
+
+
+
+
+// -------------------- Tasker endpoints --------------------
+
 export const getMyProjects = async (req, res) => {
   const userId = req.user?._id;
+
+  //  DEBUG: 
+  // log the user ID
+  // console.log("getMyProjects → userId:", userId);
+
   try {
     const assignments = await ProjectAssignment.find({
       tasker_id: userId,
       status: { $nin: ["REMOVED", "CANCELLED"] },
     })
-      .populate({
-        path: "project_id",
-        select: "project_name status avg_pay description platform createdAt",
-      })
+      .populate(
+        "project_id",
+        "project_name status avg_pay description platform createdAt",
+      )
       .sort({ assigned_at: -1 });
+
+    // //  DEBUG:
+    // 
+    //  log how many assignments were found
+    // console.log("getMyProjects → assignments count:", assignments.length);
+
+    // if (assignments.length > 0) {
+    //   console.log(
+    //     "getMyProjects → first assignment sample:",
+    //     JSON.stringify(assignments[0], null, 2),
+    //   );
+    // } else {
+    //   console.log("getMyProjects → no assignments found for this user.");
+    // }
 
     const projects = assignments.map((a) => ({
       assignment_id: a._id,
@@ -365,63 +392,56 @@ export const getMyProjects = async (req, res) => {
   }
 };
 
-// Get project taskers (tasker view)
+// get fellow tasking mates :)
 export const getProjectTaskers = async (req, res) => {
   const { projectId } = req.params;
   const userId = req.user?._id;
-  try {
-    const userAssignment = await ProjectAssignment.findOne({
-      project_id: projectId,
-      tasker_id: userId,
-      status: { $nin: ["REMOVED", "CANCELLED"] },
-    });
-    if (!userAssignment)
-      return res.status(403).json({
-        success: false,
-        message: "You are not authorized to view this project's taskers",
-      });
 
-    const assignments = await ProjectAssignment.find({
-      project_id: projectId,
-      status: { $nin: ["REMOVED", "CANCELLED"] },
-    })
-      .populate("tasker_id", "full_name email avatar status")
-      .sort({ assigned_at: -1 });
-
-    const project = await ProjectModel.findById(projectId).select(
-      "project_name status avg_pay description",
-    );
-
-    return res.status(200).json({
-      success: true,
-      data: {
-        project: {
-          id: project._id,
-          name: project.project_name,
-          status: project.status,
-          rate: project.avg_pay,
-        },
-        taskers: assignments.map((a) => ({
-          assignment_id: a._id,
-          full_name: a.tasker_id.full_name,
-          email: a.tasker_id.email,
-          avatar: a.tasker_id.avatar,
-          status: a.tasker_id.status,
-          assignment_status: a.status,
-          assigned_at: a.assigned_at,
-          is_me: a.tasker_id._id.toString() === userId.toString(),
-        })),
-        total_taskers: assignments.length,
-      },
-    });
-  } catch (error) {
-    console.error("Error fetching project taskers:", error);
-    return res.status(500).json({
+  const userAssignment = await ProjectAssignment.findOne({
+    project_id: projectId,
+    tasker_id: userId,
+    status: { $nin: ["REMOVED", "CANCELLED"] },
+  });
+  if (!userAssignment) {
+    return res.status(403).json({
       success: false,
-      message: "Error fetching project taskers",
-      error: error.message,
+      message: "You are not authorized to view this project's taskers",
     });
   }
+
+  const assignments = await ProjectAssignment.find({
+    project_id: projectId,
+    status: { $nin: ["REMOVED", "CANCELLED"] },
+  })
+    .populate("tasker_id", "full_name email avatar status")
+    .sort({ assigned_at: -1 });
+
+  const project = await ProjectModel.findById(projectId).select(
+    "project_name status avg_pay description",
+  );
+
+  return res.status(200).json({
+    success: true,
+    data: {
+      project: {
+        id: project._id,
+        name: project.project_name,
+        status: project.status,
+        rate: project.avg_pay,
+      },
+      taskers: assignments.map((a) => ({
+        assignment_id: a._id,
+        full_name: a.tasker_id.full_name,
+        email: a.tasker_id.email,
+        avatar: a.tasker_id.avatar,
+        status: a.tasker_id.status,
+        assignment_status: a.status,
+        assigned_at: a.assigned_at,
+        is_me: a.tasker_id._id.toString() === userId.toString(),
+      })),
+      total_taskers: assignments.length,
+    },
+  });
 };
 
 export default {

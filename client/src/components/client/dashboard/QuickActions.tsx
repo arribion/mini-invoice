@@ -1,37 +1,37 @@
-import { Send, Download, CreditCard, QrCode } from "lucide-react";
+import { Send, Download, CalendarDays, BookOpenText } from "lucide-react";
 import { Link } from "react-router-dom";
 
 
 export function QuickActions() {
   const actions = [
     {
-      icon: Send,
-      label: "Task Logging",
-      color: "gradient-primary",
-      link: "/client/tasks",
-    },
-    {
-      icon: Download,
-      label: "Export Invoice",
-      color: "bg-success",
-      link: "#",
-    },
-    {
-      icon: CreditCard,
+      icon: CalendarDays,
       label: "Google Calenda",
       color: "bg-warning",
       link: "https://calendar.google.com/calendar/u/0/r?cid=ZjI2MmQwYTExZTE4MzY5ZTIxMzA2MTBmMWUxOTRlNGNlYTYyYzA4ODM0NTExMmIyMTM0MWZiNTE0MDIzNTY2OUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t",
     },
     {
-      icon: QrCode,
+      icon: BookOpenText,
       label: "Google Form",
-      color: "bg-black",
+      color: "bg-green-500",
       link: "https://docs.google.com/forms/d/e/1FAIpQLSfE3VTctziQDu15Odjr12wgCL6_-B3cfKQJjWuW2BvE5avB-A/closedform",
+    },
+    {
+      icon: Send,
+      label: "Task Logging",
+      color: "bg-gray-500",
+      link: "/client/tasks",
+    },
+    {
+      icon: Download,
+      label: "Export Invoice",
+      color: "bg-gray-500",
+      link: "#",
     },
   ];
 
   return (
-    <div className="grid grid-cols-4 gap-1">
+    <div className="grid grid-cols-2 gap-1">
       {actions.map((action) => (
         <Link
           key={action.label}
@@ -42,7 +42,7 @@ export function QuickActions() {
               className={`flex h-12 w-12 items-center justify-center rounded-xl ${action.color} transition-transform group-hover:scale-105`}>
               <action.icon className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="text-xs font-medium text-muted-foreground">
+            <span className="text-xs font-semibold text-sky-500">
               {action.label}
             </span>
           </button>

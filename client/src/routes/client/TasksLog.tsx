@@ -47,6 +47,10 @@ const TasksLog = () => {
             </article>
           </div>
         )}
+
+        <article>
+          <h1 className="bg-slate-800">Recent Logs</h1>
+        </article>
       </section>
     </div>
   );

@@ -110,7 +110,7 @@ const ProjectList = () => {
         <button
           onClick={fetchProjects}
           disabled={loading}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-gray-900 hover:bg-gray-800 disabled:bg-gray-400 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition active:scale-[0.98] disabled:cursor-not-allowed">
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded bg-sky-500 hover:bg-sky-600 disabled:bg-gray-400 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition active:scale-[0.98] disabled:cursor-not-allowed">
           <LuRefreshCcw size={16} className={loading ? "animate-spin" : ""} />
           {loading ? "Refreshing..." : "Refresh"}
         </button>

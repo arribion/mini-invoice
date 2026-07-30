@@ -29,7 +29,7 @@ export function BalanceCard() {
           <span className="text-4xl font-bold text-primary-foreground tracking-tight">
             {visible ? (
               <p>
-                <span className="text-gray-400">KES</span> 92,485.50
+                <span className="text-gray-400">KES</span> 00,000.00
               </p>
             ) : (
               "•••••••••"
