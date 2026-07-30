@@ -2,22 +2,14 @@ import userModel from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
+import getCookieOptions from "../utils/cookie.js";
 
 const { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } = process.env;
 if (!JWT_ACCESS_SECRET || !JWT_REFRESH_SECRET) {
   console.warn("JWT secrets are missing!");
 }
 
-// Cookie options based on environment
-const getCookieOptions = (maxAge) => {
-  const isProduction = process.env.NODE_ENV === "production";
-  return {
-    httpOnly: true,
-    secure: isProduction, // HTTPS only in production
-    sameSite: isProduction ? "none" : "lax",
-    maxAge,
-  };
-};
+
 
 export const register = async (req, res) => {
   try {
