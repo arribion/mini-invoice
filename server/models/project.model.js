@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { ResourceModel } from "./resource.model.js";
 import cloudinary from "../config/cloudinary.js";
-import ProjectAssignment from "./project.Assignment.Model.js"; // ✅ added import
+import ProjectAssignment from "./projectAssignment.Model.js";
 
 const projectSchema = new mongoose.Schema(
   {
@@ -166,7 +166,6 @@ projectSchema.pre(
 
 // -----------------------------
 // Model export
-// -----------------------------
 export const ProjectModel =
   mongoose.models.Project || mongoose.model("Project", projectSchema);
 

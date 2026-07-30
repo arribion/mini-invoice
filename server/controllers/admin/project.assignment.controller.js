@@ -1,4 +1,4 @@
-import ProjectAssignment from "../../models/project.Assignment.Model.js";
+import ProjectAssignment from "../../models/projectAssignment.Model.js";
 import { ProjectModel } from "../../models/project.model.js"; // ✅ lowercase ‘model’
 import UserModel from "../../models/userModel.js";
 import mongoose from "mongoose";
