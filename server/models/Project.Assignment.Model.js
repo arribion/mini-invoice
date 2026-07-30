@@ -1,4 +1,3 @@
-// server/models/project.Assignment.Model.js
 import mongoose from "mongoose";
 
 const { Schema, model, Types } = mongoose;
