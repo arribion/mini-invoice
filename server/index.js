@@ -11,7 +11,7 @@ import authRouter from "./routes/auth.route.js";
 import projectRouter from "./routes/project.route.js";
 import memberRouter from "./routes/members.route.js";
 import resourceRouter from "./routes/resources.route.js";
-import projectAssignmentRoutes from "./routes/project.assignment.route.js";
+import projectAssignmentRoutes from "./routes/projectAssignment.route.js";
 
 
 const app = express();

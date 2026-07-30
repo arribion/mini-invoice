@@ -7,7 +7,7 @@ import {
   updateAssignmentStatus,
   getProjectTaskers,
   getAllAssignments,
-} from "../controllers/admin/project.assignment.controller.js"
+} from "../controllers/admin/projectAssignment.controller.js"
 const project_assignment_router = express.Router();
 
 // Create assignment(s)
