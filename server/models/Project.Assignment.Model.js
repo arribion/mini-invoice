@@ -6,14 +6,14 @@ const ProjectAssignmentSchema = new Schema(
   {
     project_id: {
       type: Types.ObjectId,
-      ref: "Project",
+      ref: "Project", // relationship with Project model
       required: true,
       index: true,
     },
 
     tasker_id: {
       type: Types.ObjectId,
-      ref: "User",
+      ref: "User", // relationship with User model
       required: true,
       index: true,
     },
@@ -46,9 +46,7 @@ const ProjectAssignmentSchema = new Schema(
       default: {},
     },
   },
-  {
-    timestamps: true,
-  },
+  { timestamps: true },
 );
 
 // Prevent duplicate assignment of same tasker to same project
@@ -57,10 +55,10 @@ ProjectAssignmentSchema.index(
   { unique: true },
 );
 
-// Optional sparse index for removed_at if you query by it
+// Sparse index for removed_at – useful for queries on non‑removed assignments
 ProjectAssignmentSchema.index({ removed_at: 1 }, { sparse: true });
 
-// Optional helper method with duplicate-key handling
+// Helper: assign a tasker to a project with duplicate‑key handling
 ProjectAssignmentSchema.statics.assignTasker = async function (
   projectId,
   taskerId,
@@ -78,10 +76,9 @@ ProjectAssignmentSchema.statics.assignTasker = async function (
   try {
     return await this.create(payload);
   } catch (err) {
-    // Duplicate key error code from MongoDB
+    // Duplicate key error (MongoDB code 11000)
     if (err && err.code === 11000) {
-      const message = "Tasker is already assigned to this project";
-      const error = new Error(message);
+      const error = new Error("Tasker is already assigned to this project");
       error.code = 11000;
       throw error;
     }
@@ -89,7 +86,7 @@ ProjectAssignmentSchema.statics.assignTasker = async function (
   }
 };
 
-// Check if the model already exists before creating it
+// Prevent model overwrite on hot‑reload / multiple imports
 const ProjectAssignment =
   mongoose.models.ProjectAssignment ||
   model("ProjectAssignment", ProjectAssignmentSchema);

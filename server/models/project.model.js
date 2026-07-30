@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { ResourceModel } from "./resource.model.js";
 import cloudinary from "../config/cloudinary.js";
+import ProjectAssignment from "./project.Assignment.Model.js"; // ✅ added import
 
 const projectSchema = new mongoose.Schema(
   {
@@ -63,6 +64,7 @@ const projectSchema = new mongoose.Schema(
 
 // -----------------------------
 // Helpers
+// -----------------------------
 
 // Remove assignments for a given project id
 async function removeAssignmentsForProject(projectId, session = null) {
@@ -107,7 +109,6 @@ async function removeResourcesAndCloudFiles(projectId) {
           });
         } catch (err) {
           // Log and continue; do not throw to avoid blocking DB cleanup
-          // Replace console.error with your logger if available
           console.error(
             `Failed to delete Cloudinary file ${r.publicId}:`,
             err?.message || err,
@@ -163,7 +164,9 @@ projectSchema.pre(
   },
 );
 
-
+// -----------------------------
+// Model export
+// -----------------------------
 export const ProjectModel =
   mongoose.models.Project || mongoose.model("Project", projectSchema);
 
