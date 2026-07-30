@@ -1,175 +1,98 @@
-// server/models/project.Model.js
+// server/models/project.Assignment.Model.js
 import mongoose from "mongoose";
-import ProjectAssignment from "./project.Assignment.Model.js";
-import { ResourceModel } from "./resource.model.js";
-import cloudinary from "../config/cloudinary.js";
 
-const projectSchema = new mongoose.Schema(
+const { Schema, model, Types } = mongoose;
+
+const ProjectAssignmentSchema = new Schema(
   {
-    project_name: {
-      type: String,
-      required: [true, "Project name is required"],
-      trim: true,
-      minlength: 3,
-      maxlength: 100,
-    },
-
-    platform: {
-      type: String,
-      required: [true, "Platform is required"],
-      trim: true,
-      minlength: 2,
-      maxlength: 50,
-    },
-
-    avg_pay: {
-      type: Number,
+    project_id: {
+      type: Types.ObjectId,
+      ref: "Project",
       required: true,
+      index: true,
     },
 
-    description: {
-      type: String,
-      required: [true, "Description is required"],
-      trim: true,
-      minlength: 10,
-      maxlength: 1000,
+    tasker_id: {
+      type: Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
     },
 
-    revenueSplit: {
-      tasker: { type: Number, default: 0 },
-      admin: { type: Number, default: 0 },
-      owner: { type: Number, default: 0 },
+    custom_rate: {
+      type: Number,
+      default: null,
+    },
+
+    assigned_at: {
+      type: Date,
+      default: () => new Date(),
+      index: true,
     },
 
     status: {
       type: String,
-      enum: ["DRAFT", "PENDING", "ACTIVE", "PAUSED", "CLOSED"],
-      default: "ACTIVE",
+      enum: ["ASSIGNED", "IN_PROGRESS", "COMPLETED", "CANCELLED", "REMOVED"],
+      default: "ASSIGNED",
       required: true,
     },
-    category: {
-      type: String,
-      trim: true,
+
+    removed_at: {
+      type: Date,
+      default: null,
     },
-    taskers: {
-      type: [mongoose.Schema.Types.ObjectId],
-      ref: "User",
-      default: [],
+
+    meta: {
+      type: Schema.Types.Mixed,
+      default: {},
     },
   },
   {
     timestamps: true,
-    versionKey: false,
   },
 );
 
-// -----------------------------
-// Helpers
-// -----------------------------
+// Prevent duplicate assignment of same tasker to same project
+ProjectAssignmentSchema.index(
+  { project_id: 1, tasker_id: 1 },
+  { unique: true },
+);
 
-// Remove assignments for a given project id
-async function removeAssignmentsForProject(projectId, session = null) {
-  if (!projectId) return;
-  const filter = { project_id: projectId }; // adjust if your ProjectAssignment uses a different field name
-  if (session) {
-    return ProjectAssignment.deleteMany(filter).session(session);
-  }
-  return ProjectAssignment.deleteMany(filter);
-}
+// Optional sparse index for removed_at if you query by it
+ProjectAssignmentSchema.index({ removed_at: 1 }, { sparse: true });
 
-// Remove resource documents for a given project id (DB-only)
-async function removeResourcesForProject(projectId, session = null) {
-  if (!projectId) return;
-  const filter = { projectID: projectId };
-  if (session) {
-    return ResourceModel.deleteMany(filter).session(session);
-  }
-  return ResourceModel.deleteMany(filter);
-}
+// Optional helper method with duplicate-key handling
+ProjectAssignmentSchema.statics.assignTasker = async function (
+  projectId,
+  taskerId,
+  opts = {},
+) {
+  const payload = {
+    project_id: projectId,
+    tasker_id: taskerId,
+    custom_rate: opts.custom_rate ?? null,
+    assigned_at: opts.assigned_at ?? new Date(),
+    meta: opts.meta ?? {},
+    status: opts.status ?? "ASSIGNED",
+  };
 
-// Best-effort: remove Cloudinary files for a project's resources, then remove DB docs
-async function removeResourcesAndCloudFiles(projectId) {
-  if (!projectId) return;
-
-  // Fetch resources with publicId and type
-  const resources = await ResourceModel.find({ projectID: projectId })
-    .select("publicId type")
-    .lean();
-
-  if (resources && resources.length) {
-    // Delete Cloudinary files in parallel (best-effort)
-    await Promise.all(
-      resources.map(async (r) => {
-        if (!r.publicId) return;
-        try {
-          const resourceType =
-            r.type === "image" ? "image" : r.type === "video" ? "video" : "raw";
-          await cloudinary.uploader.destroy(r.publicId, {
-            resource_type: resourceType,
-            invalidate: true,
-          });
-        } catch (err) {
-          // Log and continue; do not throw to avoid blocking DB cleanup
-          // Replace console.error with your logger if available
-          console.error(
-            `Failed to delete Cloudinary file ${r.publicId}:`,
-            err?.message || err,
-          );
-        }
-      }),
-    );
-  }
-
-  // Remove DB documents for resources
-  await ResourceModel.deleteMany({ projectID: projectId });
-}
-
-// -----------------------------
-// Middleware: cascade deletes
-// -----------------------------
-
-// Query middleware for findOneAndDelete (e.g., Model.findByIdAndDelete triggers this)
-projectSchema.pre("findOneAndDelete", async function () {
-  const doc = await this.model.findOne(this.getQuery()).select("_id").lean();
-  if (doc && doc._id) {
-    // remove assignments and resources (Cloudinary + DB)
-    await removeAssignmentsForProject(doc._id);
-    await removeResourcesAndCloudFiles(doc._id);
-  }
-});
-
-// Query middleware for deleteOne when called with a filter
-projectSchema.pre(
-  "deleteOne",
-  { document: false, query: true },
-  async function () {
-    const doc = await this.model.findOne(this.getQuery()).select("_id").lean();
-    if (doc && doc._id) {
-      await removeAssignmentsForProject(doc._id);
-      await removeResourcesAndCloudFiles(doc._id);
+  try {
+    return await this.create(payload);
+  } catch (err) {
+    // Duplicate key error code from MongoDB
+    if (err && err.code === 11000) {
+      const message = "Tasker is already assigned to this project";
+      const error = new Error(message);
+      error.code = 11000;
+      throw error;
     }
-  },
-);
+    throw err;
+  }
+};
 
-// Instance middleware for remove()
-projectSchema.pre(
-  "remove",
-  { document: true, query: false },
-  async function (next) {
-    try {
-      await removeAssignmentsForProject(this._id);
-      await removeResourcesAndCloudFiles(this._id);
-      next();
-    } catch (err) {
-      next(err);
-    }
-  },
-);
+// Check if the model already exists before creating it
+const ProjectAssignment =
+  mongoose.models.ProjectAssignment ||
+  model("ProjectAssignment", ProjectAssignmentSchema);
 
-// -----------------------------
-// Export model
-// -----------------------------
-export const ProjectModel =
-  mongoose.models.Project || mongoose.model("Project", projectSchema);
-
-export default ProjectModel;
+export default ProjectAssignment;
