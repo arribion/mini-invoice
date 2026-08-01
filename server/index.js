@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import "dotenv/config";
 import connectDB from "./config/db.js";
+import ping_onrender from "./utils/ping.js";
 
 // routes
 import authRouter from "./routes/auth.route.js";
@@ -13,6 +14,7 @@ import resourceRouter from "./routes/resources.route.js";
 import projectAssignmentRoutes from "./routes/projectAssignment.route.js";
 
 const app = express();
+ping_onrender(); // Start the ping cron job to keep the server alive on Render
 const PORT = process.env.PORT || 3001;
 const NODE_ENV = process.env.NODE_ENV || "development";
 

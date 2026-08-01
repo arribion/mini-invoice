@@ -24,7 +24,7 @@ export function HeroSection() {
           </p>
           <div className="mt-5 flex-col items-center gap-4 sm:flex-row">
             <Link to="/dashboard">
-              <Button className="text-sky-500 bg-white shadow-button hover:brightness-110 rounded-[10px] border border-primary-foreground/20">
+              <Button className="text-sky-500 bg-white shadow-button  rounded-[10px] border border-primary-foreground/20">
                 Request Registration <ArrowRight className="h-5 w-5" />
               </Button>
             </Link>

@@ -40,7 +40,7 @@ export default function Index() {
               POPULAR SERVICES
             </h2>
             <h1 className="mt-4 text-4xl md:text-5xl font-extrabold leading-tight">
-              Find and Work as Online freelancers
+              Find and Work as Online freelancer
             </h1>
             <p className="mt-4 text-gray-600 max-w-xl">
               Browse curated online work and get payed without any middlemen and

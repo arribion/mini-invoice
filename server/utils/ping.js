@@ -1,12 +1,14 @@
-import schedule from "node-schedule";
+import cron from "node-cron";
 
-export default function Ping_server(){
-    const job = schedule.scheduleJob("0 1 * * *", function (fireDate) {
+export default function ping_onrender() {
+  cron.schedule("* * * * *", () => {
+    try {
       console.log(
-        "Server Was supposed to ping at " +
-          fireDate +
-          ", but actually ran at " +
-          new Date(),
+        `[${new Date().toISOString()}] Running a backend server ping...`,
       );
-    });
+    } catch (error) {
+      console.log("error activating onrender backend server...");
+      console.log("ERROR: ", error);
+    }
+  });
 }
