@@ -1,4 +1,4 @@
-import { Star } from "lucide-react";
+import { Check, Loader, Star } from "lucide-react";
 import { FeaturesSection, HeroSection, TestimonialsSection } from "./HeroSection";
 
 const services = [
@@ -107,14 +107,12 @@ export default function Index() {
                 Professional results, every time
               </h2>
               <p className="mt-4 text-gray-600">
-                We connect you with vetted professionals who deliver polished,
-                reliable work. From concept to final delivery, expect clear
-                communication and high standards.
-              </p>
+                We connect you with verified online jobs. From from assessment, onboarding and finally tasking.
+                We ensure that you get easy good paying projects to task on.                </p>
               <ul className="mt-6 space-y-3">
                 <li className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-md bg-indigo-50 text-indigo-600 flex items-center justify-center">
-                    ✓
+                    <Check size={20} />
                   </div>
                   <div>
                     <div className="font-semibold">Vetted talent</div>
@@ -125,12 +123,12 @@ export default function Index() {
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-md bg-indigo-50 text-indigo-600 flex items-center justify-center">
-                    ⟳
+                    <Loader className="animate-spin" size={20} />
                   </div>
                   <div>
-                    <div className="font-semibold">Fast turnaround</div>
+                    <div className="font-semibold">Fast Payment</div>
                     <div className="text-sm text-gray-500">
-                      Timely delivery without sacrificing quality.
+                      Timely Payment for your quality work.
                     </div>
                   </div>
                 </li>

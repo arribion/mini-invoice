@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { FileText } from "lucide-react";
-import ResourceCard from "../../components/client/ResourceCard";
-import type { Resource } from "../../components/client/ResourceCard";
+import ResourceCard from "../../components/client/resources/ResourceCard";
+import type { Resource } from "../../components/client/resources/ResourceCard";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,

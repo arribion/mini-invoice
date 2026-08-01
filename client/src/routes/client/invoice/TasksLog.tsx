@@ -1,7 +1,8 @@
-import { X as Cancel, Plus } from "lucide-react";
-import TaskForm from "../../components/client/TaskForm";
-import TaskLogExcelUpload from "../../components/client/TaskLogExcelUpload";
+import { X as Cancel, PlusCircle } from "lucide-react";
+import TaskForm from "../../../components/client/task-invoice/TaskForm";
+import TaskLogExcelUpload from "../../../components/client/task-invoice/TaskLogExcelUpload";
 import { useState } from "react";
+import RecentTaskLogs from "../../../components/client/task-invoice/RecentTaskLogs";
 
 const TasksLog = () => {
   const [showManualTaskForm, setShowManualTaskForm] = useState(false);
@@ -25,8 +26,8 @@ const TasksLog = () => {
         <div>
           <button
             onClick={() => setShowManualTaskForm(!showManualTaskForm)}
-            className="bg-sky-500 hover:bg-sky-600 text-white flex gap-2 items-center font-semibold py-1 px-4 rounded">
-            <Plus/>
+            className="bg-sky-500 hover:bg-sky-600 text-white flex gap-2 items-center font-semibold py-2 px-6 rounded">
+            <PlusCircle />
             Create Task
           </button>
         </div>
@@ -48,12 +49,10 @@ const TasksLog = () => {
           </div>
         )}
 
-        <article>
-          <h1 className="bg-slate-800">Recent Logs</h1>
-        </article>
+        <RecentTaskLogs />
       </section>
     </div>
   );
-}
+};
 
-export default TasksLog
+export default TasksLog;

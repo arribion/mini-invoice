@@ -2,7 +2,7 @@
 import AccountDelection from "../../components/client/bio/AccountDelection";
 import PasswordUpdate from "../../components/client/bio/PasswordUpdate";
 import { SettingsOverview } from "../../components/client/bio/SettingsOverview";
-import PaymentMethods from "../../components/client/PaymentMethods";
+import PaymentMethods from "../../components/client/payments/PaymentMethods";
 
 function Settings() {
   return (

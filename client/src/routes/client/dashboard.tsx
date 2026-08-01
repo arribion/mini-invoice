@@ -2,7 +2,7 @@ import { useState } from "react";
 import { BalanceCard } from "../../components/client/dashboard/BalanceCard";
 import { QuickActions } from "../../components/client/dashboard/QuickActions";
 import { SendMoneyDialog } from "../../components/CreateInvoiceDialog";
-import PaymentMethods from "../../components/client/PaymentMethods";
+import PaymentMethods from "../../components/client/payments/PaymentMethods";
 import ClientStats from "../../components/client/dashboard/ClientStats";
 
 function Dashboard() {

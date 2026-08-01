@@ -4,7 +4,7 @@ import { ProtectedRoute } from "./routes/ProtectedRoute";
 
 import Index from "./routes/landing";
 import Resources from "./routes/client/Resources";
-import Invoices from "./routes/client/Invoices";
+import Invoices from "./routes/client/invoice/Invoices";
 import Dashboard from "./routes/client/dashboard";
 import Settings from "./routes/client/Settings";
 import ClientLayout from "./layout/ClientLayout";
@@ -19,16 +19,16 @@ import ManageMembers from "./routes/admin/ManageMembers";
 import NotFoundComponent from "./components/NotFound";
 import About from "./routes/About";
 import Login from "./routes/auth/Login";
-import InvoiceViewer from "./routes/client/InvoiceViewer";
+import InvoiceViewer from "./routes/client/invoice/InvoiceViewer";
 import AuthLayout from "./layout/AuthLayout";
 import MainLayout from "./layout/MainLayout";
 import Payments from "./routes/client/Payments";
 import Projects from "./routes/client/Projects";
-import TasksLog from "./routes/client/TasksLog";
+import TasksLog from "./routes/client/invoice/TasksLog";
 import Task from "./routes/admin/task/Task";
 import Invoicing from "./routes/admin/Invoicing";
 import Financies from "./routes/admin/Financies";
-import MyTask from "./routes/client/MyTask";
+import MyTask from "./routes/client/tasks/MyTask";
 
 import ContactUs from "./routes/ContactUs";
 import Note from "./components/client/Note";

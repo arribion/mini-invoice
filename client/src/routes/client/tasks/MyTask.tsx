@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "../../../hooks/useAuth";
 
 type Assignment = {
   _id: string;
@@ -21,13 +21,13 @@ type Assignment = {
 const statusBadgeClass = (status?: string) => {
   switch ((status || "").toUpperCase()) {
     case "ACTIVE":
-      return "bg-emerald-100 text-emerald-800 border-emerald-200";
+      return "bg-green-500 border-green-200";
     case "PENDING":
-      return "bg-amber-100 text-amber-800 border-amber-200";
+      return "bg-amber-600 border-amber-200";
     case "CLOSED":
-      return "bg-slate-100 text-slate-700 border-slate-200";
+      return "bg-red-600 border-slate-200";
     case "ON_HOLD":
-      return "bg-yellow-50 text-yellow-800 border-yellow-200";
+      return "bg-yellow-500 border-yellow-200";
     default:
       return "bg-slate-100 text-slate-700 border-slate-200";
   }
@@ -135,8 +135,11 @@ const MyTask: React.FC = () => {
             return (
               <div
                 key={assignment._id}
-                className="bg-white border rounded shadow-sm p-4">
-                <h2 className="text-lg font-semibold text-slate-800">
+                className="bg-white border rounded shadow-card p-4">
+                <h2
+                  className={`text-lg font-semibold ${statusBadgeClass(
+                    project.status,
+                  )} text-slate-50 p-1 rounded`}>
                   {project.project_name}
                 </h2>
                 <p className="text-sm text-slate-600 mt-1">
@@ -144,7 +147,7 @@ const MyTask: React.FC = () => {
                 </p>
                 <div className="flex gap-2 mt-2">
                   <span
-                    className={`text-xs px-2 py-1 rounded ${statusBadgeClass(
+                    className={`text-xs px-2 py-1 rounded text-white ${statusBadgeClass(
                       project.status,
                     )}`}>
                     Project: {project.status}

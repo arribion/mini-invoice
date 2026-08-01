@@ -1,8 +1,8 @@
 
-const Accounting = () => {
-  return (
-    <div>Accounting</div>
-  )
-}
+// const Accounting = () => {
+//   return (
+//     <div>Accounting</div>
+//   )
+// }
 
-export default Accounting
+// export default Accounting
