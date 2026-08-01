@@ -1,28 +1,28 @@
 import { Link } from "react-router-dom";
-import { Button } from "./ui/button";
+import { Button } from "../../components/ui/button";
 import { ArrowRight, Globe, Lock, Server, Star } from "lucide-react";
-import hero_background from "../assets/hero_background.jpg";
+// import hero_background from "../../assets/hero_background.jpg";
 
 export function HeroSection() {
   return (
     <section
       className="relative overflow-hidden"
       style={{
-        backgroundImage: `url(${hero_background})`,
+        // backgroundImage: `url(${hero_background})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}>
-      <div className="absolute inset-0 bg-sky-950/70" />
+      <div className="absolute inset-0 bg-sky-600/70" />
 
       <div className="relative mx-auto max-w-7xl px-4 pb-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
-        <div className="mx-auto max-w-3xl mt-[5em] text-center">
+        <div className="">
           <h1 className="text-4xl font-extrabold tracking-tight text-primary-foreground sm:text-5xl lg:text-6xl leading-[1.1]">
             GT ONLINE CONSULTANTS
           </h1>
-          <p className="mt-6 text-lg text-primary-foreground/70 sm:text-xl max-w-2xl mx-auto leading-relaxed">
+          <p className="text-slate-300 mt-6 text-lg sm:text-xl lg:text-2xl max-w-3xl">
             Thinking in systems, building for the future.
           </p>
-          <div className="mt-5 flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <div className="mt-5 flex-col items-center gap-4 sm:flex-row">
             <Link to="/dashboard">
               <Button className="text-sky-500 bg-white shadow-button hover:brightness-110 rounded-[10px] border border-primary-foreground/20">
                 Request Registration <ArrowRight className="h-5 w-5" />
@@ -68,7 +68,7 @@ export function ArchitectureSection() {
   ];
 
   return (
-    <section className="py-24 sm:py-22 bg-accent/30">
+    <section className="py-24 sm:py-22 ">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center mb-16">
           <h2 className="text-3xl font-bold tracking-tight text-sky-500 sm:text-4xl">
@@ -118,35 +118,43 @@ export function ArchitectureSection() {
 export function FeaturesSection() {
   const features = [
     {
+      icon: Server,
       title: "Task Automation",
-      description: "Automate repetitive workflows and save hours every week.",
+      description: "Streamline workflows with automated task assignments and reminders.",
     },
     {
+      icon: Lock,
       title: "Secure Payments",
-      description: "Integrated gateways with encryption and fraud protection.",
+      description: "We ensure your payed on time and securely with our integrated payment system.",
     },
     {
+      icon: Globe,
       title: "Scalable Projects",
       description:
         "Handle small tasks or enterprise-level projects seamlessly.",
     },
     {
+      icon: Star,
       title: "Real-time Updates",
       description: "Stay informed with instant notifications and dashboards.",
     },
   ];
 
   return (
-    <section className="py-20 bg-primary/10">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-bold text-center text-sky-500 mb-12">
-          Why Choose Us
+    <section className="py-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 min-h-[70vh]">
+      <div>
+        <h2 className="text-3xl font-bold text-center text-sky-500 mb-8">
+          Outstanding Workmanship
         </h2>
+         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {features.map((f) => (
             <div
               key={f.title}
-              className="rounded-xl border border-border bg-card p-6 shadow-card">
+              className="rounded-lg border-l-4 border-sky-500 min-h-[150px] bg-card p-6 shadow-card">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-500 text-white mb-4">
+                <f.icon className="h-5 w-5" />
+              </span>
               <h3 className="text-xl font-semibold text-card-foreground mb-2">
                 {f.title}
               </h3>
@@ -154,7 +162,7 @@ export function FeaturesSection() {
             </div>
           ))}
         </div>
-      </div>
+      
     </section>
   );
 }
@@ -188,12 +196,10 @@ export function TestimonialsSection() {
   ];
 
   return (
-    <section className="py-20 bg-accent/10">
+    <section className="py-20 ">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-bold text-center text-sky-500 mb-12">
-          What they Said To you :)
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        <div className="grid grid-cols-[repeat(4,_minmax(0,_1fr))] gap-8">
           {testimonials.map((t) => (
             <div
               key={t.name}

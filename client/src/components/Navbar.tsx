@@ -62,11 +62,18 @@ export function Navbar() {
 
           {/* Conditional authentication desktop view */}
           {!user ? (
-            <Link to="/login">
-              <button className="bg-sky-500 shadow-card text-slate-50 rounded-3xl px-4 py-1 text-sm font-medium">
-                Sign In
-              </button>
-            </Link>
+            <div>
+              <div className="hidden md:flex gap-3">
+                <Link to="/login">
+                    <button className="px-4 py-2 hover:bg-sky-500 hover:text-white rounded-md border border-sky-600 text-sky-600 duration-500 transition">
+                      Sign in
+                    </button>
+                </Link>
+                <button className="px-4 py-2 hover:bg-sky-500 hover:text-white rounded-md bg-sky-600 text-white">
+                  Request Registration
+                </button>
+                </div>
+            </div>
           ) : (
             <Link to={dashboardPath} className="flex items-center gap-3 ml-2">
               <button className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 text-white font-semibold text-sm shadow-sm transition-transform hover:scale-105">

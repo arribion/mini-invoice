@@ -2,7 +2,7 @@
 import { Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
 
-import Index from "./routes";
+import Index from "./routes/landing";
 import Resources from "./routes/client/Resources";
 import Invoices from "./routes/client/Invoices";
 import Dashboard from "./routes/client/dashboard";
@@ -36,7 +36,6 @@ import Note from "./components/client/Note";
 const App = () => {
   return (
     <>
-     
       <Routes>
         {/* Public Auth Layout */}
         <Route element={<AuthLayout />}>
@@ -66,7 +65,7 @@ const App = () => {
             <Route path="/client/payments" element={<Payments />} />
             <Route path="/client/settings" element={<Settings />} />
 
-            <Route path="/client/note" element={ <Note/> } />
+            <Route path="/client/note" element={<Note />} />
           </Route>
         </Route>
 
