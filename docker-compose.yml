@@ -1,0 +1,94 @@
+services:
+  # ---------------------------------------------------------------------------
+  # 1. Backend API Service (Express.js)
+  # Reads configuration directly from server/.env (including MongoDB Atlas URI)
+  # ---------------------------------------------------------------------------
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: gt_server
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3001}:3001"
+    env_file:
+      - ./server/.env
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    networks:
+      - gt_network
+
+  # ---------------------------------------------------------------------------
+  # 2. Frontend Client Service (React + Vite)
+  # Reads configuration directly from client/.env
+  # ---------------------------------------------------------------------------
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: gt_client
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    env_file:
+      - ./client/.env
+    environment:
+      - VITE_BASE_URL=http://localhost:3001
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    depends_on:
+      - server
+    networks:
+      - gt_network
+
+  # ---------------------------------------------------------------------------
+  # 3. Optional Local MongoDB Database (for offline development / testing)
+  # ---------------------------------------------------------------------------
+  mongo:
+    image: mongo:7.0
+    container_name: gt_mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: gtonline
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - gt_network
+    profiles:
+      - local-db
+
+  # ---------------------------------------------------------------------------
+  # 4. Optional Mongo Express Web GUI (http://localhost:8081)
+  # ---------------------------------------------------------------------------
+  mongo-express:
+    image: mongo-express:latest
+    container_name: gt_mongo_express
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongo
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
+      ME_CONFIG_BASICAUTH: "false"
+    depends_on:
+      - mongo
+    networks:
+      - gt_network
+    profiles:
+      - local-db
+
+# ---------------------------------------------------------------------------
+# Networks and Volumes
+# ---------------------------------------------------------------------------
+networks:
+  gt_network:
+    driver: bridge
+
+volumes:
+  mongo_data:
+    driver: local
