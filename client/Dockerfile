@@ -12,11 +12,11 @@ COPY package.json pnpm-lock.yaml ./
 # Install dependencies
 RUN pnpm install --frozen-lockfile
 
-# Copy the rest of the application source code
+# Copy the rest of the frontend source code
 COPY . .
 
-# Expose backend server port
-EXPOSE 3001
+# Expose Vite dev server port
+EXPOSE 5173
 
-# Run development server with hot reloading
-CMD ["pnpm", "dev"]
+# Start Vite dev server bound to all network interfaces (0.0.0.0)
+CMD ["pnpm", "dev", "--host"]
