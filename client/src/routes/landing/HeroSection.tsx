@@ -151,7 +151,11 @@ export function FeaturesSection() {
           {features.map((f) => (
             <div
               key={f.title}
+<<<<<<< HEAD
               className="rounded-lg border-l-4 border-sky-500 min-h-37.5 bg-card p-6 shadow-card">
+=======
+              className="rounded-lg border-l-4 border-sky-500 min-h-[150px] bg-card p-6 shadow-card">
+>>>>>>> b415c5b180475e77cd627dcba0014afdb7276270
               <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-500 text-white mb-4">
                 <f.icon className="h-5 w-5" />
               </span>
@@ -199,7 +203,11 @@ export function TestimonialsSection() {
     <section className="py-20 ">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         
+<<<<<<< HEAD
         <div className="grid grid-cols-4 gap-8">
+=======
+        <div className="grid grid-cols-[repeat(4,_minmax(0,_1fr))] gap-8">
+>>>>>>> b415c5b180475e77cd627dcba0014afdb7276270
           {testimonials.map((t) => (
             <div
               key={t.name}

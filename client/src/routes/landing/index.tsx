@@ -32,7 +32,11 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-gray-50 text-gray-800">
       <main>
+<<<<<<< HEAD
         <HeroSection/>
+=======
+        <HeroSection />
+>>>>>>> b415c5b180475e77cd627dcba0014afdb7276270
 
         <section className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-2 gap-8 items-end">
           <div>
